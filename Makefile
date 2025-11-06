@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+         #
+#    By: kskender <kskender@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/04 00:00:00 by auto              #+#    #+#              #
-#    Updated: 2025/11/06 03:38:07 by klejdi           ###   ########.fr        #
+#    Updated: 2025/11/06 17:35:02 by kskender         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,7 +32,6 @@ PARSER_SRCS = \
 	src/parsing/lexing/token_utils.c \
 	src/parsing/lexing/tokenize.c \
 	src/parsing/lexing/tokenize_helper.c \
-	src/parsing/lexing/debug.c \
 	src/parsing/lexing/init.c \
 	src/parsing/command/token_to_cmd.c \
 	src/parsing/command/find_token.c \

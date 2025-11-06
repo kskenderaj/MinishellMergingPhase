@@ -3,18 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   exec_args_helpers.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 15:14:26 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/06 04:12:43 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/06 18:20:00 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 #include <fcntl.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 
+/*
+ * Tokenizer for executor: returns the next space-delimited word from *str,
+ * merging quoted segments and removing surrounding quotes. If the entire
+ * returned word was formed only from quoted segments, the returned buffer
+ * is prefixed with a marker byte: 0x01 for single-quoted, 0x02 for
+ * double-quoted. The caller is responsible for freeing the returned string
+ * via the project's GC helpers (we use gc_malloc to allocate).
+ */
 static char *get_next_word(char **str, char delim)
 {
     char *scan = *str;
@@ -23,6 +31,7 @@ static char *get_next_word(char **str, char delim)
     int first_quote = 0; /* 0 = none, '\'' = single, '"' = double */
     int all_quoted_segments = 1;
 
+    /* skip leading delimiters */
     while (*scan == delim)
         scan++;
     if (*scan == '\0')
@@ -70,7 +79,7 @@ static char *get_next_word(char **str, char delim)
 
     /* allocate space (extra byte for optional marker) */
     int need_marker = (all_quoted_segments && first_quote != 0) ? 1 : 0;
-    result = gc_malloc(total + need_marker + 1);
+    result = gc_malloc((size_t)total + need_marker + 1);
     if (!result)
         return (NULL);
 
@@ -119,66 +128,33 @@ static char *get_next_word(char **str, char delim)
     }
     out[idx] = '\0';
 
-    /* Note: do not further sanitize the token here. We intentionally keep the
-       copied contents verbatim (except for removed surrounding quotes). The
-       caller (expand_args_inplace) will honor quoted markers to decide
-       whether to expand variables. Removing characters here can break that
-       logic for inputs produced by the test harness. */
-
     *str = p;
-    /* Debug: append token info to /tmp/get_next_word_debug.txt to help
-       understand tokenization in failing tests. This is temporary. */
-    {
-        int d = open("tests/strict_tmp/get_next_word_debug.txt", O_WRONLY | O_CREAT | O_APPEND, 0644);
-        if (d != -1)
-        {
-            dprintf(d, "token='%s' marker=%d len=%d\n", result, need_marker, idx);
-            close(d);
-        }
-    }
     return (result);
 }
 
+/* Simple argument splitter that preserves tokens returned by the tokenizer.
+ * Previously this code removed marker-only tokens; doing so discards valid
+ * empty quoted arguments ("" and ''), so we pass tokens through verbatim.
+ */
 void split_args(char *input, char **args, int max_args)
 {
-    int i;
-    char *ptr;
+    int i = 0;
+    char *ptr = input;
 
-    i = 0;
-    ptr = input;
     while (i < max_args - 1)
     {
         char *w = get_next_word(&ptr, ' ');
         if (!w)
             break;
-        /* skip empty tokens (including marker-only tokens) that can be produced
-           when sanitizing embedded test harness sequences */
-        if (w[0] == '\0' || (((unsigned char)w[0] == 0x01 || (unsigned char)w[0] == 0x02) && w[1] == '\0'))
-            continue;
-        /* also skip tokens that are only composed of backslashes or quote chars
-           these are often produced by embedding sequences like '\'' in test files */
-        int only_special = 1;
-        for (int si = 0; w[si]; ++si)
-        {
-            if (w[si] != '\\' && w[si] != '\'' && w[si] != '"')
-            {
-                only_special = 0;
-                break;
-            }
-        }
-        if (only_special)
-            continue;
-        args[i] = w;
-        i++;
+        args[i++] = w;
     }
     args[i] = NULL;
 }
 
 void shift_left_by(char **args, int start, int by)
 {
-    int j;
+    int j = start;
 
-    j = start;
     while (args[j + by])
     {
         args[j] = args[j + by];
