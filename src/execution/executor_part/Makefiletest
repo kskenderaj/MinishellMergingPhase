@@ -1,0 +1,39 @@
+# Test Makefile
+CC = gcc
+CFLAGS = -Wall -Wextra -Werror -I../../../include -I../../../include/libft
+OBJ_DIR = obj
+
+SRCS = exec_tester.c
+
+OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
+
+
+NAME = test_executor
+
+LIBEXEC = libexec.a
+LIBFT = ../../../include/libft/libft.a
+
+all: $(NAME)
+
+$(NAME): $(OBJS) $(LIBEXEC) $(LIBFT)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBEXEC) $(LIBFT) ../../../globals.o -o $(NAME) -lreadline
+
+$(OBJ_DIR)/%.o: %.c
+	@mkdir -p $(OBJ_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -rf $(OBJ_DIR)
+
+fclean: clean
+	rm -f $(NAME)
+
+re: fclean all
+
+test: all
+	./$(NAME)
+
+valgrind: all
+	valgrind --leak-check=full --track-origins=yes ./$(NAME)
+
+.PHONY: all clean fclean re test valgrind

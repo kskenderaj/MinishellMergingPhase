@@ -1,0 +1,3 @@
+export TST=1
+unset TST
+env | grep TST
