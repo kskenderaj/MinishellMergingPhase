@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins1.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 00:07:02 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/03 14:17:01 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/09 23:31:12 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 /* resolve_cd_target: set *target based on args and argc
    returns 0 on success, 1 on error (and prints an error message) */
-static int	resolve_cd_target(char **args, int argc, char **target)
+static int resolve_cd_target(char **args, int argc, char **target)
 {
 	if (argc > 2)
 	{
@@ -55,12 +55,12 @@ static int	resolve_cd_target(char **args, int argc, char **target)
  * - Permission denied: error
  * - Updates OLDPWD and PWD in environment
  */
-int	ft_cd(char **args)
+int ft_cd(char **args)
 {
-	char	*target;
-	char	oldpwd[PATH_MAX];
-	char	newpwd[PATH_MAX];
-	int		argc;
+	char *target;
+	char oldpwd[PATH_MAX];
+	char newpwd[PATH_MAX];
+	int argc;
 
 	argc = 0;
 	while (args[argc])
@@ -71,7 +71,7 @@ int	ft_cd(char **args)
 	if (resolve_cd_target(args, argc, &target))
 		return (1);
 	if (chdir(target) != 0)
-		return (perror("cd"), 1);
+		return (perror(target), 1);
 	if (!getcwd(newpwd, sizeof(newpwd)))
 		return (perror("cd: getcwd (newpwd)"), 1);
 	if (args[1] && strcmp(args[1], "-") == 0)

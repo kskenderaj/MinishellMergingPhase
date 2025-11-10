@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 16:04:59 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/06 03:38:10 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/09 22:06:02 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,35 +123,36 @@ static void setup_child_io_and_exec(int idx, int ncmds, int pipes[64][2],
 	/* if command is a shell builtin, run it in this child process */
 	if (cmd && cmd[0])
 	{
+		int ret;
 		if (!strcmp(cmd[0], "echo"))
 		{
-			ft_echo(cmd);
-			_exit(0);
+			ret = ft_echo(cmd);
+			_exit(ret);
 		}
 		else if (!strcmp(cmd[0], "cd"))
 		{
-			ft_cd(cmd);
-			_exit(0);
+			ret = ft_cd(cmd);
+			_exit(ret);
 		}
 		else if (!strcmp(cmd[0], "pwd"))
 		{
-			ft_pwd(cmd);
-			_exit(0);
+			ret = ft_pwd(cmd);
+			_exit(ret);
 		}
 		else if (!strcmp(cmd[0], "export"))
 		{
-			ft_export(cmd);
-			_exit(0);
+			ret = ft_export(cmd);
+			_exit(ret);
 		}
 		else if (!strcmp(cmd[0], "unset"))
 		{
-			ft_unset(cmd);
-			_exit(0);
+			ret = ft_unset(cmd);
+			_exit(ret);
 		}
 		else if (!strcmp(cmd[0], "env"))
 		{
-			ft_env(cmd);
-			_exit(0);
+			ret = ft_env(cmd);
+			_exit(ret);
 		}
 	}
 	exec_external(cmd, envp);
@@ -184,6 +185,15 @@ static int wait_children(pid_t pids[64], int ncmds)
 		i++;
 	}
 	if (WIFEXITED(status))
-		return (WEXITSTATUS(status));
-	return (128);
+	{
+		g_shell.last_status = WEXITSTATUS(status);
+		return (g_shell.last_status);
+	}
+	if (WIFSIGNALED(status))
+	{
+		g_shell.last_status = 128 + WTERMSIG(status);
+		return (g_shell.last_status);
+	}
+	g_shell.last_status = 128;
+	return (g_shell.last_status);
 }

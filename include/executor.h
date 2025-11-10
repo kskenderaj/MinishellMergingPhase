@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 13:20:10 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/04 17:37:59 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/09 22:06:01 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,14 @@ typedef struct s_shell_state
 {
 	char *exported_vars[MAX_EXPORTED];
 	int exported_count;
+	int last_status;
+	t_env_list *env;
 } t_shell_state;
 
 /* global shell state is defined in globals.c */
 extern t_shell_state g_shell;
+
+t_env_list *setup_env_list(void);
 
 typedef struct s_filelist
 {

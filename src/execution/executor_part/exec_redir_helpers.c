@@ -1,4 +1,43 @@
-/* ************************************************************************** */
+/* *************************************		res = handl		res = handl		res = handle_attached_operators(&data, tok);
+		if (res == 2)
+			return (2);
+		else if (res != 0)
+			return (1);
+		else
+			continue ;
+		res = handle_separated_operators(args, &i, in_fd, out_fd);
+		if (res == 2)
+			return (2);
+		else if (res != 0)
+			return (1);
+		else
+			continue ;rators(&data, tok);
+		if (res == 2)
+			return (2);
+		else if (res != 0)
+			return (1);
+		else
+			continue ;
+		res = handle_separated_operators(args, &i, in_fd, out_fd);
+		if (res == 2)
+			return (2);
+		else if (res != 0)
+			return (1);
+		else
+			continue ;rators(&data, tok);
+		if (res == 2)
+			return (2);
+		else if (res != 0)
+			return (res);
+		else
+			continue;
+		res = handle_separated_operators(args, &i, in_fd, out_fd);
+		if (res == 2)
+			return (2);
+		else if (res != 0)
+			return (res);
+		else
+			continue;*********************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   exec_redir_helpers.c                               :+:      :+:    :+:   */
@@ -14,12 +53,12 @@
 
 /* implementation intentionally moved to exec_redir_separated.c */
 
-int	setup_redirections(char **args, int *in_fd, int *out_fd)
+int setup_redirections(char **args, int *in_fd, int *out_fd)
 {
-	int				i;
-	int				res;
-	char			*tok;
-	t_redir_data	data;
+	int i;
+	int res;
+	char *tok;
+	t_redir_data data;
 
 	*in_fd = -1;
 	*out_fd = -1;
@@ -31,26 +70,25 @@ int	setup_redirections(char **args, int *in_fd, int *out_fd)
 		data.idx = &i;
 		data.in_fd = in_fd;
 		data.out_fd = out_fd;
-		if ((strcmp(tok, ">") == 0 || strcmp(tok, ">>") == 0 || strcmp(tok,
-					"<") == 0 || strcmp(tok, "<<") == 0) && args[i + 1] == NULL)
+		if ((strcmp(tok, ">") == 0 || strcmp(tok, ">>") == 0 || strcmp(tok, "<") == 0 || strcmp(tok, "<<") == 0) && args[i + 1] == NULL)
 		{
 			ft_putstr_fd("minishell: syntax error near token `newline`\n",
-				STDERR_FILENO);
-			return (1);
+						 STDERR_FILENO);
+			return (2);
 		}
 		res = handle_attached_operators(&data, tok);
 		if (res != 2)
 		{
 			if (res != 0)
-				return (1);
-			continue ;
+				return (2);
+			continue;
 		}
 		res = handle_separated_operators(args, &i, in_fd, out_fd);
 		if (res != 2)
 		{
 			if (res != 0)
-				return (1);
-			continue ;
+				return (2);
+			continue;
 		}
 		i++;
 	}

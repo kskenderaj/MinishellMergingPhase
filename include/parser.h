@@ -1,5 +1,5 @@
 /* ************************************************************************** */
-/*                                                                            */
+/*                                                    // Initialization            */
 /*                                                        :::      ::::::::   */
 /*   parser.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
@@ -126,11 +126,21 @@ void create_filenode(char *str, int red_type, t_file_list *filelst);
 void init_segment_lst(t_segment_list *lst);
 char *segments_expand(t_segment_list *seglst, t_env_list *envlst, int last_status);
 char *expand_env(char *str, t_env_list *env_lst);
+char *check_for_env(t_env_list *envlst, const char *str, size_t len);
 char *get_expand(char *seg_str, int i, int last_status, t_env_list *envlst);
 
 // debug
 void print_tokens(const t_token_list *lst);
 void print_segment_list(const t_segment_list *list);
 void init_segment_lst(t_segment_list *lst);
+
+// Initialization
+void init_token_lst(t_token_list *lst);
+void init_cmd_lst(t_cmd_list *lst);
+void init_env_lst(t_env_list *lst);
+
+// Parsing
+char *look_for_cmd(t_token *token, t_token_list *toklst, t_cmd_list *cmdlst);
+void final_token(t_token_list *toklst, t_env_list *envlst, int last_status);
 
 #endif

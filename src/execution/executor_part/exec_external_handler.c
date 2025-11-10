@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 17:34:28 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/06 03:21:48 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/07 20:27:21 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ int exec_builtin_with_redir(int (*builtin)(char **), char **args, int in_fd, int
         close(out_fd);
     }
     ret = builtin(args);
+    g_shell.last_status = ret;
     dup2(saved_in, STDIN_FILENO);
     dup2(saved_out, STDOUT_FILENO);
     close(saved_in);

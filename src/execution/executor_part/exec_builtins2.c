@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 17:31:20 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/05 21:18:20 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/09 23:31:10 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,9 @@ static void export_no_value(char *arg)
 {
 	if (!is_valid_identifier(arg))
 	{
-		ft_putstr_fd("export: not a valid identifier: ", STDERR_FILENO);
+		ft_putstr_fd("export: `", STDERR_FILENO);
 		ft_putstr_fd(arg, STDERR_FILENO);
-		ft_putchar_fd('\n', STDERR_FILENO);
+		ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
 	}
 	else
 	{
@@ -101,9 +101,9 @@ static void export_with_value(char *arg)
 
 	if (!is_valid_identifier(name))
 	{
-		ft_putstr_fd("export: not a valid identifier: ", STDERR_FILENO);
+		ft_putstr_fd("export: `", STDERR_FILENO);
 		ft_putstr_fd(name, STDERR_FILENO);
-		ft_putchar_fd('\n', STDERR_FILENO);
+		ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
 	}
 	else
 	{
@@ -127,18 +127,40 @@ int ft_export(char **args)
 	int i;
 
 	i = 1;
+	int ret = 0;
 	if (!args[1])
 	{
 		print_exported_env();
+		g_shell.last_status = 0;
 		return (0);
 	}
 	while (args[i])
 	{
 		if (ft_strchr(args[i], '='))
+		{
+			/* export_with_value prints errors for invalid names */
+			/* it currently doesn't return a status, so check validity here */
+			char *eq = ft_strchr(args[i], '=');
+			int namelen = (int)(eq - args[i]);
+			char *name = (char *)gc_malloc(namelen + 1);
+			if (name)
+			{
+				memcpy(name, args[i], namelen);
+				name[namelen] = '\0';
+				if (!is_valid_identifier(name))
+					ret = 1;
+				gc_free(name);
+			}
 			export_with_value(args[i]);
+		}
 		else
+		{
+			if (!is_valid_identifier(args[i]))
+				ret = 1;
 			export_no_value(args[i]);
+		}
 		i++;
 	}
-	return (0);
+	g_shell.last_status = ret;
+	return (ret);
 }

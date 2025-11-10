@@ -6,11 +6,12 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:06:11 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/04 16:49:37 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/09 23:31:11 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
+#include "main_helpers.h"
 
 void print_exported_env(void)
 {
@@ -58,8 +59,14 @@ int ft_env(char **args)
 	extern char **environ;
 	int i;
 
+	if (args[1])
+	{
+		// run the command
+		char **cmd_args = args + 1;
+		run_external(cmd_args, -1, -1, NULL);
+		return (g_shell.last_status);
+	}
 	i = 0;
-	(void)args;
 	while (environ[i])
 	{
 		ft_putstr_fd(environ[i], STDOUT_FILENO);
@@ -74,18 +81,21 @@ int ft_unset(char **args)
 	int i;
 
 	i = 1;
+	int ret = 0;
 	while (args[i])
 	{
 		if (!is_valid_identifier(args[i]))
 		{
-			ft_putstr_fd("unset: not a valid identifier: ", STDERR_FILENO);
+			ft_putstr_fd("unset: `", STDERR_FILENO);
 			ft_putstr_fd(args[i], STDERR_FILENO);
-			ft_putchar_fd('\n', STDERR_FILENO);
+			ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
+			ret = 1;
 			i++;
 			continue;
 		}
 		unsetenv(args[i]);
 		i++;
 	}
-	return (0);
+	g_shell.last_status = ret;
+	return (ret);
 }

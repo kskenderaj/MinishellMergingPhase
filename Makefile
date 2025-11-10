@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: kskender <kskender@student.42.fr>          +#+  +:+       +#+         #
+#    By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/04 00:00:00 by auto              #+#    #+#              #
-#    Updated: 2025/11/06 17:35:02 by kskender         ###   ########.fr        #
+#    Updated: 2025/11/07 19:23:17 by klejdi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -124,7 +124,11 @@ LIBFT_DIR = include/libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
 # All objects (executor objects and GC objects are provided by LIBEXEC)
-OBJS = $(MAIN_OBJ) $(GLOBAL_OBJ) $(PARSER_OBJS)
+MAIN_SRCS = src/main/input.c \
+		   src/main/assigns.c \
+		   src/main/dispatch.c
+MAIN_OBJS = $(MAIN_SRCS:.c=.o)
+OBJS = $(MAIN_OBJ) $(GLOBAL_OBJ) $(PARSER_OBJS) $(MAIN_OBJS)
 
 # Colors for output
 GREEN = \033[0;32m
@@ -139,11 +143,26 @@ $(NAME): $(LIBFT) $(LIBEXEC) $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) $(LIBEXEC) $(LIBFT) $(READLINE_FLAGS) -o $(NAME)
 	@echo "$(GREEN)✓ $(NAME) created successfully!$(RESET)"
 
+# Build a small token visualizer test that links the parser and GC objects
+tokenize_test: $(LIBFT) $(GC_OBJS) $(PARSER_OBJS)
+	@echo "$(YELLOW)Linking tokenize_test...$(RESET)"
+	$(CC) $(CFLAGS) $(INCLUDES) tests/tokenize_test.c $(PARSER_OBJS) $(GC_OBJS) $(LIBFT) -o tests/tokenize_test
+	@echo "$(GREEN)✓ tests/tokenize_test created successfully!$(RESET)"
+
+tokenize_suite: $(LIBFT) $(GC_OBJS) $(PARSER_OBJS)
+	@echo "$(YELLOW)Linking tokenize_suite...$(RESET)"
+	$(CC) $(CFLAGS) $(INCLUDES) tests/tokenize_suite.c $(PARSER_OBJS) $(GC_OBJS) $(LIBFT) -o tests/tokenize_suite
+	@echo "$(GREEN)✓ tests/tokenize_suite created successfully!$(RESET)"
+
 $(LIBFT):
 	@echo "$(YELLOW)Building libft...$(RESET)"
 	$(MAKE) -C $(LIBFT_DIR)
 
 %.o: %.c
+	@echo "$(YELLOW)Compiling $<...$(RESET)"
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
+src/main/%.o: src/main/%.c
 	@echo "$(YELLOW)Compiling $<...$(RESET)"
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 

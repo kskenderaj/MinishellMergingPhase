@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 17:27:10 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/04 17:27:49 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/09 22:06:05 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,4 +23,5 @@ void init_shell(void)
         g_shell.exported_vars[i] = NULL;
         i++;
     }
+    g_shell.env = setup_env_list();
 }

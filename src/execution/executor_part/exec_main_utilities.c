@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 18:05:38 by klejdi            #+#    #+#             */
-/*   Updated: 2025/10/24 16:03:40 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/09 23:31:11 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,11 @@ static int handle_attached_operators(char **args, int *idx, int *in_fd, int *out
             if (*out_fd != -1)
                 close(*out_fd);
             *out_fd = open(fname, O_WRONLY | O_CREAT | O_APPEND, 0644);
+            if (*out_fd < 0)
+            {
+                perror(fname);
+                return (int)1;
+            }
             if (tok[2] != '\0')
                 shift_left_by(args, *idx, 1);
             else
@@ -85,6 +90,11 @@ static int handle_attached_operators(char **args, int *idx, int *in_fd, int *out
             if (*out_fd != -1)
                 close(*out_fd);
             *out_fd = open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if (*out_fd < 0)
+            {
+                perror(fname);
+                return (int)1; // for output, return 1, don't run command
+            }
             if (tok[1] != '\0')
                 shift_left_by(args, *idx, 1);
             else
@@ -100,6 +110,12 @@ static int handle_attached_operators(char **args, int *idx, int *in_fd, int *out
             if (*in_fd != -1)
                 close(*in_fd);
             *in_fd = open(fname, O_RDONLY);
+            if (*in_fd < 0)
+            {
+                perror(fname);
+                *in_fd = -2;
+                // for input, don't return 1, let command run but fail
+            }
             if (tok[1] != '\0')
                 shift_left_by(args, *idx, 1);
             else
@@ -121,6 +137,11 @@ static int handle_separated_operators(char **args, int *i, int *in_fd, int *out_
             *out_fd = -1;
         }
         *out_fd = open(args[*i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (*out_fd < 0)
+        {
+            perror(args[*i + 1]);
+            return (1);
+        }
         args[*i] = NULL;
         args[*i + 1] = NULL;
         shift_left_by(args, *i, 2);
@@ -134,6 +155,11 @@ static int handle_separated_operators(char **args, int *i, int *in_fd, int *out_
             *out_fd = -1;
         }
         *out_fd = open(args[*i + 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+        if (*out_fd < 0)
+        {
+            perror(args[*i + 1]);
+            return (1);
+        }
         args[*i] = NULL;
         args[*i + 1] = NULL;
         shift_left_by(args, *i, 2);
@@ -147,6 +173,12 @@ static int handle_separated_operators(char **args, int *i, int *in_fd, int *out_
             *in_fd = -1;
         }
         *in_fd = open(args[*i + 1], O_RDONLY);
+        if (*in_fd < 0)
+        {
+            perror(args[*i + 1]);
+            *in_fd = -2;
+            // don't return 1
+        }
         args[*i] = NULL;
         args[*i + 1] = NULL;
         shift_left_by(args, *i, 2);

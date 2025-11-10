@@ -3,60 +3,55 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*        		t_token_list tokens;
+		init_token_lst(&tokens);
+		if (tokenize(&tokens, input) != 0)
+		{
+			g_shell.last_status = 2;
+			free(input);
+			continue;
+		}
+		t_cmd_list cmds;
+		init_cmd_lst(&cmds);                              +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 00:58:58 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/06 18:14:09 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/07 20:27:17 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
+#include "main_helpers.h"
+#include "parser.h"
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <glob.h>
 
-/* helpers for assignment and expansion */
-static int	is_assignment(const char *s)
-{
-	const char	*p;
-
-	if (!s || !*s)
-		return (0);
-	p = s;
-	if (!(ft_isalpha((unsigned char)*p) || *p == '_'))
-		return (0);
-	p++;
-	while (*p && *p != '=')
-	{
-		if (!(ft_isalnum((unsigned char)*p) || *p == '_'))
-			return (0);
-		p++;
-	}
-	return (*p == '=');
-}
+/* helpers for assignment and expansion (is_assignment and collect_assignment
+	were moved to src/main/assigns.c so they can be used by multiple helpers) */
 
 /* build an envp array merging current environ and local assignments (KEY=VAL strings)
  * returned array is gc_malloc'd and safe to pass to execve
  */
-static char	**build_envp_from_local(char **local)
+static char **build_envp_from_local(char **local)
 {
-	extern char	**environ;
-	int			envc;
-	int			expc;
-	int			localc;
-	char		**out;
-	int			outi;
-	int			found;
-	int			elen;
-	char		*entry;
-	char		*eq;
-	int			namelen;
-	int			replaced;
-	const char	*ename;
-	int			j;
+	extern char **environ;
+	int envc;
+	int expc;
+	int localc;
+	char **out;
+	int outi;
+	int found;
+	int elen;
+	char *entry;
+	char *eq;
+	int namelen;
+	int replaced;
+	const char *ename;
+	int j;
 
 	/* 'ename' will be fetched inside the loop below */
 	/* will fetch exported names inside the loop below */
@@ -82,7 +77,7 @@ static char	**build_envp_from_local(char **local)
 	{
 		ename = g_shell.exported_vars[j];
 		if (!ename)
-			continue ;
+			continue;
 		found = 0;
 		elen = ft_strlen(ename);
 		for (int k = 0; k < outi; ++k)
@@ -90,7 +85,7 @@ static char	**build_envp_from_local(char **local)
 			if (ft_strncmp(out[k], ename, elen) == 0 && out[k][elen] == '=')
 			{
 				found = 1;
-				break ;
+				break;
 			}
 		}
 		if (!found)
@@ -110,17 +105,16 @@ static char	**build_envp_from_local(char **local)
 	{
 		eq = ft_strchr(local[l], '=');
 		if (!eq)
-			continue ;
+			continue;
 		namelen = (int)(eq - local[l]);
 		replaced = 0;
 		for (int m = 0; m < outi; ++m)
 		{
-			if (ft_strncmp(out[m], local[l], (size_t)namelen) == 0
-				&& out[m][namelen] == '=')
+			if (ft_strncmp(out[m], local[l], (size_t)namelen) == 0 && out[m][namelen] == '=')
 			{
 				out[m] = gc_strdup(local[l]);
 				replaced = 1;
-				break ;
+				break;
 			}
 		}
 		if (!replaced)
@@ -134,14 +128,14 @@ static char	**build_envp_from_local(char **local)
 
 	* is a gc_malloc'd array sized to local_count*2: pairs of key and previous value (or NULL)
  */
-static char	**apply_assignments_temp(char **local)
+char **apply_assignments_temp(char **local)
 {
-	int		count;
-	char	**prev;
-	int		i;
-	char	*eq;
-	char	*key;
-	char	*val;
+	int count;
+	char **prev;
+	int i;
+	char *eq;
+	char *key;
+	char *val;
 
 	if (!local)
 		return (NULL);
@@ -154,7 +148,7 @@ static char	**apply_assignments_temp(char **local)
 	{
 		eq = ft_strchr(local[k], '=');
 		if (!eq)
-			continue ;
+			continue;
 		key = gc_substr(local[k], 0, (unsigned int)(eq - local[k]));
 		val = eq + 1;
 		prev[i++] = key;
@@ -165,14 +159,14 @@ static char	**apply_assignments_temp(char **local)
 	return (prev);
 }
 
-static void	restore_assignments(char **prev)
+void restore_assignments(char **prev)
 {
-	int		i;
-	char	*key;
-	char	*old;
+	int i;
+	char *key;
+	char *old;
 
 	if (!prev)
-		return ;
+		return;
 	i = 0;
 	while (prev[i])
 	{
@@ -185,24 +179,22 @@ static void	restore_assignments(char **prev)
 	}
 }
 
-static void	expand_args_inplace(char **args)
+void expand_args_inplace(char **args)
 {
-	int			i;
-	char		*p;
-	int			allow_expand;
-	char		*stripped;
-	char		*dollar;
-	char		*start;
-	int			len;
-	char		*varname;
-	char		*prefix;
-	char		*suffix;
-	char		*joined;
-	char		*src;
-	int			j;
-	char		*clean;
-	const char	*name = NULL;
-	const char	*v = NULL;
+	int i;
+	char *p;
+	int allow_expand;
+	char *stripped;
+	char *dollar;
+	char *start;
+	int len;
+	char *varname;
+	char *prefix;
+	char *suffix;
+	char *joined;
+	const char *name = NULL;
+	const char *v = NULL;
+	char was_quoted[32] = {0};
 
 	i = 0;
 	while (args && args[i])
@@ -216,6 +208,7 @@ static void	expand_args_inplace(char **args)
 			args[i] = stripped;
 			p = args[i];
 			allow_expand = 0;
+			was_quoted[i] = 1;
 		}
 		else if (p && (unsigned char)p[0] == 0x02)
 		{
@@ -224,51 +217,74 @@ static void	expand_args_inplace(char **args)
 			args[i] = stripped;
 			p = args[i];
 			allow_expand = 1;
+			was_quoted[i] = 2;
 		}
 		if (allow_expand && p && *p == '$')
 		{
 			/* simple $VAR: only expand if NAME starts with letter or underscore */
 			name = p + 1;
-			v = getenv(name);
-			if (name && (*name == '_' || ft_isalpha((unsigned char)*name)))
+			/* handle special $? expansion */
+			if (name && name[0] == '?')
 			{
-				if (v)
-					args[i] = gc_strdup(v);
-				else
-					args[i] = gc_strdup("");
+				char *code = gc_itoa(g_shell.last_status);
+				args[i] = code ? code : gc_strdup("");
 			}
 			else
 			{
-				/* leave as-is (do not strip positional parameters like $2) */
-				args[i] = gc_strdup(p);
+				v = check_for_env(g_shell.env, name, ft_strlen(name));
+				if (name && (*name == '_' || ft_isalpha((unsigned char)*name)))
+				{
+					if (v)
+						args[i] = gc_strdup(v);
+					else
+						args[i] = gc_strdup("");
+				}
+				else
+				{
+					/* leave as-is (do not strip positional parameters like $2) */
+					args[i] = gc_strdup(p);
+				}
 			}
 		}
 		else
 		{
-			/* support $VAR inside string (simple) */
+			/* support $VAR inside string (recursive) */
 			if (allow_expand && p)
 			{
-				dollar = ft_strchr(p, '$');
-				if (dollar)
+				while ((dollar = ft_strchr(p, '$')))
 				{
 					/* only handle single $VAR occurrence where NAME starts with letter or underscore */
 					start = p;
 					name = dollar + 1;
-					if (name && (*name == '_'
-							|| ft_isalpha((unsigned char)*name)))
+					/* support $? inside string */
+					if (name && name[0] == '?')
+					{
+						char *num = gc_itoa(g_shell.last_status);
+						prefix = gc_substr(start, 0, (unsigned int)(dollar - start));
+						suffix = gc_strdup(name + 1);
+						joined = NULL;
+						if (num)
+						{
+							joined = gc_strjoin(prefix, num);
+							joined = gc_strjoin(joined, suffix);
+							gc_free(num);
+						}
+						else
+							joined = gc_strjoin(prefix, suffix);
+						args[i] = joined;
+						p = args[i];
+					}
+					else if (name && (*name == '_' || ft_isalpha((unsigned char)*name)))
 					{
 						len = 0;
-						while (name[len]
-							&& (ft_isalnum((unsigned char)name[len])
-								|| name[len] == '_'))
+						while (name[len] && (ft_isalnum((unsigned char)name[len]) || name[len] == '_'))
 							len++;
 						if (len > 0)
 						{
 							varname = gc_substr(name, 0, (unsigned int)len);
 							/* lookup value for this variable name */
-							v = getenv(varname);
-							prefix = gc_substr(start, 0, (unsigned int)(dollar
-										- start));
+							v = check_for_env(g_shell.env, varname, ft_strlen(varname));
+							prefix = gc_substr(start, 0, (unsigned int)(dollar - start));
 							suffix = gc_strdup(name + len);
 							joined = NULL;
 							if (v)
@@ -281,26 +297,77 @@ static void	expand_args_inplace(char **args)
 								joined = gc_strjoin(prefix, suffix);
 							}
 							args[i] = joined;
+							p = args[i];
 						}
+						else
+						{
+							/* no valid var, skip this $ */
+							p = dollar + 1;
+						}
+					}
+					else
+					{
+						/* not valid, skip */
+						p = dollar + 1;
 					}
 				}
 			}
 		}
-		if (p && !allow_expand)
+		i++;
+	}
+	/* wildcard expansion */
+	i = 0;
+	while (args && args[i])
+	{
+		if (was_quoted[i])
 		{
-			src = args[i];
-			j = 0;
-			clean = gc_malloc(ft_strlen(src) + 1);
-			if (clean)
+			i++;
+			continue;
+		}
+		if (ft_strchr(args[i], '*'))
+		{
+			glob_t globbuf;
+			if (glob(args[i], GLOB_NOCHECK, NULL, &globbuf) == 0)
 			{
-				for (int k = 0; src[k]; ++k)
+				if (globbuf.gl_pathc == 1)
 				{
-					if (src[k] == '\\' || src[k] == '\'' || src[k] == '"')
-						continue ;
-					clean[j++] = src[k];
+					args[i] = gc_strdup(globbuf.gl_pathv[0]);
 				}
-				clean[j] = '\0';
-				args[i] = clean;
+				else if (globbuf.gl_pathc > 1)
+				{
+					// find the end
+					int j = i;
+					while (args[j])
+						j++;
+					int total_args = j;
+					int remaining = total_args - i - 1;
+					if (i + globbuf.gl_pathc + remaining < 32)
+					{
+						// shift
+						for (int k = total_args; k > i; k--)
+						{
+							args[k + globbuf.gl_pathc - 1] = args[k];
+						}
+						// insert
+						for (size_t k = 0; k < globbuf.gl_pathc; k++)
+						{
+							args[i + k] = gc_strdup(globbuf.gl_pathv[k]);
+						}
+						i += globbuf.gl_pathc - 1;
+					}
+					else
+					{
+						// join
+						char *joined = gc_strdup(globbuf.gl_pathv[0]);
+						for (size_t k = 1; k < globbuf.gl_pathc; k++)
+						{
+							char *temp = gc_strjoin(joined, " ");
+							joined = gc_strjoin(temp, globbuf.gl_pathv[k]);
+						}
+						args[i] = joined;
+					}
+				}
+				globfree(&globbuf);
 			}
 		}
 		i++;
@@ -309,20 +376,29 @@ static void	expand_args_inplace(char **args)
 
 /* Forward declarations from other modules */
 
-/* collect_assignment: return a GC-allocated copy of an assignment token
- * kept as a small helper so callers can rely on ownership semantics.
- */
-static char	*collect_assignment(char *s)
+/* collect_assignment moved to src/main/assigns.c */
+
+void exec_external(char **args, char **envp);
+void split_args(char *input, char **args, int max_args);
+
+int has_unmatched_quotes(char *str)
 {
-	if (!s)
-		return (NULL);
-	return (gc_strdup(s));
+	int i = 0;
+	int in_single = 0;
+	int in_double = 0;
+
+	while (str[i])
+	{
+		if (str[i] == '\'' && !in_double)
+			in_single = !in_single;
+		else if (str[i] == '"' && !in_single)
+			in_double = !in_double;
+		i++;
+	}
+	return in_single || in_double;
 }
 
-void		exec_external(char **args, char **envp);
-void		split_args(char *input, char **args, int max_args);
-
-static int	is_builtin(const char **args)
+int is_builtin(const char **args)
 {
 	if (!args || !args[0])
 		return (0);
@@ -341,15 +417,20 @@ static int	is_builtin(const char **args)
 	return (0);
 }
 
-static int	run_external(char **args, int in_fd, int out_fd, char **envp)
+int run_external(char **args, int in_fd, int out_fd, char **envp)
 {
-	pid_t		pid;
-	int			status;
-	extern char	**environ;
+	pid_t pid;
+	int status;
+	extern char **environ;
 
 	pid = fork();
 	if (pid == 0)
 	{
+		if (in_fd == -2)
+		{
+			close(STDIN_FILENO);
+			in_fd = -1;
+		}
 		if (in_fd != -1)
 		{
 			dup2(in_fd, STDIN_FILENO);
@@ -371,22 +452,34 @@ static int	run_external(char **args, int in_fd, int out_fd, char **envp)
 	if (out_fd != -1)
 		close(out_fd);
 	if (pid > 0)
-		waitpid(pid, &status, 0);
+	{
+		if (waitpid(pid, &status, 0) > 0)
+		{
+			if (WIFEXITED(status))
+				g_shell.last_status = WEXITSTATUS(status);
+			else if (WIFSIGNALED(status))
+				g_shell.last_status = 128 + WTERMSIG(status);
+			else
+				g_shell.last_status = 128;
+		}
+		else
+			perror("waitpid");
+	}
 	else
 		perror("fork");
-	return (0);
+	return (g_shell.last_status);
 }
 
-static int	build_and_run_pipeline(char **args, char **envp)
+int build_and_run_pipeline(char **args, char **envp)
 {
-	char		*tmp_argv[32];
-	char		**cmd_argvs[32];
-	char		**argv_gc;
-	int			ci;
-	int			ai;
-	int			ti;
-	int			x;
-	extern char	**environ;
+	char *tmp_argv[32];
+	char **cmd_argvs[32];
+	char **argv_gc;
+	int ci;
+	int ai;
+	int ti;
+	int x;
+	extern char **environ;
 
 	ci = 0;
 	ai = 0;
@@ -415,170 +508,152 @@ static int	build_and_run_pipeline(char **args, char **envp)
 	return (0);
 }
 
-static int	execute_builtin_with_possible_redir(char **args, int in_fd,
-		int out_fd)
+int execute_builtin_with_possible_redir(char **args, int in_fd,
+										int out_fd)
 {
+	int ret = 0;
+
 	if (in_fd != -1 || out_fd != -1)
 	{
 		if (!strcmp(args[0], "echo"))
-			exec_builtin_with_redir(ft_echo, args, in_fd, out_fd);
+			ret = exec_builtin_with_redir(ft_echo, args, in_fd, out_fd);
 		else if (!strcmp(args[0], "cd"))
-			exec_builtin_with_redir(ft_cd, args, in_fd, out_fd);
+			ret = exec_builtin_with_redir(ft_cd, args, in_fd, out_fd);
 		else if (!strcmp(args[0], "pwd"))
-			exec_builtin_with_redir(ft_pwd, args, in_fd, out_fd);
+			ret = exec_builtin_with_redir(ft_pwd, args, in_fd, out_fd);
 		else if (!strcmp(args[0], "export"))
-			exec_builtin_with_redir(ft_export, args, in_fd, out_fd);
+			ret = exec_builtin_with_redir(ft_export, args, in_fd, out_fd);
 		else if (!strcmp(args[0], "unset"))
-			exec_builtin_with_redir(ft_unset, args, in_fd, out_fd);
+			ret = exec_builtin_with_redir(ft_unset, args, in_fd, out_fd);
 		else if (!strcmp(args[0], "env"))
-			exec_builtin_with_redir(ft_env, args, in_fd, out_fd);
+			ret = exec_builtin_with_redir(ft_env, args, in_fd, out_fd);
 	}
 	else
 	{
 		if (!strcmp(args[0], "echo"))
-			ft_echo(args);
+			ret = ft_echo(args);
 		else if (!strcmp(args[0], "cd"))
-			ft_cd(args);
+			ret = ft_cd(args);
 		else if (!strcmp(args[0], "pwd"))
-			ft_pwd(args);
+			ret = ft_pwd(args);
 		else if (!strcmp(args[0], "export"))
-			ft_export(args);
+			ret = ft_export(args);
 		else if (!strcmp(args[0], "unset"))
-			ft_unset(args);
+			ret = ft_unset(args);
 		else if (!strcmp(args[0], "env"))
-			ft_env(args);
+			ret = ft_env(args);
 	}
-	return (0);
+	g_shell.last_status = ret;
+	return (ret);
 }
 
-int	main(void)
+/* helper implementations were moved to src/main/assigns.c and src/main/dispatch.c */
+
+int main(void)
 {
-	char input[1024];
+	char *input = NULL;
 	char *args[32];
-	char *p;
 	int in_fd;
 	int out_fd;
-	int i;
-	int handled;
-
 	char *local_assigns[32];
-	int la_i;
-	int read;
-	int write;
-	int is_export_cmd;
-	char *eq;
-	char *key;
-	char *val;
 	char **cmd_envp;
-	char **prev;
 
 	/* initialize shell globals and signals */
 	init_shell();
 	start_signals();
 	while (1)
 	{
-		if (isatty(STDIN_FILENO))
-			printf("minishell$ ");
-		if (!fgets(input, sizeof(input), stdin))
-			break ;
-		input[strcspn(input, "\n\r")] = 0;
-		/* skip comment-only lines */
-		p = input;
-		while (*p && isspace((unsigned char)*p))
-			p++;
-		if (*p == '#')
-			continue ;
-		if (!strcmp(input, "exit"))
-			break ;
+		input = get_input_line();
+		if (!input)
+			break;
+		if (is_comment_line(input))
+		{
+			free(input);
+			continue;
+		}
+		if (is_exit_line(input))
+		{
+			free(input);
+			break;
+		}
+		/* Now proceed with old parsing for execution */
 		split_args(input, args, 32);
-		if (!args[0])
-			continue ;
-		/* collect assignments anywhere in args into local_assigns[] and remove them
-			* but if the command is `export` we should keep assignments as arguments
-			* so ft_export can handle 'export VAR=val' semantics.
-			*/
-		la_i = 0;
-		read = 0;
-		write = 0;
-		is_export_cmd = (args[0] && !strcmp(args[0], "export"));
-		if (is_export_cmd)
+		if (has_unmatched_quotes(input))
 		{
-			/* do not strip assignments; leave args intact */
-			local_assigns[0] = NULL;
+			g_shell.last_status = 2;
+			free(input);
+			continue;
 		}
-		else
+		if (args[0] && !strcmp(args[0], "|"))
 		{
-			/* debug logging removed */
-			while (args[read])
+			ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", STDERR_FILENO);
+			g_shell.last_status = 2;
+			free(input);
+			continue;
+		}
+		int last = 0;
+		while (args[last])
+			last++;
+		if (last > 0 && !strcmp(args[last - 1], "|"))
+		{
+			ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", STDERR_FILENO);
+			g_shell.last_status = 2;
+			free(input);
+			continue;
+		}
+		int i = 0;
+		while (args[i])
+		{
+			if (!strcmp(args[i], "|") && args[i + 1] && !strcmp(args[i + 1], "|"))
 			{
-				if (is_assignment(args[read]))
-				{
-					local_assigns[la_i++] = collect_assignment(args[read]);
-					read++;
-					continue ;
-				}
-				args[write++] = args[read++];
+				ft_putstr_fd("minishell: syntax error near unexpected token `|'\n", STDERR_FILENO);
+				g_shell.last_status = 2;
+				free(input);
+				continue;
 			}
-			args[write] = NULL;
-			local_assigns[la_i] = NULL;
-			/* debug logging removed */
+			i++;
 		}
+		expand_args_inplace(args);
+		if (!args[0])
+		{
+			free(input);
+			continue;
+		}
+		/* collect assignments anywhere in args into local_assigns[] and remove them
+		 * but if the command is `export` we should keep assignments as arguments
+		 * so ft_export can handle 'export VAR=val' semantics.
+		 */
+		/* collect and strip local assignments */
+		collect_local_assignments(args, local_assigns);
 		if (!args[0])
 		{
 			/* no command: assignments become shell variables */
-			for (int k = 0; k < la_i; ++k)
-			{
-				eq = ft_strchr(local_assigns[k], '=');
-				if (!eq)
-					continue ;
-				key = gc_substr(local_assigns[k], 0, (unsigned int)(eq
-							- local_assigns[k]));
-				val = eq + 1;
-				if (key)
-					setenv(key, val ? val : "", 1);
-			}
-			continue ;
+			apply_assignments_when_no_command(local_assigns);
+			continue;
 		}
 		in_fd = -1;
 		out_fd = -1;
-		if (setup_redirections(args, &in_fd, &out_fd))
-			continue ;
-		i = 0;
-		handled = 0;
+		int ret = setup_redirections(args, &in_fd, &out_fd);
+		if (ret)
+		{
+			g_shell.last_status = ret;
+			free(input);
+			continue;
+		}
 		/* build per-command envp if local assignments exist */
 		cmd_envp = NULL;
 		if (local_assigns[0])
 			cmd_envp = build_envp_from_local(local_assigns);
 		/* debug logging removed */
-		while (args[i])
+		if (detect_and_handle_pipeline(args, cmd_envp))
 		{
-			if (!strcmp(args[i], "|"))
-			{
-				build_and_run_pipeline(args, cmd_envp);
-				handled = 1;
-				break ;
-			}
-			i++;
+			free(input);
+			continue;
 		}
-		if (handled)
-		{
-			continue ;
-		}
-		if (is_builtin((const char **)args))
-		{
-			/* for builtins: apply assignments temporarily, run,
-				then restore */
-			prev = NULL;
-			if (local_assigns[0])
-				prev = apply_assignments_temp(local_assigns);
-			expand_args_inplace(args);
-			execute_builtin_with_possible_redir(args, in_fd, out_fd);
-			if (prev)
-				restore_assignments(prev);
-			continue ;
-		}
-		expand_args_inplace(args);
-		run_external(args, in_fd, out_fd, cmd_envp);
+		run_command_or_builtin(args, cmd_envp, local_assigns, in_fd, out_fd);
+		if (in_fd == -2)
+			g_shell.last_status = 1;
+		free(input);
 	}
-	return (0);
+	return (g_shell.last_status);
 }
