@@ -34,15 +34,18 @@ typedef struct s_file_list t_file_list;
 // Structs -- BEGIN
 typedef enum e_toktype
 {
-	TK_WORD,	// 0
-	TK_BUILTIN, // 1
-	S_QUOTES,	// 2 ''
-	D_QUOTES,	// 3 ""
-	TK_INFILE,	// 4 <
-	TK_OUTFILE, // 5 >
-	TK_HEREDOC, // 6 <<
-	TK_APPEND,	// 7 >>
-	TK_PIPE,	// 8 |
+	T_IDENTIFIER,
+	T_LPAREN,
+	T_RPAREN,
+	T_OR,
+	T_AND,
+	T_REDIR_IN,
+	T_REDIR_OUT,
+	T_REDIR_APPEND,
+	T_PIPE,
+	T_HEREDOC,
+	T_UNKNOWN,
+	T_EOF
 } t_toktype;
 
 typedef enum seg_type
@@ -142,5 +145,17 @@ void init_env_lst(t_env_list *lst);
 // Parsing
 char *look_for_cmd(t_token *token, t_token_list *toklst, t_cmd_list *cmdlst);
 void final_token(t_token_list *toklst, t_env_list *envlst, int last_status);
+
+/* ADD THESE MISSING PROTOTYPES */
+char *ft_getenv(const char *name, t_env_list *env_list);
+void ft_setenv(const char *name, const char *value, t_env_list *env_list);
+t_token_list *tokenize_input(char *line);
+t_cmd_list *parse_commands(t_token_list *tokens);
+int execute_commands(t_cmd_list *commands);
+void free_token_lst(t_token_list **lst);
+void free_cmd_lst(t_cmd_list **lst);
+void cleanup_shell(void);
+int is_exit_command(char *line);
+/* END OF ADDED PROTOTYPES */
 
 #endif

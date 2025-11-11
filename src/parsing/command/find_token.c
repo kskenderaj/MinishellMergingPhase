@@ -1,11 +1,21 @@
-
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   find_token.c                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/11 03:13:15 by klejdi            #+#    #+#             */
+/*   Updated: 2025/11/11 03:13:16 by klejdi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "parser.h"
 
-static int	no_quote_segment(t_segment_list *lst, char *str, int *i)
+static int no_quote_segment(t_segment_list *lst, char *str, int *i)
 {
-	int			start;
-	t_segment	*segment;
+	int start;
+	t_segment *segment;
 
 	start = *i;
 	while (str[*i] && str[*i] != '\'' && str[*i] != '\"')
@@ -19,12 +29,12 @@ static int	no_quote_segment(t_segment_list *lst, char *str, int *i)
 	return (1);
 }
 
-static int	quote_segment(t_segment_list *lst, char *str, int *i)
+static int quote_segment(t_segment_list *lst, char *str, int *i)
 {
-	char		q;
-	int			start;
-	t_segment	*segment;
-	t_seg_type	type;
+	char q;
+	int start;
+	t_segment *segment;
+	t_seg_type type;
 
 	if (!str[*i] || (str[*i] != '\'' && str[*i] != '\"'))
 		return (1);
@@ -46,9 +56,9 @@ static int	quote_segment(t_segment_list *lst, char *str, int *i)
 	return (1);
 }
 
-int	find_segment(t_segment_list *lst, char *str)
+int find_segment(t_segment_list *lst, char *str)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	if (!str || !lst)
@@ -58,7 +68,7 @@ int	find_segment(t_segment_list *lst, char *str)
 		if (!no_quote_segment(lst, str, &i))
 			return (0);
 		if (!str[i])
-			break ;
+			break;
 		if (!quote_segment(lst, str, &i))
 			return (0);
 	}
@@ -70,20 +80,19 @@ t_segment *create_segment(char *start, int len, t_seg_type type)
 	t_segment *segment;
 
 	segment = gc_malloc(sizeof(*segment));
-	if(!segment)
+	if (!segment)
 		return NULL;
 	segment->value = gc_substr(start, 0, (size_t)len);
-	if(!segment->value)
+	if (!segment->value)
 		return NULL;
 	segment->type = type;
-	segment->next = NULL; 
+	segment->next = NULL;
 	return segment;
 }
 
-
 int push_segment(t_segment_list *lst, t_segment *segment)
 {
-	if(!lst || !segment)
+	if (!lst || !segment)
 		return 0;
 	if (!lst->head)
 	{

@@ -1,218 +1,12 @@
-/* ***************************************static int handlstatic int handle_attached_infile(char **args, int *idx, int *in_fd, char *tok)
-{
-	char *fname;
-
-	if (tok[1] != '\0')
-		fname = tok + 1;
-	else
-		fname = args[*idx + 1];
-	if (!fname)
-		return (2);nfile(char **args, int *idx, int *in_fd, char *tok)
-{
-	char *fname;
-
-	if (tok[1] != '\0')
-		fname = tok + 1;
-	else
-		fname = args[*idx + 1];
-	if (!fname)
-		return (2);
-	if (!strcmp(fname, ">") || !strcmp(fname, "<") || !strcmp(fname, ">>") || !strcmp(fname, "<<"))
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
-		ft_putstr_fd(fname, STDERR_FILENO);
-		ft_putstr_fd("`\n", STDERR_FILENO);
-		return (2);
-	}**static instatic int	handle_attached_append(char **args, static int	handle_attached_heredoc(char **argsstatic int	handle_attached_append(char **astatic int	handle_attached_heredoc(char **args, int *idx, int *in_fd,
-		char *tok)
-{
-	char	*delim;
-
-	if (tok[2] != '\0')
-		delim = tok + 2;
-	else
-		delim = args[*idx + 1];
-	if (!delim)
-		return (1);
-	if (!strcmp(delim, ">") || !strcmp(delim, "<") || !strcmp(delim, ">>") || !strcmp(delim, "<<"))
-		return (1);
-	if (*in_fd != -1)
-		close(*in_fd);
-	*in_fd = exec_heredoc(delim);
-	if (tok[2] != '\0')
-		shift_left_by(args, *idx, 1);
-	else
-		shift_left_by(args, *idx, 2);
-	return (0);
-}out_fd,
-		char *tok)
-{
-	char	*fname;
-
-	if (tok[2] != '\0')
-		fname = tok + 2;
-	else
-		fname = args[*idx + 1];
-	if (!fname)
-		return (1);
-	if (!strcmp(fname, ">") || !strcmp(fname, "<") || !strcmp(fname, ">>") || !strcmp(fname, "<<"))
-		return (1);
-	if (*out_fd != -1)
-		close(*out_fd);
-	*out_fd = open(fname, O_WRONLY | O_CREAT | O_APPEND, 0644);
-	if (tok[2] != '\0')
-		shift_left_by(args, *idx, 1);
-	else
-		shift_left_by(args, *idx, 2);
-	return (0);
-}ttached_outfile(char **static int	handle_attached_infile(char **args, int *idx, int *in_fd, char *tok)
-{
-	char	*fname;
-
-	if (tok[1] != '\0')
-		fname = tok + 1;
-	else
-		fname = args[*idx + 1];
-	if (!fname)
-		return (1);
-	if (!strcmp(fname, ">") || !strcmp(fname, "<") || !strcmp(fname, ">>") || !strcmp(fname, "<<"))
-		return (1);
-	if (*in_fd != -1)
-		close(*in_fd);
-	*in_fd = open(fname, O_RDONLY);
-	if (tok[1] != '\0')
-		shift_left_by(args, *idx, 1);
-	else
-		shift_left_by(args, *idx, 2);
-	return (0);
-} *out_fd,
-		char *tok)
-{
-	char	*fname;
-
-	if (tok[1] != '\0')
-		fname = tok + 1;
-	else
-		fname = args[*idx + 1];
-	if (!fname)
-		return (1);
-	if (!strcmp(fname, ">") || !strcmp(fname, "<") || !strcmp(fname, ">>") || !strcmp(fname, "<<"))
-		return (1);
-	if (*out_fd != -1)
-		close(*out_fd);
-	*out_fd = open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (tok[1] != '\0')
-		shift_left_by(args, *idx, 1);
-	else
-		shift_left_by(args, *idx, 2);
-	return (0);
-}d,
-		char *tok)
-{
-	char	*delim;
-
-	if (tok[2] != '\0')
-		delim = tok + 2;
-	else
-		delim = args[*idx + 1];
-	if (!delim)
-		return (1);
-	if (!strcmp(delim, ">") || !strcmp(delim, "<") || !strcmp(delim, ">>") || !strcmp(delim, "<<"))
-		return (2);
-	if (*in_fd != -1)
-		close(*in_fd);
-	*in_fd = exec_heredoc(delim);
-	if (tok[2] != '\0')
-		shift_left_by(args, *idx, 1);
-	else
-		shift_left_by(args, *idx, 2);
-	return (0);
-}d,
-		char *tok)
-{
-	char	*fname;
-
-	if (tok[2] != '\0')
-		fname = tok + 2;
-	else
-		fname = args[*idx + 1];
-	if (!fname)
-		return (1);
-	if (!strcmp(fname, ">") || !strcmp(fname, "<") || !strcmp(fname, ">>") || !strcmp(fname, "<<"))
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
-		ft_putstr_fd(fname, STDERR_FILENO);
-		ft_putstr_fd("`\n", STDERR_FILENO);
-		return (2);
-	}
-	if (*out_fd != -1)
-		close(*out_fd);
-	*out_fd = open(fname, O_WRONLY | O_CREAT | O_APPEND, 0644);
-	if (tok[2] != '\0')
-		shift_left_by(args, *idx, 1);
-	else
-		shift_left_by(args, *idx, 2);
-	return (0);
-}tfile(char **args,static int	handle_attached_infile(char **args, int *idx, int *in_fd, char *tok)
-{
-	char	*fname;
-
-	if (tok[1] != '\0')
-		fname = tok + 1;
-	else
-		fname = args[*idx + 1];
-	if (!fname)
-		return (1);
-	if (!strcmp(fname, ">") || !strcmp(fname, "<") || !strcmp(fname, ">>") || !strcmp(fname, "<<"))
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
-		ft_putstr_fd(fname, STDERR_FILENO);
-		ft_putstr_fd("`\n", STDERR_FILENO);
-		return (2);
-	}
-	if (*in_fd != -1)
-		close(*in_fd);
-	*in_fd = open(fname, O_RDONLY);
-	if (tok[1] != '\0')
-		shift_left_by(args, *idx, 1);
-	else
-		shift_left_by(args, *idx, 2);
-	return (0);
-}_fd,
-		char *tok)
-{
-	char	*fname;
-
-	if (tok[1] != '\0')
-		fname = tok + 1;
-	else
-		fname = args[*idx + 1];
-	if (!fname)
-		return (1);
-	if (!strcmp(fname, ">") || !strcmp(fname, "<") || !strcmp(fname, ">>") || !strcmp(fname, "<<"))
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token `", STDERR_FILENO);
-		ft_putstr_fd(fname, STDERR_FILENO);
-		ft_putstr_fd("`\n", STDERR_FILENO);
-		return (2);
-	}
-	if (*out_fd != -1)
-		close(*out_fd);
-	*out_fd = open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (tok[1] != '\0')
-		shift_left_by(args, *idx, 1);
-	else
-		shift_left_by(args, *idx, 2);
-	return (0);
-}* */
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   exec_redir_attached.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/29 23:59:26 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/09 22:54:49 by klejdi           ###   ########.fr       */
+/*   Created: 2025/11/11 02:36:12 by klejdi            #+#    #+#             */
+/*   Updated: 2025/11/11 02:36:12 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,6 +28,14 @@ static int handle_attached_append(char **args, int *idx, int *out_fd,
 	if (*out_fd != -1)
 		close(*out_fd);
 	*out_fd = open(fname, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	if (*out_fd == -1)
+	{
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
+		ft_putstr_fd(fname, STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+		ft_putendl_fd((char *)strerror(errno), STDERR_FILENO);
+		return (1);
+	}
 	if (tok[2] != '\0')
 		shift_left_by(args, *idx, 1);
 	else
@@ -279,6 +81,14 @@ static int handle_attached_outfile(char **args, int *idx, int *out_fd,
 	if (*out_fd != -1)
 		close(*out_fd);
 	*out_fd = open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (*out_fd == -1)
+	{
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
+		ft_putstr_fd(fname, STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+		ft_putendl_fd((char *)strerror(errno), STDERR_FILENO);
+		return (1);
+	}
 	if (tok[1] != '\0')
 		shift_left_by(args, *idx, 1);
 	else
@@ -306,6 +116,14 @@ static int handle_attached_infile(char **args, int *idx, int *in_fd, char *tok)
 	if (*in_fd != -1)
 		close(*in_fd);
 	*in_fd = open(fname, O_RDONLY);
+	if (*in_fd == -1)
+	{
+		ft_putstr_fd("minishell: ", STDERR_FILENO);
+		ft_putstr_fd(fname, STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+		ft_putendl_fd((char *)strerror(errno), STDERR_FILENO);
+		return (1);
+	}
 	if (tok[1] != '\0')
 		shift_left_by(args, *idx, 1);
 	else

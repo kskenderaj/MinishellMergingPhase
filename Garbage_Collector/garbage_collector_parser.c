@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 15:59:49 by klejdi            #+#    #+#             */
-/*   Updated: 2025/10/22 16:30:16 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/10 23:27:19 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,4 +62,23 @@ char *gc_strjoin(const char *s1, const char *s2)
     res = gc_strdup(tmp);
     free(tmp);
     return (res);
+}
+
+void free_env_list(t_env_list *env_lst)
+{
+    t_env_node *current;
+    t_env_node *next;
+
+    if (!env_lst)
+        return;
+    current = env_lst->head;
+    while (current)
+    {
+        next = current->next;
+        free(current->key);
+        free(current->value);
+        free(current);
+        current = next;
+    }
+    free(env_lst);
 }

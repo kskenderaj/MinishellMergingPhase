@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 13:20:10 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/09 22:06:01 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/11 02:46:57 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,6 @@ typedef struct s_shell_state
 
 /* global shell state is defined in globals.c */
 extern t_shell_state g_shell;
-
-t_env_list *setup_env_list(void);
 
 typedef struct s_filelist
 {
@@ -106,17 +104,15 @@ int exec_heredoc(const char *delimiter);
 char **convert_env_to_array(t_env_list *env_list);
 char *find_in_path(char *cmd);
 void shift_left_by(char **args, int start, int by);
-int handle_attached_operators(t_redir_data *data,
-							  char *tok);
-int handle_separated_operators(char **args, int *i,
-							   int *in_fd, int *out_fd);
+int handle_attached_operators(t_redir_data *data, char *tok);
+int handle_separated_operators(char **args, int *i, int *in_fd, int *out_fd);
 pid_t exec_parent_runner(t_cmd_node *cmd, int *io_data);
 /* Main utilities */
 void split_args(char *input, char **args, int max_args);
 int setup_redirections(char **args, int *in_fd,
 					   int *out_fd);
 /* Initialization */
-void init_shell(void);
+void init_shell(char **envp);
 /* Utility to run */
 int not_error_file(t_filelist *current, int update,
 				   t_commandlist *cmd);

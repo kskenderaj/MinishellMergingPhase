@@ -92,3 +92,5 @@ char *get_expand(char *seg_str, int i, int last_status, t_env_list *envlst)
 	else
 		return (expand_env(seg_str + i, envlst));
 }
+
+/* setup_env_list is defined in globals.c; duplicate removed here */

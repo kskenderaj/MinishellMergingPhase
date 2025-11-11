@@ -24,11 +24,11 @@ bool is_built_in(char *str)
 
 int collect_redirs(t_token *token, t_cmd_node *cmdnode)
 {
-	while (token && token->type != TK_PIPE)
+	while (token && token->type != T_PIPE)
 	{
 		if (is_redirection(token->type))
 		{
-			if (!token->next || token->next->type != TK_WORD)
+			if (!token->next || token->next->type != T_OR)
 				return -1;
 			create_filenode(token->next->value, token->type, cmdnode->files);
 			token = token->next;

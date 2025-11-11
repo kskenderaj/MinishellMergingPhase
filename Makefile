@@ -5,8 +5,8 @@
 #                                                     +:+ +:+         +:+      #
 #    By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2025/11/04 00:00:00 by auto              #+#    #+#              #
-#    Updated: 2025/11/07 19:23:17 by klejdi           ###   ########.fr        #
+#    Created: 2025/11/11 08:15:00 by klejdi            #+#    #+#              #
+#    Updated: 2025/11/11 04:26:32 by klejdi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,120 +15,75 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Werror
 READLINE_FLAGS = -lreadline
 
-# Include directories
-INCLUDES = -Iinclude -Iinclude/libft -Isrc/execution/executor_part -IGarbage_Collector
-
-# Main source file (you need to create this)
-MAIN_SRC = main.c
-MAIN_OBJ = $(MAIN_SRC:.c=.o)
-
-# Globals (single definition of g_shell)
-GLOBAL_SRC = globals.c
-GLOBAL_OBJ = $(GLOBAL_SRC:.c=.o)
-
-# Parser sources
-PARSER_SRCS = \
-	src/parsing/lexing/token_check.c \
-	src/parsing/lexing/token_utils.c \
-	src/parsing/lexing/tokenize.c \
-	src/parsing/lexing/tokenize_helper.c \
-	src/parsing/lexing/init.c \
-	src/parsing/command/token_to_cmd.c \
-	src/parsing/command/find_token.c \
-	src/parsing/command/add_env.c \
-	src/parsing/command/token_to_cmd_helper.c \
-	src/parsing/command/expand_env.c \
-	src/parsing/command/cmdlst_filelst.c
-
-PARSER_OBJS = $(PARSER_SRCS:.c=.o)
-
-# Executor sources
-EXECUTOR_DIR = src/execution/executor_part
-EXECUTOR_SRCS = \
-	$(EXECUTOR_DIR)/exec_basics.c \
-	$(EXECUTOR_DIR)/exec_basics1.c \
-	$(EXECUTOR_DIR)/exec_builtins.c \
-	$(EXECUTOR_DIR)/exec_builtins1.c \
-	$(EXECUTOR_DIR)/exec_builtins2.c \
-	$(EXECUTOR_DIR)/exec_builtins3.c \
-	$(EXECUTOR_DIR)/exec_echo.c \
-	$(EXECUTOR_DIR)/exec_external_handler.c \
-	$(EXECUTOR_DIR)/exec_external_helpers.c \
-	$(EXECUTOR_DIR)/exec_path.c \
-	$(EXECUTOR_DIR)/exec_error.c \
-	$(EXECUTOR_DIR)/exec_parent_runner.c \
-	$(EXECUTOR_DIR)/exec_args_helpers.c \
-	$(EXECUTOR_DIR)/exec_pipeline_helpers.c \
-	$(EXECUTOR_DIR)/exec_redir_helpers.c \
-	$(EXECUTOR_DIR)/exec_redir_attached.c \
-	$(EXECUTOR_DIR)/exec_redir_separated.c \
-	$(EXECUTOR_DIR)/exec_redir_heredoc.c \
-	$(EXECUTOR_DIR)/exec_redir_infile.c \
-	$(EXECUTOR_DIR)/exec_redir_outfile.c \
-	$(EXECUTOR_DIR)/exec_redirections.c \
-	$(EXECUTOR_DIR)/exec_utility_to_run.c \
-	$(EXECUTOR_DIR)/exec_redirections1.c \
-	$(EXECUTOR_DIR)/signals.c \
-	$(EXECUTOR_DIR)/init_shell.c
-
-
-EXECUTOR_OBJS = $(EXECUTOR_SRCS:.c=.o)
-
-# Execution archive produced by executor part
-LIBEXEC = $(EXECUTOR_DIR)/libexec.a
-
-# Executor archive rule: build all executor and GC objs and archive them
-
-$(LIBEXEC): $(EXECUTOR_OBJS) $(GC_OBJS)
-	@echo "$(YELLOW)Building executor archive...$(RESET)"
-	# Compile any missing Garbage_Collector object files
-	@for src in $(GC_SRCS); do \
-		obj=$${src%.c}.o; \
-		if [ ! -f $$obj ]; then \
-			echo "$(YELLOW)Compiling $$src...$(RESET)"; \
-			$(CC) $(CFLAGS) $(INCLUDES) -c $$src -o $$obj || exit 1; \
-		fi; \
-	done
-	# Compile any missing executor object files
-	@for src in $(EXECUTOR_SRCS); do \
-		obj=$${src%.c}.o; \
-		if [ ! -f $$obj ]; then \
-			echo "$(YELLOW)Compiling $$src...$(RESET)"; \
-			$(CC) $(CFLAGS) $(INCLUDES) -c $$src -o $$obj || exit 1; \
-		fi; \
-	done
-	ar rcs $(LIBEXEC) $(EXECUTOR_OBJS) $(GC_OBJS)
-
-# Pattern rules to compile executor and GC sources to object files
-$(EXECUTOR_DIR)/%.o: $(EXECUTOR_DIR)/%.c
-	@echo "$(YELLOW)Compiling $<...$(RESET)"
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-Garbage_Collector/%.o: Garbage_Collector/%.c
-	@echo "$(YELLOW)Compiling $<...$(RESET)"
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-# Garbage Collector sources
-GC_DIR = Garbage_Collector
-GC_SRCS = \
-	$(GC_DIR)/garbage_collector.c \
-	$(GC_DIR)/garbage_collector1.c \
-	$(GC_DIR)/garbage_collector_utils.c \
-	$(GC_DIR)/garbage_collector_utils1.c \
-	$(GC_DIR)/garbage_collector_parser.c
-
-GC_OBJS = $(GC_SRCS:.c=.o)
-
-# Libft (adjust path as needed)
+# --- DIRECTORIES ---
+OBJ_DIR = obj
 LIBFT_DIR = include/libft
-LIBFT = $(LIBFT_DIR)/libft.a
+INCLUDE_DIRS = -Iinclude -I$(LIBFT_DIR)
 
-# All objects (executor objects and GC objects are provided by LIBEXEC)
-MAIN_SRCS = src/main/input.c \
-		   src/main/assigns.c \
-		   src/main/dispatch.c
-MAIN_OBJS = $(MAIN_SRCS:.c=.o)
-OBJS = $(MAIN_OBJ) $(GLOBAL_OBJ) $(PARSER_OBJS) $(MAIN_OBJS)
+# --- SOURCE FILES (MANUALLY LISTED FOR 42 NORM) ---
+SRCS = \
+    main.c \
+    src/main/debug.c \
+    globals.c \
+    src/main/assigns.c \
+    src/main/builtins.c \
+    src/main/dispatch.c \
+    src/main/env_utils.c \
+    src/main/execute.c \
+    src/main/exit.c \
+    src/main/exit_code.c \
+    src/main/expand.c \
+    src/main/input.c \
+    src/main/pipeline.c \
+    src/parsing/command/add_env.c \
+    src/parsing/command/cmdlst_filelst.c \
+    src/parsing/command/expand_env.c \
+    src/parsing/command/find_token.c \
+    src/parsing/command/token_to_cmd_helper.c \
+    src/parsing/lexing/init.c \
+    src/parsing/lexing/token_check.c \
+    src/parsing/lexing/token_utils.c \
+    src/parsing/lexing/tokenize_helper.c \
+    src/parsing/parser.c \
+    src/parsing/tokenizer.c \
+    src/execution/executor_part/exec_args_helpers.c \
+    src/execution/executor_part/exec_basics.c \
+    src/execution/executor_part/exec_basics1.c \
+    src/execution/executor_part/exec_builtins.c \
+    src/execution/executor_part/exec_builtins1.c \
+    src/execution/executor_part/exec_builtins2.c \
+    src/execution/executor_part/exec_builtins3.c \
+    src/execution/executor_part/exec_echo.c \
+    src/execution/executor_part/exec_error.c \
+    src/execution/executor_part/exec_external_handler.c \
+    src/execution/executor_part/exec_external_helpers.c \
+    src/execution/executor_part/exec_main_utilities.c \
+    src/execution/executor_part/exec_parent_runner.c \
+    src/execution/executor_part/exec_path.c \
+    src/execution/executor_part/exec_pipeline_helpers.c \
+    src/execution/executor_part/exec_redir_attached.c \
+    src/execution/executor_part/exec_redir_helpers.c \
+    src/execution/executor_part/exec_redir_heredoc.c \
+    src/execution/executor_part/exec_redir_infile.c \
+    src/execution/executor_part/exec_redir_outfile.c \
+    src/execution/executor_part/exec_redir_separated.c \
+    src/execution/executor_part/exec_redirections.c \
+    src/execution/executor_part/exec_redirections1.c \
+    src/execution/executor_part/exec_utility_to_run.c \
+    src/execution/executor_part/init_shell.c \
+    src/execution/executor_part/signals.c \
+    Garbage_Collector/free_structs.c \
+    Garbage_Collector/garbage_collector.c \
+    Garbage_Collector/garbage_collector1.c \
+    Garbage_Collector/garbage_collector_parser.c \
+    Garbage_Collector/garbage_collector_utils.c \
+    Garbage_Collector/garbage_collector_utils1.c
+
+# --- OBJECT FILES ---
+OBJS = $(addprefix $(OBJ_DIR)/, $(SRCS:.c=.o))
+
+# Libft
+LIBFT = $(LIBFT_DIR)/libft.a
 
 # Colors for output
 GREEN = \033[0;32m
@@ -138,55 +93,42 @@ RESET = \033[0m
 
 all: $(NAME)
 
-$(NAME): $(LIBFT) $(LIBEXEC) $(OBJS)
+$(NAME): $(LIBFT) $(OBJS)
 	@echo "$(YELLOW)Linking $(NAME)...$(RESET)"
-	$(CC) $(CFLAGS) $(OBJS) $(LIBEXEC) $(LIBFT) $(READLINE_FLAGS) -o $(NAME)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBFT) $(READLINE_FLAGS) -o $(NAME)
 	@echo "$(GREEN)✓ $(NAME) created successfully!$(RESET)"
-
-# Build a small token visualizer test that links the parser and GC objects
-tokenize_test: $(LIBFT) $(GC_OBJS) $(PARSER_OBJS)
-	@echo "$(YELLOW)Linking tokenize_test...$(RESET)"
-	$(CC) $(CFLAGS) $(INCLUDES) tests/tokenize_test.c $(PARSER_OBJS) $(GC_OBJS) $(LIBFT) -o tests/tokenize_test
-	@echo "$(GREEN)✓ tests/tokenize_test created successfully!$(RESET)"
-
-tokenize_suite: $(LIBFT) $(GC_OBJS) $(PARSER_OBJS)
-	@echo "$(YELLOW)Linking tokenize_suite...$(RESET)"
-	$(CC) $(CFLAGS) $(INCLUDES) tests/tokenize_suite.c $(PARSER_OBJS) $(GC_OBJS) $(LIBFT) -o tests/tokenize_suite
-	@echo "$(GREEN)✓ tests/tokenize_suite created successfully!$(RESET)"
 
 $(LIBFT):
 	@echo "$(YELLOW)Building libft...$(RESET)"
 	$(MAKE) -C $(LIBFT_DIR)
 
-%.o: %.c
+# Rule to compile .c files into the obj/ directory
+$(OBJ_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
 	@echo "$(YELLOW)Compiling $<...$(RESET)"
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-src/main/%.o: src/main/%.c
-	@echo "$(YELLOW)Compiling $<...$(RESET)"
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $< -o $@
 
 clean:
 	@echo "$(YELLOW)Cleaning object files...$(RESET)"
-	rm -f $(OBJS)
-	rm -f $(EXECUTOR_OBJS) $(GC_OBJS)
+	rm -rf $(OBJ_DIR)
 	$(MAKE) -C $(LIBFT_DIR) clean
 
 fclean: clean
 	@echo "$(YELLOW)Full clean...$(RESET)"
 	rm -f $(NAME)
-	rm -f $(LIBEXEC)
 	$(MAKE) -C $(LIBFT_DIR) fclean
 
 re: fclean
 	$(MAKE) all
 
 # Debug target
-debug: CFLAGS += -g
+debug: CFLAGS += -g -DDEBUG
 debug: re
 
-# Sanitize target
-sanitize: CFLAGS += -fsanitize=address -g
+sanitize: CFLAGS += -g -O0 -fsanitize=address,undefined -fno-omit-frame-pointer -DDEBUG
 sanitize: re
+
+debug_san: CFLAGS += -g -O0 -fsanitize=address,undefined -fno-omit-frame-pointer -DDEBUG
+debug_san: re
 
 .PHONY: all clean fclean re debug sanitize

@@ -35,6 +35,16 @@
 /* ************************************************************************** */
 
 #include "executor.h"
+#include <string.h>
+
+static int print_file_error(const char *name)
+{
+	ft_putstr_fd("minishell: ", STDERR_FILENO);
+	ft_putstr_fd((char *)name, STDERR_FILENO);
+	ft_putstr_fd(": ", STDERR_FILENO);
+	ft_putendl_fd((char *)strerror(errno), STDERR_FILENO);
+	return (1);
+}
 
 int handle_output_redirection(char **args, int *i, int *out_fd)
 {
@@ -51,6 +61,8 @@ int handle_output_redirection(char **args, int *i, int *out_fd)
 	if (*out_fd != -1)
 		close(*out_fd);
 	*out_fd = open(args[*i + 1], flags, 0644);
+	if (*out_fd == -1)
+		return (print_file_error(args[*i + 1]));
 	args[*i] = NULL;
 	args[*i + 1] = NULL;
 	shift_left_by(args, *i, 2);
@@ -66,6 +78,8 @@ int handle_input_redirection(char **args, int *i, int *in_fd)
 		if (*in_fd != -1)
 			close(*in_fd);
 		*in_fd = open(args[*i + 1], O_RDONLY);
+		if (*in_fd == -1)
+			return (print_file_error(args[*i + 1]));
 	}
 	else if (strcmp(args[*i], "<<") == 0 && args[*i + 1])
 	{
@@ -74,6 +88,8 @@ int handle_input_redirection(char **args, int *i, int *in_fd)
 		if (*in_fd != -1)
 			close(*in_fd);
 		*in_fd = exec_heredoc(args[*i + 1]);
+		if (*in_fd == -1)
+			return (1);
 	}
 	else
 		return (2);

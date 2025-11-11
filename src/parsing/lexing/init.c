@@ -9,7 +9,7 @@ void init_segment_lst(t_segment_list *lst)
 	lst->size = 0;
 }
 
-void	init_token_lst(t_token_list *lst)
+void init_token_lst(t_token_list *lst)
 {
 	lst->head = NULL;
 	lst->tail = NULL;
@@ -34,5 +34,4 @@ void init_files_lst(t_file_list *lst)
 	lst->head = NULL;
 	lst->tail = NULL;
 	lst->size = 0;
-
 }

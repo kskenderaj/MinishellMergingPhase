@@ -1,51 +1,12 @@
-/* *************************************		res = handl		res = handl		res = handle_attached_operators(&data, tok);
-		if (res == 2)
-			return (2);
-		else if (res != 0)
-			return (1);
-		else
-			continue ;
-		res = handle_separated_operators(args, &i, in_fd, out_fd);
-		if (res == 2)
-			return (2);
-		else if (res != 0)
-			return (1);
-		else
-			continue ;rators(&data, tok);
-		if (res == 2)
-			return (2);
-		else if (res != 0)
-			return (1);
-		else
-			continue ;
-		res = handle_separated_operators(args, &i, in_fd, out_fd);
-		if (res == 2)
-			return (2);
-		else if (res != 0)
-			return (1);
-		else
-			continue ;rators(&data, tok);
-		if (res == 2)
-			return (2);
-		else if (res != 0)
-			return (res);
-		else
-			continue;
-		res = handle_separated_operators(args, &i, in_fd, out_fd);
-		if (res == 2)
-			return (2);
-		else if (res != 0)
-			return (res);
-		else
-			continue;*********************** */
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   exec_redir_helpers.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/29 16:30:47 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/03 15:50:46 by kskender         ###   ########.fr       */
+/*   Created: 2025/11/11 03:53:57 by klejdi            #+#    #+#             */
+/*   Updated: 2025/11/11 03:54:02 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +14,7 @@
 
 /* implementation intentionally moved to exec_redir_separated.c */
 
+/* Canonical setup_redirections implementation */
 int setup_redirections(char **args, int *in_fd, int *out_fd)
 {
 	int i;
@@ -86,8 +48,10 @@ int setup_redirections(char **args, int *in_fd, int *out_fd)
 		res = handle_separated_operators(args, &i, in_fd, out_fd);
 		if (res != 2)
 		{
+			if (res == 1)
+				return (1); /* file open error */
 			if (res != 0)
-				return (2);
+				return (2); /* syntax */
 			continue;
 		}
 		i++;

@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 16:02:10 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/04 21:22:34 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/11 04:26:19 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 typedef struct s_gc_collector t_gc_collector;
 
 #include "libft.h"
+#include "executor.h"
+#include "parser.h"
 #include <fcntl.h>
 #include <stdarg.h>
 #include <stdlib.h>
@@ -65,6 +67,7 @@ void gc_close(int fd);
 // Utility functions
 void gc_print(void);
 size_t gc_count(void);
+void free_env_list(t_env_list *env_lst);
 
 // String utilities
 char *gc_strdup(const char *s);

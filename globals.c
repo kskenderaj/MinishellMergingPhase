@@ -1,4 +1,14 @@
-/* globals.c — single definition of g_shell */
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   globals.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/11 01:53:44 by klejdi            #+#    #+#             */
+/*   Updated: 2025/11/11 01:54:34 by klejdi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "executor.h"
 
@@ -6,45 +16,31 @@
 
 t_shell_state g_shell = {{NULL}, 0, 0, NULL};
 
-t_env_list *setup_env_list(void)
+t_env_list *setup_env_list(char **envp)
 {
     t_env_list *env_list;
-    extern char **environ;
-    char **env;
-    t_env_node *node;
+    char *key;
+    char *value;
+    int i;
+    char *eq_ptr;
 
-    env_list = gc_malloc(sizeof(t_env_list));
+    env_list = malloc(sizeof(t_env_list));
     if (!env_list)
         return (NULL);
     init_env_lst(env_list);
-    env = environ;
-    while (*env)
+    i = 0;
+    while (envp && envp[i])
     {
-        char *eq = ft_strchr(*env, '=');
-        if (eq)
+        eq_ptr = ft_strchr(envp[i], '=');
+        if (eq_ptr)
         {
-            char *key = gc_substr(*env, 0, (unsigned int)(eq - *env));
-            char *value = gc_strdup(eq + 1);
-            node = gc_malloc(sizeof(t_env_node));
-            if (node)
-            {
-                node->key = key;
-                node->value = value;
-                node->next = NULL;
-                if (!env_list->head)
-                {
-                    env_list->head = node;
-                    env_list->tail = node;
-                }
-                else
-                {
-                    env_list->tail->next = node;
-                    env_list->tail = node;
-                }
-                env_list->size++;
-            }
+            key = ft_substr(envp[i], 0, eq_ptr - envp[i]);
+            value = ft_strdup(eq_ptr + 1);
+            ft_setenv(key, value, env_list);
+            free(key);
+            free(value);
         }
-        env++;
+        i++;
     }
     return (env_list);
 }
