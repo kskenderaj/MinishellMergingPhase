@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_args_helpers.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 15:14:26 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/06 18:20:00 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/12 02:58:34 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,6 @@
 #include <string.h>
 #include <unistd.h>
 
-/*
- * Tokenizer for executor: returns the next space-delimited word from *str,
- * merging quoted segments and removing surrounding quotes. If the entire
- * returned word was formed only from quoted segments, the returned buffer
- * is prefixed with a marker byte: 0x01 for single-quoted, 0x02 for
- * double-quoted. The caller is responsible for freeing the returned string
- * via the project's GC helpers (we use gc_malloc to allocate).
- */
 static char *get_next_word(char **str, char delim)
 {
     char *scan = *str;
@@ -73,22 +65,32 @@ static char *get_next_word(char **str, char delim)
 
     if (total == 0)
     {
+        /* Produce empty token (e.g., "" or '') so argument positions stay consistent */
+        char *empty = gc_malloc(1);
+        if (!empty)
+            return (NULL);
+        empty[0] = '\0';
         *str = scan;
-        return (NULL);
+        return (empty);
     }
 
     /* allocate space (extra byte for optional marker) */
-    int need_marker = (all_quoted_segments && first_quote != 0) ? 1 : 0;
+    int need_marker;
+    if (all_quoted_segments && first_quote != 0)
+        need_marker = 1;
+    else
+        need_marker = 0;
     result = gc_malloc((size_t)total + need_marker + 1);
     if (!result)
         return (NULL);
 
-    /* If entire word consists of quoted segments and first quote was single or double,
-       prefix marker so callers can detect quoted token semantics. */
     char *out = result;
     if (need_marker)
     {
-        out[0] = (first_quote == '\'') ? '\x01' : '\x02';
+        if (first_quote == '\'')
+            out[0] = '\x01';
+        else
+            out[0] = '\x02';
         out++;
     }
 
@@ -132,10 +134,6 @@ static char *get_next_word(char **str, char delim)
     return (result);
 }
 
-/* Simple argument splitter that preserves tokens returned by the tokenizer.
- * Previously this code removed marker-only tokens; doing so discards valid
- * empty quoted arguments ("" and ''), so we pass tokens through verbatim.
- */
 void split_args(char *input, char **args, int max_args)
 {
     int i = 0;
@@ -160,10 +158,6 @@ void shift_left_by(char **args, int start, int by)
         args[j] = args[j + by];
         j++;
     }
-    while (by > 0)
-    {
-        args[j] = NULL;
-        j++;
-        by--;
-    }
+    /* terminate once; callers must not rely on multiple trailing NULLs */
+    args[j] = NULL;
 }

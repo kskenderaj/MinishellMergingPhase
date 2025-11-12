@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 17:28:18 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/09 22:47:21 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/12 02:41:24 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,16 +53,32 @@ static t_filelist *find_last_heredoc(t_commandlist *cmd, int heredoc_count)
 // Opens the last heredoc
 static int write_heredoc_to_temp(int tmpfd, t_filelist *last_heredoc)
 {
-	char buffer[1024];
-	size_t len;
+	char *line;
 
-	len = strlen(last_heredoc->filename);
-	while (fgets(buffer, sizeof(buffer), stdin))
+	start_heredoc_signals();
+	while (1)
 	{
-		if (strncmp(buffer, last_heredoc->filename, len) == 0 && buffer[len] == '\n')
+		line = readline("heredoc> ");
+		if (g_sigint_status)
+		{
+			if (line)
+				free(line);
 			break;
-		write(tmpfd, buffer, strlen(buffer));
+		}
+		if (!line)
+		{
+			ft_putstr_fd("minishell: warning: here-document delimited by end-of-file\n", STDERR_FILENO);
+			break;
+		}
+		if (ft_strcmp(line, last_heredoc->filename) == 0)
+		{
+			free(line);
+			break;
+		}
+		ft_putendl_fd(line, tmpfd);
+		free(line);
 	}
+	start_signals();
 	lseek(tmpfd, 0, SEEK_SET);
 	return (tmpfd);
 }
@@ -73,8 +89,6 @@ int setup_heredoc_fd(t_commandlist *cmd)
 	t_filelist *last_heredoc;
 	int tmpfd;
 	char template[] = "/tmp/minishell_heredoc_XXXXXX";
-	size_t len;
-	int d;
 
 	heredoc_count = count_heredoc(cmd);
 	if (heredoc_count == 0)
@@ -82,16 +96,10 @@ int setup_heredoc_fd(t_commandlist *cmd)
 	last_heredoc = find_last_heredoc(cmd, heredoc_count);
 	if (!last_heredoc)
 		return (-1);
-	len = strlen(last_heredoc->filename);
 	tmpfd = mkstemp(template);
 	if (tmpfd == -1)
 		return (-1);
-	d = open("tests/strict_tmp/heredoc_debug.txt",
-			 O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (d != -1)
-	{
-		printf("delimiter='%s' len=%zu\n", last_heredoc->filename, len);
-		close(d);
-	}
+	// Unlink the file immediately, so it's cleaned up on close
+	unlink(template);
 	return (write_heredoc_to_temp(tmpfd, last_heredoc));
 }

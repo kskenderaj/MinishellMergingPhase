@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/11 03:08:27 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/11 04:26:18 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/11 19:23:36 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,7 +58,10 @@ t_token_list *tokenize_input(char *line)
 
     if (!line)
         return (NULL);
-    tokens = (t_token_list *)malloc(sizeof(t_token_list));
+    /* fast syntax validation before tokenizing */
+    if (!check_tokens(line, 0))
+        return (NULL);
+    tokens = (t_token_list *)gc_malloc(sizeof(t_token_list));
     if (!tokens)
         return (NULL);
     init_token_lst(tokens);

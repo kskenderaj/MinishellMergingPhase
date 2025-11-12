@@ -121,8 +121,6 @@ t_segment *create_segment(char *start, int len, t_seg_type type);
 /* Command/list helpers (implemented in parsing/command) */
 t_cmd_node *create_cmdnode(void);
 void push_cmd(t_cmd_list *lst, t_cmd_node *node);
-int collect_redirs(t_token *token, t_cmd_node *cmdnode);
-bool is_built_in(char *str);
 void create_filenode(char *str, int red_type, t_file_list *filelst);
 
 /* Segment utilities used elsewhere */
@@ -151,7 +149,6 @@ char *ft_getenv(const char *name, t_env_list *env_list);
 void ft_setenv(const char *name, const char *value, t_env_list *env_list);
 t_token_list *tokenize_input(char *line);
 t_cmd_list *parse_commands(t_token_list *tokens);
-int execute_commands(t_cmd_list *commands);
 void free_token_lst(t_token_list **lst);
 void free_cmd_lst(t_cmd_list **lst);
 void cleanup_shell(void);

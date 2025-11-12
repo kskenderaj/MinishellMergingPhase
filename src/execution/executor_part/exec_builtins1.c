@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 00:07:02 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/09 23:31:12 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/11 20:13:01 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,16 +45,6 @@ static int resolve_cd_target(char **args, int argc, char **target)
 	return (0);
 }
 
-/*
- * ft_cd - Change the current working directory.
- * Handles all edge cases:
- * - No argument: change to HOME
- * - "-": change to OLDPWD and print new dir
- * - Too many arguments: error
- * - Nonexistent directory: error
- * - Permission denied: error
- * - Updates OLDPWD and PWD in environment
- */
 int ft_cd(char **args)
 {
 	char *target;

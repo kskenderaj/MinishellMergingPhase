@@ -1,18 +1,33 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   execute.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/11 20:12:07 by klejdi            #+#    #+#             */
+/*   Updated: 2025/11/12 02:41:23 by klejdi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 #include "executor.h"
+#include "builtins.h"
+#include "main_helpers.h" /* for expand_args_inplace prototype */
 #include <sys/wait.h>
 
-static int is_builtin_cmd(char *s)
+int is_builtin_cmd(char *s)
 {
     if (!s)
         return (0);
-    return (!ft_strcmp(s, "echo") || !ft_strcmp(s, "cd") || !ft_strcmp(s, "pwd") || !ft_strcmp(s, "export") || !ft_strcmp(s, "unset") || !ft_strcmp(s, "env"));
+    return (!ft_strcmp(s, "echo") || !ft_strcmp(s, "cd") || !ft_strcmp(s, "pwd") || !ft_strcmp(s, "export") || !ft_strcmp(s, "unset") || !ft_strcmp(s, "env") || !ft_strcmp(s, "exit"));
 }
 
 static int run_single_builtin(char **args, int in_fd, int out_fd)
 {
     if (!args || !args[0] || !is_builtin_cmd(args[0]))
         return (-1);
+    expand_args_inplace(args);
     if (!ft_strcmp(args[0], "echo"))
         return (exec_builtin_with_redir(ft_echo, args, in_fd, out_fd));
     if (!ft_strcmp(args[0], "cd"))
@@ -23,6 +38,8 @@ static int run_single_builtin(char **args, int in_fd, int out_fd)
         return (exec_builtin_with_redir(ft_export, args, in_fd, out_fd));
     if (!ft_strcmp(args[0], "unset"))
         return (exec_builtin_with_redir(ft_unset, args, in_fd, out_fd));
+    if (!ft_strcmp(args[0], "exit"))
+        return (exec_builtin_with_redir(ft_exit, args, in_fd, out_fd));
     return (exec_builtin_with_redir(ft_env, args, in_fd, out_fd));
 }
 
@@ -52,13 +69,23 @@ static void child_exec_external(char **args, int in_fd, int out_fd, char **envp)
         close(in_fd);
     if (out_fd != -1)
         close(out_fd);
+    start_signals(); /* ensure parent prompt signals aren't inherited incorrectly */
+    signal(SIGINT, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
+    if (!args || !args[0] || args[0][0] == '\0')
+    {
+        extern void exec_external(char **args, char **envp);
+        exec_external(args, envp);
+    }
     path = find_in_path(args[0]);
     execve(path, args, envp);
-    if (errno == ENOENT)
-        _exit(127);
-    if (errno == EACCES || errno == EISDIR)
-        _exit(126);
-    _exit(126);
+    /* Reuse external handler's error printing for consistency */
+    {
+        extern void exec_external(char **args, char **envp);
+        (void)path;
+        /* exec_external also prints and exits on failure */
+        exec_external(args, envp);
+    }
 }
 
 static int run_single_external(char **args, int in_fd, int out_fd)
@@ -66,6 +93,7 @@ static int run_single_external(char **args, int in_fd, int out_fd)
     pid_t pid;
     char **envp;
 
+    expand_args_inplace(args);
     envp = generate_env(g_shell.env);
     pid = fork();
     if (pid == 0)
@@ -74,7 +102,11 @@ static int run_single_external(char **args, int in_fd, int out_fd)
         close(in_fd);
     if (out_fd != -1)
         close(out_fd);
-    return (wait_child_status(pid));
+    {
+        int st = wait_child_status(pid);
+        g_shell.last_status = st;
+        return (st);
+    }
 }
 
 static int count_cmds(t_cmd_list *lst)
@@ -115,6 +147,9 @@ int execute_commands(t_cmd_list *commands)
         i = 0;
         while (node)
         {
+            /* expand args for each command in pipeline */
+            if (node->cmd)
+                expand_args_inplace(node->cmd);
             cmdv[i++] = node->cmd;
             node = node->next;
         }
@@ -132,11 +167,20 @@ int execute_commands(t_cmd_list *commands)
 
         in_fd = -1;
         out_fd = -1;
+        /* expand before handling redirections so files can use $VAR */
+        if (node->cmd)
+            expand_args_inplace(node->cmd);
         red = setup_redirections(node->cmd, &in_fd, &out_fd);
         if (red == 2)
+        {
+            g_shell.last_status = 2;
             return (2);
+        }
         if (red == 1)
+        {
+            g_shell.last_status = 1;
             return (1);
+        }
         if (!node->cmd[0])
         {
             if (in_fd != -1)
@@ -150,7 +194,10 @@ int execute_commands(t_cmd_list *commands)
 
             bret = run_single_builtin(node->cmd, in_fd, out_fd);
             if (bret >= 0)
+            {
+                g_shell.last_status = bret;
                 return (bret);
+            }
         }
         return (run_single_external(node->cmd, in_fd, out_fd));
     }

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   assigns.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/11 19:57:32 by klejdi            #+#    #+#             */
+/*   Updated: 2025/11/11 19:57:33 by klejdi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "main_helpers.h"
 #include "executor.h"
 
@@ -67,6 +79,10 @@ void apply_assignments_when_no_command(char **local_assigns)
         key = gc_substr(local_assigns[k], 0, (unsigned int)(eq - local_assigns[k]));
         val = eq + 1;
         if (key)
-            setenv(key, val ? val : "", 1);
+        {
+            if (!val)
+                val = "";
+            setenv(key, val, 1);
+        }
     }
 }

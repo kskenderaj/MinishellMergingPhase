@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 17:31:20 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/09 23:31:10 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/11 17:11:24 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,11 +111,11 @@ static void export_with_value(char *arg)
 		stripped = strip_quotes(value);
 		if (stripped)
 		{
-			setenv(name, stripped, 1);
+			ft_setenv(name, stripped, g_shell.env);
 			gc_free(stripped);
 		}
 		else
-			setenv(name, value, 1);
+			ft_setenv(name, value, g_shell.env);
 		/* track the name as exported */
 		if (!is_in_exported(name) && g_shell.exported_count < MAX_EXPORTED)
 			g_shell.exported_vars[g_shell.exported_count++] = gc_strdup(name);

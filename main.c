@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/11 02:30:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/11 04:26:26 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/12 02:56:47 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,19 +23,22 @@ void start_debug_segv_backtrace(void);
 
 static void increment_shlvl(void)
 {
-	char *shlvl_str;
-	int shlvl;
+	char *cur;
+	int lvl;
+	char *new_val;
 
-	shlvl_str = ft_getenv("SHLVL", g_shell.env);
-	shlvl = 1;
-	if (shlvl_str)
+	cur = ft_getenv("SHLVL", g_shell.env);
+	lvl = 1;
+	if (cur)
 	{
-		shlvl = ft_atoi(shlvl_str) + 1;
-		free(shlvl_str);
+		lvl = ft_atoi(cur) + 1;
+		free(cur);
 	}
-	shlvl_str = ft_itoa(shlvl);
-	ft_setenv("SHLVL", shlvl_str, g_shell.env);
-	free(shlvl_str);
+	new_val = ft_itoa(lvl);
+	if (!new_val)
+		return;
+	ft_setenv("SHLVL", new_val, g_shell.env);
+	free(new_val);
 }
 
 int main(int argc, char **argv, char **envp)
@@ -73,12 +76,20 @@ int main(int argc, char **argv, char **envp)
 		}
 		if (!line)
 		{
+			/* Distinguish Ctrl+D (EOF) from Ctrl+C (SIGINT). */
+			if (g_sigint_status)
+			{
+				*exit_code() = 1;
+				g_sigint_status = 0;
+				continue; /* Do not exit on Ctrl+C */
+			}
 			if (interactive)
 				ft_putendl_fd("exit", STDOUT_FILENO);
-			break;
+			break; /* Real EOF (Ctrl+D) */
 		}
 		if (interactive && *line)
 			add_history(line);
+		g_sigint_status = 0;
 		if (is_exit_command(line))
 		{
 			free(line);

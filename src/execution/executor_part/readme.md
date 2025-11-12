@@ -40,3 +40,15 @@ For each argument, it checks if there’s an =. If so, splits and validates the 
 If no =, just validates and marks as exported if already set.
 If no arguments, prints all exported variables.
 THATS EXPORT EVERY DETAIL ON HOW IT WORKS I WROTE THERE
+
+Tokenizer: Quote-aware, handles |, <, >, <<, >>, with early syntax checks.
+Parser: Linked list of command nodes; redirs left in argv for executor.
+Executor:
+Single and pipeline execution.
+Builtins run in parent with redirections; externals via fork/execve.
+Unified error reporting; exit codes aligned (127 ENOENT, 126 EACCES/EISDIR, 2 syntax, 128+signal).
+Redirections: Attached and separated operators; centralized syntax checks; heredoc stub.
+Expansion: $VAR, $? and $<digit>→""; no expansion in single quotes; quote-aware splitting.
+Environment: Linked-list env; export formatting sorted/escaped; unset removes; SHLVL increment.
+Builtins: echo, cd, pwd, env (rejects args), export (sorted/escaped), unset, exit (numeric parsing, too many args, non-numeric).
+Stability: Fixed pipeline segfaults; safe argv shifting to avoid OOB writes.

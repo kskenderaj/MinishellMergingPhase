@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 13:20:10 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/11 02:46:57 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/11 20:34:52 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,7 @@ int ft_pwd(char **args);
 int ft_env(char **args);
 int ft_unset(char **args);
 int ft_export(char **args);
+int ft_exit(char **args);
 void print_exported_env(void);
 /* Builtins helpers */
 char **generate_env(t_env_list *env);
@@ -103,6 +104,8 @@ int exec_builtin_with_redir(int (*builtin)(char **),
 int exec_heredoc(const char *delimiter);
 char **convert_env_to_array(t_env_list *env_list);
 char *find_in_path(char *cmd);
+int is_valid_identifier(const char *name);
+int is_builtin_cmd(char *s);
 void shift_left_by(char **args, int start, int by);
 int handle_attached_operators(t_redir_data *data, char *tok);
 int handle_separated_operators(char **args, int *i, int *in_fd, int *out_fd);
@@ -111,6 +114,8 @@ pid_t exec_parent_runner(t_cmd_node *cmd, int *io_data);
 void split_args(char *input, char **args, int max_args);
 int setup_redirections(char **args, int *in_fd,
 					   int *out_fd);
+/* High-level execution entry */
+int execute_commands(t_cmd_list *commands);
 /* Initialization */
 void init_shell(char **envp);
 /* Utility to run */

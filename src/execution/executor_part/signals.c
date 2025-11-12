@@ -11,10 +11,11 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <signal.h>
-#include <unistd.h>
-#include <termios.h>
 #include <string.h>
+#ifdef HAVE_READLINE
+#include <readline/readline.h>
+#include <readline/history.h>
+#endif
 
 /* Global observed elsewhere when a SIGINT occurred */
 volatile sig_atomic_t g_sigint_status = 0;
@@ -38,10 +39,13 @@ void handle_sig_int(int signal_nb)
     (void)signal_nb;
     g_sigint_status = 1;
     write(STDOUT_FILENO, "\n", 1);
-#if defined(READLINE_LIBRARY) || defined(HAVE_READLINE) || defined(rl_on_new_line)
-    rl_on_new_line();
-    rl_replace_line("", 0);
-    rl_redisplay();
+#ifdef HAVE_READLINE
+    if (isatty(STDIN_FILENO))
+    {
+        rl_on_new_line();
+        rl_replace_line("", 0);
+        rl_redisplay();
+    }
 #endif
 }
 

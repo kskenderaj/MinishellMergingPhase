@@ -6,19 +6,91 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 17:34:28 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/07 20:27:21 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/11 20:13:52 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
+#include <errno.h>
+#include <string.h>
+
+static int has_slash(const char *s)
+{
+    int i;
+
+    if (!s)
+        return (0);
+    i = 0;
+    while (s[i])
+    {
+        if (s[i] == '/')
+            return (1);
+        i++;
+    }
+    return (0);
+}
+
+static void print_exec_error_and_exit(char **args)
+{
+    int code;
+
+    code = 126;
+    if (errno == ENOENT)
+    {
+        if (has_slash(args[0]))
+        {
+            ft_putstr_fd("minishell: ", STDERR_FILENO);
+            ft_putstr_fd(args[0], STDERR_FILENO);
+            ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
+        }
+        else
+        {
+            ft_putstr_fd("minishell: ", STDERR_FILENO);
+            ft_putstr_fd(args[0], STDERR_FILENO);
+            ft_putstr_fd(": command not found\n", STDERR_FILENO);
+        }
+        code = 127;
+    }
+    else if (errno == EACCES)
+    {
+        ft_putstr_fd("minishell: ", STDERR_FILENO);
+        ft_putstr_fd(args[0], STDERR_FILENO);
+        ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
+        code = 126;
+    }
+    else if (errno == EISDIR)
+    {
+        ft_putstr_fd("minishell: ", STDERR_FILENO);
+        ft_putstr_fd(args[0], STDERR_FILENO);
+        ft_putstr_fd(": Is a directory\n", STDERR_FILENO);
+        code = 126;
+    }
+    else
+    {
+        ft_putstr_fd("minishell: ", STDERR_FILENO);
+        ft_putstr_fd(args[0], STDERR_FILENO);
+        ft_putstr_fd(": ", STDERR_FILENO);
+        ft_putstr_fd((char *)strerror(errno), STDERR_FILENO);
+        ft_putstr_fd("\n", STDERR_FILENO);
+        code = 126;
+    }
+    _exit(code);
+}
 
 // Executes external command (execve in current process)
 void exec_external(char **args, char **envp)
 {
     char *exec_path;
-
+    if (!args || !args[0] || args[0][0] == '\0')
+    {
+        errno = ENOENT;
+        /* fabricate a placeholder name so error line matches tester expectations */
+        static char *placeholder[2] = {"", NULL};
+        print_exec_error_and_exit(placeholder);
+    }
     exec_path = find_in_path(args[0]);
     execve(exec_path, args, envp);
+    print_exec_error_and_exit(args);
 }
 
 // Sets up redirections for builtins and runs them

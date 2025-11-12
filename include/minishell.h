@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/23 14:22:44 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/11 01:57:48 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/12 02:41:22 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,10 +151,8 @@ int process_command(char *prompt, t_env_list *env_list);
 char *get_env_value(t_env_list *env, const char *key);
 
 // signals.c
-void handle_sig_int(int signal_nb);
-void remove_ctrlc_echo(void);
-void handle_ctrlc_heredoc(int signal_nb);
-void start_heredoc_signals(void);
 void start_signals(void);
+void start_heredoc_signals(void);
+extern volatile sig_atomic_t g_sigint_status;
 
 #endif

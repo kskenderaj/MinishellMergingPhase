@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/11 03:08:59 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/11 04:26:17 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/11 18:08:16 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,21 +70,6 @@ bool is_redirection(t_toktype t)
     return (t == T_REDIR_IN || t == T_REDIR_OUT || t == T_REDIR_APPEND || t == T_HEREDOC);
 }
 
-// A helper to create a new command node
-static t_cmd_node *create_cmd_node(void)
-{
-    t_cmd_node *node;
-
-    node = malloc(sizeof(t_cmd_node));
-    if (!node)
-        return (NULL);
-    node->cmd = NULL;
-    node->files = NULL;
-    node->next = NULL;
-    // You would initialize other fields here
-    return (node);
-}
-
 // A helper to add an argument to a command node's args array
 static void add_arg_to_cmd(t_cmd_node *cmd, char *arg)
 {
@@ -118,31 +103,45 @@ t_cmd_list *parse_commands(t_token_list *tokens)
 {
     t_cmd_list *cmd_list;
     t_cmd_node *current_cmd;
-    t_token *current_token;
+    t_token *tok;
 
-    if (!tokens || !tokens->head)
+    if (!tokens)
         return (NULL);
-    cmd_list = malloc(sizeof(t_cmd_list));
+    cmd_list = (t_cmd_list *)malloc(sizeof(*cmd_list));
     if (!cmd_list)
         return (NULL);
     init_cmd_lst(cmd_list);
-    current_cmd = create_cmd_node();
-    cmd_list->head = current_cmd;
-    cmd_list->tail = current_cmd;
-    current_token = tokens->head;
-    while (current_token)
+    current_cmd = create_cmdnode();
+    if (!current_cmd)
     {
-        if (current_token->type == T_PIPE)
+        free(cmd_list);
+        return (NULL);
+    }
+    push_cmd(cmd_list, current_cmd);
+    tok = tokens->head;
+    while (tok)
+    {
+        if (tok->type == T_PIPE)
         {
-            current_cmd->next = create_cmd_node();
-            current_cmd = current_cmd->next;
-            cmd_list->tail = current_cmd;
+            /* Start a new command after a pipe. Even if the previous
+             * command had no args, keep the empty node to match pipe count. */
+            current_cmd = create_cmdnode();
+            if (!current_cmd)
+            {
+                // on allocation failure, free what we built so far
+                // and signal parse error
+                free_cmd_lst(&cmd_list);
+                return (NULL);
+            }
+            push_cmd(cmd_list, current_cmd);
         }
-        else // For now, treat all non-pipe tokens as command arguments
+        else
         {
-            add_arg_to_cmd(current_cmd, current_token->value);
+            /* Keep redirection operators and their targets as-is in argv;
+             * execution layer consumes them via setup_redirections(). */
+            add_arg_to_cmd(current_cmd, tok->value);
         }
-        current_token = current_token->next;
+        tok = tok->next;
     }
     return (cmd_list);
 }

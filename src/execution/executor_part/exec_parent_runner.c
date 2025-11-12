@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 13:14:57 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/09 22:06:04 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/11 17:40:44 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,9 @@ pid_t exec_parent_runner(t_cmd_node *cmd, int *io_data)
 		return (*(cmd->env->pid));
 	error_code = table_of_builtins(cmd, generate_env(cmd->env), 1);
 	/* record last status for shell */
-	g_shell.last_status = error_code >= 0 ? error_code : g_shell.last_status;
+	if (error_code >= 0)
+		g_shell.last_status = error_code;
+	else
+		g_shell.last_status = g_shell.last_status;
 	return (*(cmd->env->pid));
 }

@@ -6,11 +6,12 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 16:04:59 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/09 22:06:02 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/11 20:08:15 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
+#include "builtins.h"
 
 /* forward prototypes for helpers to avoid implicit declarations under C99 */
 static int create_pipes(int pipes[64][2], int ncmds);
@@ -27,16 +28,24 @@ int exec_pipeline(char ***cmds, int ncmds, char **envp)
 	pid_t pids[64];
 
 	if (ncmds <= 0)
+	{
+		g_shell.last_status = 1;
 		return (1);
+	}
 	if (create_pipes(pipes, ncmds) != 0)
+	{
+		g_shell.last_status = 1;
 		return (1);
+	}
 	if (spawn_pipeline_children(cmds, ncmds, envp, pipes, pids) != 0)
 	{
 		close_all_pipes(pipes, ncmds);
+		g_shell.last_status = 1;
 		return (1);
 	}
 	close_all_pipes(pipes, ncmds);
-	return (wait_children(pids, ncmds));
+	g_shell.last_status = wait_children(pids, ncmds);
+	return (g_shell.last_status);
 }
 
 static int create_pipes(int pipes[64][2], int ncmds)
@@ -123,6 +132,9 @@ static void setup_child_io_and_exec(int idx, int ncmds, int pipes[64][2],
 	/* if command is a shell builtin, run it in this child process */
 	if (cmd && cmd[0])
 	{
+		/* ensure argv[0] is not empty string; if so exit 0 */
+		if (cmd[0][0] == '\0')
+			_exit(0);
 		int ret;
 		if (!strcmp(cmd[0], "echo"))
 		{
@@ -152,6 +164,11 @@ static void setup_child_io_and_exec(int idx, int ncmds, int pipes[64][2],
 		else if (!strcmp(cmd[0], "env"))
 		{
 			ret = ft_env(cmd);
+			_exit(ret);
+		}
+		else if (!strcmp(cmd[0], "exit"))
+		{
+			ret = ft_exit(cmd);
 			_exit(ret);
 		}
 	}

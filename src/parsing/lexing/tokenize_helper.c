@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/11 01:59:44 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/11 03:32:52 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/11 17:40:39 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,37 +68,38 @@ int word_end(char *input, int i)
 	return (i);
 }
 
-int handle_redir(t_token_list *lst, char *input, int *i, int red_len)
+int handle_redir(t_token_list *lst, char *input, int *i, int rlen)
 {
 	int start;
 	int next;
 	int end;
 
-	if (!red_len)
-		return 1;
-	if (add_token(lst, red_type(input, *i), input + *i, red_len) != 0)
-		return 1;
-	*i += red_len;
+	if (!rlen)
+		return (1);
+	if (add_token(lst, red_type(input, *i), input + *i, rlen) != 0)
+		return (1);
+	*i += rlen;
 	*i = skip_spaces(input, *i);
+	/* If missing target or another operator follows, don't fail here; leave parsing to detect */
 	if (!input[*i] || input[*i] == '|' || input[*i] == '<' || input[*i] == '>')
-		return 1;
+		return (0);
 	if (input[*i] == '\'' || input[*i] == '"')
 	{
 		start = *i;
 		next = scan_quote(input, *i);
 		if (next < 0)
-			return 1;
+			return (1);
 		if (add_token(lst, T_IDENTIFIER, input + start, next - start) != 0)
-			return 1;
+			return (1);
 		*i = next;
-		return 0;
+		return (0);
 	}
 	start = *i;
 	end = word_end(input, *i);
 	if (end <= start)
-		return 1;
+		return (0);
 	if (add_token(lst, T_IDENTIFIER, input + start, end - start) != 0)
-		return 1;
+		return (1);
 	*i = end;
-	return 0;
+	return (0);
 }
