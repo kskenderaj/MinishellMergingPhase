@@ -1,12 +1,12 @@
 /* ************************************************************************** */
-/*                                                    // Initialization            */
+/*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   parser.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/12 14:40:09 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/05 20:45:14 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/15 21:24:56 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,11 +129,11 @@ char *segments_expand(t_segment_list *seglst, t_env_list *envlst, int last_statu
 char *expand_env(char *str, t_env_list *env_lst);
 char *check_for_env(t_env_list *envlst, const char *str, size_t len);
 char *get_expand(char *seg_str, int i, int last_status, t_env_list *envlst);
+int skip_var(char *str);
 
 // debug
 void print_tokens(const t_token_list *lst);
 void print_segment_list(const t_segment_list *list);
-void init_segment_lst(t_segment_list *lst);
 
 // Initialization
 void init_token_lst(t_token_list *lst);

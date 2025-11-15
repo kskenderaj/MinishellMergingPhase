@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/11 10:15:00 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/11 20:08:18 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/15 21:24:48 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,16 +91,68 @@ static char *expand_one(const char *s, t_env_list *env, int last_status)
 
 /* strip_outer_quotes helper removed; expand_word handles quotes inline */
 
+static void toggle_quote_mode(int *mode, char c)
+{
+    if (c == '\'' && *mode != 2)
+    {
+        if (*mode == 1)
+            *mode = 0;
+        else if (*mode == 0)
+            *mode = 1;
+    }
+    else if (c == '"' && *mode != 1)
+    {
+        if (*mode == 2)
+            *mode = 0;
+        else if (*mode == 0)
+            *mode = 2;
+    }
+}
+
+static char *append_char(char *out, char c)
+{
+    char buf[2];
+    char *tmp;
+    buf[0] = c;
+    buf[1] = '\0';
+    tmp = ft_strjoin(out, buf);
+    free(out);
+    return (tmp);
+}
+
+static char *handle_dollar_segment(const char *p, char *out, t_env_list *env, int last_status, int *adv)
+{
+    int span;
+    char *exp;
+    char *join;
+
+    span = var_span(p);
+    if (span == 1)
+    {
+        *adv = 1;
+        return (append_char(out, '$'));
+    }
+    exp = expand_one(p, env, last_status);
+    if (!exp)
+    {
+        *adv = 0;
+        return (out);
+    }
+    join = ft_strjoin(out, exp);
+    free(exp);
+    free(out);
+    *adv = span;
+    return (join);
+}
+
 static char *expand_word(char *arg, t_env_list *env, int last_status)
 {
     char *out;
-    char *tmp;
     const char *p;
-    int mode; /* 0: unquoted, 1: single, 2: double */
+    int mode;
 
     if (!arg)
         return (NULL);
-    /* If argument came with a leading quote marker from the splitter, skip it */
     if ((unsigned char)arg[0] == '\x01' || (unsigned char)arg[0] == '\x02')
         arg++;
     out = ft_strdup("");
@@ -110,76 +162,101 @@ static char *expand_word(char *arg, t_env_list *env, int last_status)
     p = arg;
     while (*p)
     {
-        if (*p == '\'' && mode != 2)
+        if (*p == '$' && (p[1] == '\'' || p[1] == '"'))
         {
-            /* toggle single-quote mode; do not copy the quote */
-            if (mode == 1)
-                mode = 0;
-            else if (mode == 0)
-                mode = 1;
             p++;
             continue;
         }
-        if (*p == '"' && mode != 1)
+        if (*p == '\'' || *p == '"')
         {
-            /* toggle double-quote mode; do not copy the quote */
-            if (mode == 2)
-                mode = 0;
-            else if (mode == 0)
-                mode = 2;
+            toggle_quote_mode(&mode, *p);
             p++;
             continue;
         }
         if (*p == '$' && (mode == 0 || mode == 2))
         {
-            int span = var_span(p);
-            if (span == 1)
+            int adv = 0;
+            out = handle_dollar_segment(p, out, env, last_status, &adv);
+            if (adv > 0)
             {
-                /* literal '$' */
-                tmp = ft_strjoin(out, "$");
-                free(out);
-                out = tmp;
-                p += 1;
+                p += adv;
                 continue;
             }
-            char *exp = expand_one(p, env, last_status);
-            if (!exp)
-                return (out);
-            char *join = ft_strjoin(out, exp);
-            free(exp);
-            free(out);
-            out = join;
-            p += span;
-            continue;
         }
-        {
-            char buf[2];
-            buf[0] = *p;
-            buf[1] = '\0';
-            tmp = ft_strjoin(out, buf);
-            free(out);
-            out = tmp;
-        }
+        out = append_char(out, *p);
         p++;
     }
     return (out);
 }
 
+/* Strip one pair of matching outer quotes from an argument ("..." or '...').
+** Leaves heredoc delimiters untouched so we can differentiate quoted vs unquoted later. */
+static char *strip_outer_quotes_simple(char *s)
+{
+    size_t len;
+    char *out;
+    if (!s)
+        return (NULL);
+    len = ft_strlen(s);
+    if (len >= 2 && ((s[0] == '"' && s[len - 1] == '"') || (s[0] == '\'' && s[len - 1] == '\'')))
+    {
+        out = ft_substr(s, 1, len - 2);
+        if (!out)
+            return (s);
+        free(s);
+        return (out);
+    }
+    return (s);
+}
+
+static int is_attached_heredoc(char *s)
+{
+    return (s && s[0] == '<' && s[1] == '<' && s[2] != '\0');
+}
+
+static int is_redir_op(char *s)
+{
+    return (s && (!ft_strcmp(s, "<") || !ft_strcmp(s, ">") || !ft_strcmp(s, ">>") || !ft_strcmp(s, "<<")));
+}
+
 void expand_args_inplace(char **args)
 {
     int i;
+    int skip_hd;
     char *expanded;
+
     if (!args)
         return;
     i = 0;
+    skip_hd = 0;
     while (args[i])
     {
+        if (skip_hd)
+        {
+            skip_hd = 0;
+            i++;
+            continue;
+        }
+        if (!ft_strcmp(args[i], "<<"))
+        {
+            skip_hd = 1;
+            i++;
+            continue;
+        }
+        if (is_attached_heredoc(args[i]))
+        {
+            i++;
+            continue;
+        }
         expanded = expand_word(args[i], g_shell.env, g_shell.last_status);
         if (expanded)
         {
-            /* Do not free args[i] here: argv may be GC-managed. */
+            if (expanded != args[i])
+                free(args[i]);
             args[i] = expanded;
         }
+        if (args[i] && !is_redir_op(args[i]))
+            args[i] = strip_outer_quotes_simple(args[i]);
         i++;
     }
 }

@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 13:20:10 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/11 20:34:52 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/14 22:53:27 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,5 +135,7 @@ int count_outfile(t_commandlist *cmd);
 int setup_outfile_fd(t_commandlist *cmd);
 int count_heredoc(t_commandlist *cmd);
 int setup_heredoc_fd(t_commandlist *cmd);
+/* New: setup heredocs directly from parser command node */
+int setup_heredoc_from_cmdnode(t_cmd_node *cmd);
 /* Export utility functions -- END */
 #endif

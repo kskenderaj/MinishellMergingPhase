@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 18:05:38 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/11 03:53:40 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/15 20:49:39 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@
 //     if (strncmp(tok, ">>", 2) == 0)
 //         return ((int)(intptr_t)({
 //             /* attached append */
-//             char *fname = (tok[2] != '\0') ? tok + 2 : args[*idx + 1];
+//             /* attached append example removed */
 //             if (!fname)
 //                 return (int)1;
 //             if (*out_fd != -1)
@@ -68,7 +68,7 @@
 //     if (strncmp(tok, "<<", 2) == 0)
 //         return ((int)(intptr_t)({
 //             /* attached heredoc */
-//             char *delim = (tok[2] != '\0') ? tok + 2 : args[*idx + 1];
+//             /* attached heredoc example removed */
 //             if (!delim)
 //                 return (int)1;
 //             if (*in_fd != -1)
@@ -83,7 +83,7 @@
 //     if (tok[0] == '>' && tok[1] != '>')
 //         return ((int)(intptr_t)({
 //             /* attached outfile */
-//             char *fname = (tok[1] != '\0') ? tok + 1 : args[*idx + 1];
+//             /* attached outfile example removed */
 //             if (!fname)
 //                 return (int)1;
 //             if (*out_fd != -1)
@@ -103,7 +103,7 @@
 //     if (tok[0] == '<' && tok[1] != '<')
 //         return ((int)(intptr_t)({
 //             /* attached infile */
-//             char *fname = (tok[1] != '\0') ? tok + 1 : args[*idx + 1];
+//             /* attached infile example removed */
 //             if (!fname)
 //                 return (int)1;
 //             if (*in_fd != -1)

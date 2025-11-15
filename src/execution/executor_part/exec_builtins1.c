@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 00:07:02 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/11 20:13:01 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/15 20:37:02 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ static int resolve_cd_target(char **args, int argc, char **target)
 {
 	if (argc > 2)
 	{
-		ft_putstr_fd("cd: too many arguments\n", STDERR_FILENO);
+		ft_putstr_fd("minishell: cd: too many arguments\n", STDERR_FILENO);
 		return (1);
 	}
 	if (argc == 1 || (args[1] && args[1][0] == '\0'))
@@ -26,7 +26,7 @@ static int resolve_cd_target(char **args, int argc, char **target)
 		*target = getenv("HOME");
 		if (!*target)
 		{
-			ft_putstr_fd("cd: HOME not set\n", STDERR_FILENO);
+			ft_putstr_fd("minishell: cd: HOME not set\n", STDERR_FILENO);
 			return (1);
 		}
 		return (0);
@@ -36,7 +36,7 @@ static int resolve_cd_target(char **args, int argc, char **target)
 		*target = getenv("OLDPWD");
 		if (!*target)
 		{
-			ft_putstr_fd("cd: OLDPWD not set\n", STDERR_FILENO);
+			ft_putstr_fd("minishell: cd: OLDPWD not set\n", STDERR_FILENO);
 			return (1);
 		}
 		return (0);
@@ -56,14 +56,21 @@ int ft_cd(char **args)
 	while (args[argc])
 		argc++;
 	if (!getcwd(oldpwd, sizeof(oldpwd)))
-		return (perror("cd: getcwd (oldpwd)"), 1);
+		return (perror("minishell: cd: getcwd (oldpwd)"), 1);
 	/* determine target and validate args */
 	if (resolve_cd_target(args, argc, &target))
 		return (1);
 	if (chdir(target) != 0)
-		return (perror(target), 1);
+	{
+		ft_putstr_fd("minishell: cd: ", STDERR_FILENO);
+		ft_putstr_fd(target, STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
+		ft_putstr_fd((char *)strerror(errno), STDERR_FILENO);
+		ft_putchar_fd('\n', STDERR_FILENO);
+		return (1);
+	}
 	if (!getcwd(newpwd, sizeof(newpwd)))
-		return (perror("cd: getcwd (newpwd)"), 1);
+		return (perror("minishell: cd: getcwd (newpwd)"), 1);
 	if (args[1] && strcmp(args[1], "-") == 0)
 		printf("%s\n", newpwd);
 	setenv("OLDPWD", oldpwd, 1);

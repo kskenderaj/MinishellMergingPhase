@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/11 01:53:44 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/12 02:56:47 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/15 21:24:54 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,8 @@ t_env_list *setup_env_list(char **envp)
         if (eq_ptr)
         {
             key = ft_substr(envp[i], 0, eq_ptr - envp[i]);
-            value = ft_substr(envp[i], (unsigned int)(eq_ptr - envp[i] + 1), ft_strlen(eq_ptr + 1));
+            value = ft_substr(envp[i], (unsigned int)(eq_ptr - envp[i] + 1),
+                              ft_strlen(eq_ptr + 1));
             if (key && value)
                 ft_setenv(key, value, env_list);
             if (key)

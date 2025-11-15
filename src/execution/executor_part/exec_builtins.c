@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 00:32:23 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/12 02:56:47 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/15 20:37:16 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ char **generate_env(t_env_list *env)
 		count++;
 		cur = cur->next;
 	}
-	envp = gc_malloc(sizeof(char *) * (count + 1));
+	envp = (char **)malloc(sizeof(char *) * (count + 1));
 	if (!envp)
 		return (NULL);
 	cur = env->head;
@@ -80,9 +80,12 @@ char **generate_env(t_env_list *env)
 			len = ft_strlen(cur->key) + 1;
 			if (cur->value)
 				len += ft_strlen(cur->value);
-			line = gc_malloc(len + 1);
+			line = (char *)malloc(len + 1);
 			if (!line)
+			{
+				envp[i] = NULL;
 				return (envp);
+			}
 			line[0] = '\0';
 			ft_strlcpy(line, cur->key, len + 1);
 			ft_strlcat(line, "=", len + 1);
@@ -162,7 +165,7 @@ int ft_exit(char **args)
 	}
 	if (!is_numeric(args[1]))
 	{
-		ft_putstr_fd("exit: ", STDERR_FILENO);
+		ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
 		ft_putstr_fd(args[1], STDERR_FILENO);
 		ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
 		cleanup_shell();
@@ -170,13 +173,13 @@ int ft_exit(char **args)
 	}
 	if (argc > 2)
 	{
-		ft_putstr_fd("exit: too many arguments\n", STDERR_FILENO);
+		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
 		g_shell.last_status = 1;
 		return (1);
 	}
 	if (!parse_exit_status(args[1], &code))
 	{
-		ft_putstr_fd("exit: ", STDERR_FILENO);
+		ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
 		ft_putstr_fd(args[1], STDERR_FILENO);
 		ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
 		cleanup_shell();

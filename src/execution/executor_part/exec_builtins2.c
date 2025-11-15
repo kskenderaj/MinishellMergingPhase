@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 17:31:20 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/11 17:11:24 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/15 20:37:17 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ static void export_no_value(char *arg)
 {
 	if (!is_valid_identifier(arg))
 	{
-		ft_putstr_fd("export: `", STDERR_FILENO);
+		ft_putstr_fd("minishell: export: `", STDERR_FILENO);
 		ft_putstr_fd(arg, STDERR_FILENO);
 		ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
 	}
@@ -101,8 +101,8 @@ static void export_with_value(char *arg)
 
 	if (!is_valid_identifier(name))
 	{
-		ft_putstr_fd("export: `", STDERR_FILENO);
-		ft_putstr_fd(name, STDERR_FILENO);
+		ft_putstr_fd("minishell: export: `", STDERR_FILENO);
+		ft_putstr_fd(arg, STDERR_FILENO);
 		ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
 	}
 	else
@@ -138,8 +138,6 @@ int ft_export(char **args)
 	{
 		if (ft_strchr(args[i], '='))
 		{
-			/* export_with_value prints errors for invalid names */
-			/* it currently doesn't return a status, so check validity here */
 			char *eq = ft_strchr(args[i], '=');
 			int namelen = (int)(eq - args[i]);
 			char *name = (char *)gc_malloc(namelen + 1);

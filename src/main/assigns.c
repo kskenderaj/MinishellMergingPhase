@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/11 19:57:32 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/11 19:57:33 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/15 20:49:38 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,18 +71,24 @@ void apply_assignments_when_no_command(char **local_assigns)
     char *key;
     char *val;
 
-    for (int k = 0; local_assigns[k]; ++k)
     {
-        eq = ft_strchr(local_assigns[k], '=');
-        if (!eq)
-            continue;
-        key = gc_substr(local_assigns[k], 0, (unsigned int)(eq - local_assigns[k]));
-        val = eq + 1;
-        if (key)
+        int k;
+        k = 0;
+        while (local_assigns[k])
         {
-            if (!val)
-                val = "";
-            setenv(key, val, 1);
+            eq = ft_strchr(local_assigns[k], '=');
+            if (eq)
+            {
+                key = gc_substr(local_assigns[k], 0, (unsigned int)(eq - local_assigns[k]));
+                val = eq + 1;
+                if (key)
+                {
+                    if (!val)
+                        val = "";
+                    setenv(key, val, 1);
+                }
+            }
+            k++;
         }
     }
 }

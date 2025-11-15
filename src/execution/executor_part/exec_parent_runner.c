@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/06 13:14:57 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/11 17:40:44 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/14 23:02:26 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ pid_t exec_parent_runner(t_cmd_node *cmd, int *io_data)
 	dup_and_or_close(&io_data[2], &io_data[4]);
 	if (error_code != EXIT_SUCCESS)
 		return (*(cmd->env->pid));
-	error_code = table_of_builtins(cmd, generate_env(cmd->env), 1);
+	error_code = table_of_builtins(cmd, NULL, 1);
 	/* record last status for shell */
 	if (error_code >= 0)
 		g_shell.last_status = error_code;

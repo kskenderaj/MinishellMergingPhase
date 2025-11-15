@@ -6,7 +6,7 @@
 #    By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/11 08:15:00 by klejdi            #+#    #+#              #
-#    Updated: 2025/11/11 04:26:32 by klejdi           ###   ########.fr        #
+#    Updated: 2025/11/15 21:24:53 by klejdi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -23,17 +23,16 @@ INCLUDE_DIRS = -Iinclude -I$(LIBFT_DIR)
 # --- SOURCE FILES (MANUALLY LISTED FOR 42 NORM) ---
 SRCS = \
     main.c \
-    src/main/debug.c \
     globals.c \
     src/main/assigns.c \
     src/main/builtins.c \
     src/main/dispatch.c \
     src/main/env_utils.c \
     src/main/execute.c \
-    src/main/exit.c \
     src/main/exit_code.c \
     src/main/expand.c \
     src/main/input.c \
+    src/main/driver.c \
     src/main/pipeline.c \
     src/parsing/command/add_env.c \
     src/parsing/command/cmdlst_filelst.c \
@@ -68,7 +67,6 @@ SRCS = \
     src/execution/executor_part/exec_redir_outfile.c \
     src/execution/executor_part/exec_redir_separated.c \
     src/execution/executor_part/exec_redirections.c \
-    src/execution/executor_part/exec_redirections1.c \
     src/execution/executor_part/exec_utility_to_run.c \
     src/execution/executor_part/init_shell.c \
     src/execution/executor_part/signals.c \
@@ -121,14 +119,4 @@ fclean: clean
 re: fclean
 	$(MAKE) all
 
-# Debug target
-debug: CFLAGS += -g -DDEBUG
-debug: re
-
-sanitize: CFLAGS += -g -O0 -fsanitize=address,undefined -fno-omit-frame-pointer -DDEBUG
-sanitize: re
-
-debug_san: CFLAGS += -g -O0 -fsanitize=address,undefined -fno-omit-frame-pointer -DDEBUG
-debug_san: re
-
-.PHONY: all clean fclean re debug sanitize
+.PHONY: all clean fclean re

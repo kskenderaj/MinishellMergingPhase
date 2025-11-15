@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/11 20:12:07 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/12 02:41:23 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/15 21:24:48 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,21 +61,22 @@ static void child_exec_external(char **args, int in_fd, int out_fd, char **envp)
 {
     char *path;
 
-    if (in_fd != -1)
-        dup2(in_fd, STDIN_FILENO);
-    if (out_fd != -1)
-        dup2(out_fd, STDOUT_FILENO);
-    if (in_fd != -1)
-        close(in_fd);
-    if (out_fd != -1)
-        close(out_fd);
-    start_signals(); /* ensure parent prompt signals aren't inherited incorrectly */
-    signal(SIGINT, SIG_DFL);
-    signal(SIGQUIT, SIG_DFL);
-    if (!args || !args[0] || args[0][0] == '\0')
+    // Redirect stdin and stdout
+    if (in_fd != STDIN_FILENO)
     {
-        extern void exec_external(char **args, char **envp);
-        exec_external(args, envp);
+        dup2(in_fd, STDIN_FILENO);
+        close(in_fd);
+    }
+    if (out_fd != STDOUT_FILENO)
+    {
+        dup2(out_fd, STDOUT_FILENO);
+        close(out_fd);
+    }
+
+    // --- NEW: Handle empty command ---
+    if (!args || !args[0] || !*args[0])
+    {
+        exit(0); // Successfully do nothing, allows data to pass through pipe
     }
     path = find_in_path(args[0]);
     execve(path, args, envp);
@@ -105,6 +106,16 @@ static int run_single_external(char **args, int in_fd, int out_fd)
     {
         int st = wait_child_status(pid);
         g_shell.last_status = st;
+        if (envp)
+        {
+            int ei = 0;
+            while (envp[ei])
+            {
+                free(envp[ei]);
+                ei++;
+            }
+            free(envp);
+        }
         return (st);
     }
 }
@@ -115,7 +126,9 @@ static int count_cmds(t_cmd_list *lst)
     t_cmd_node *cur;
 
     n = 0;
-    cur = lst ? lst->head : NULL;
+    cur = NULL;
+    if (lst)
+        cur = lst->head;
     while (cur)
     {
         n++;
@@ -124,81 +137,128 @@ static int count_cmds(t_cmd_list *lst)
     return (n);
 }
 
+static int prepass_setup_heredocs(t_cmd_list *commands)
+{
+    t_cmd_node *node;
+
+    node = commands->head;
+    while (node)
+    {
+        if (setup_heredoc_from_cmdnode(node) == -1)
+        {
+            if (g_sigint_status)
+                return (1);
+            return (1);
+        }
+        node = node->next;
+    }
+    return (0);
+}
+
+static void free_envp_array(char **envp)
+{
+    int ei;
+
+    if (!envp)
+        return;
+    ei = 0;
+    while (envp[ei])
+    {
+        free(envp[ei]);
+        ei++;
+    }
+    free(envp);
+}
+
+static int run_pipeline_path(t_cmd_list *commands, int ncmds)
+{
+    char ***cmdv;
+    char **envp;
+    t_cmd_node *node;
+    int i;
+    int ret;
+
+    cmdv = malloc(sizeof(char **) * ncmds);
+    if (!cmdv)
+        return (1);
+    node = commands->head;
+    i = 0;
+    while (node)
+    {
+        if (node->cmd)
+            expand_args_inplace(node->cmd);
+        cmdv[i++] = node->cmd;
+        node = node->next;
+    }
+    envp = generate_env(g_shell.env);
+    ret = exec_pipeline(cmdv, ncmds, envp);
+    free_envp_array(envp);
+    free(cmdv);
+    return (ret);
+}
+
+static int handle_empty_after_redir(int in_fd, int out_fd)
+{
+    if (in_fd != -1)
+        close(in_fd);
+    if (out_fd != -1)
+        close(out_fd);
+    return (0);
+}
+
+static int run_single_command_path(t_cmd_node *node)
+{
+    int in_fd;
+    int out_fd;
+    int red;
+    int bret;
+
+    in_fd = -1;
+    out_fd = -1;
+    if (node->cmd)
+        expand_args_inplace(node->cmd);
+    red = setup_redirections(node->cmd, &in_fd, &out_fd);
+    if (red == 2)
+    {
+        g_shell.last_status = 2;
+        return (2);
+    }
+    if (red == 1)
+    {
+        g_shell.last_status = 1;
+        return (1);
+    }
+    if (!node->cmd[0])
+        return (handle_empty_after_redir(in_fd, out_fd));
+    bret = run_single_builtin(node->cmd, in_fd, out_fd);
+    if (bret >= 0)
+    {
+        g_shell.last_status = bret;
+        return (bret);
+    }
+    return (run_single_external(node->cmd, in_fd, out_fd));
+}
+
 int execute_commands(t_cmd_list *commands)
 {
     int ncmds;
     t_cmd_node *node;
 
-    if (!commands)
+    if (!commands || !commands->head)
         return (0);
+    /* Pre-execution pass: setup all heredocs first */
+    if (prepass_setup_heredocs(commands))
+        return (1);
     ncmds = count_cmds(commands);
     if (ncmds <= 0)
         return (0);
     if (ncmds > 1)
     {
-        char ***cmdv;
-        char **envp;
-        int i;
-
-        cmdv = gc_malloc(sizeof(char **) * ncmds);
-        if (!cmdv)
-            return (1);
-        node = commands->head;
-        i = 0;
-        while (node)
-        {
-            /* expand args for each command in pipeline */
-            if (node->cmd)
-                expand_args_inplace(node->cmd);
-            cmdv[i++] = node->cmd;
-            node = node->next;
-        }
-        envp = generate_env(g_shell.env);
-        return (exec_pipeline(cmdv, ncmds, envp));
+        return (run_pipeline_path(commands, ncmds));
     }
     /* single command path */
     node = commands->head;
     if (!node || !node->cmd)
         return (0);
-    {
-        int in_fd;
-        int out_fd;
-        int red;
-
-        in_fd = -1;
-        out_fd = -1;
-        /* expand before handling redirections so files can use $VAR */
-        if (node->cmd)
-            expand_args_inplace(node->cmd);
-        red = setup_redirections(node->cmd, &in_fd, &out_fd);
-        if (red == 2)
-        {
-            g_shell.last_status = 2;
-            return (2);
-        }
-        if (red == 1)
-        {
-            g_shell.last_status = 1;
-            return (1);
-        }
-        if (!node->cmd[0])
-        {
-            if (in_fd != -1)
-                close(in_fd);
-            if (out_fd != -1)
-                close(out_fd);
-            return (0);
-        }
-        {
-            int bret;
-
-            bret = run_single_builtin(node->cmd, in_fd, out_fd);
-            if (bret >= 0)
-            {
-                g_shell.last_status = bret;
-                return (bret);
-            }
-        }
-        return (run_single_external(node->cmd, in_fd, out_fd));
-    }
+    return (run_single_command_path(node));
 }

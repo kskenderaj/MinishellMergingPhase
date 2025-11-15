@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 17:27:10 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/11 04:26:14 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/14 23:02:30 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,37 +29,12 @@ void init_shell(char **envp)
 
 void cleanup_shell(void)
 {
-#ifdef DEBUG
-    t_env_node *cur = NULL;
     if (g_shell.env)
     {
-        cur = g_shell.env->head;
-        while (cur)
-        {
-            write(STDERR_FILENO, "[DEBUG] free env key=", 22);
-            if (cur->key)
-                write(STDERR_FILENO, cur->key, ft_strlen(cur->key));
-            write(STDERR_FILENO, "\n", 1);
-            cur = cur->next;
-        }
-    }
-#endif
-    if (g_shell.env)
-    {
-#ifdef DEBUG
-        write(STDERR_FILENO, "[DEBUG] calling free_env_list()\n", 33);
-#endif
         free_env_list(g_shell.env);
         g_shell.env = NULL;
-#ifdef DEBUG
-        write(STDERR_FILENO, "[DEBUG] finished free_env_list()\n", 34);
-#endif
     }
     if (isatty(STDIN_FILENO))
-    {
-#ifdef DEBUG
-        write(STDERR_FILENO, "[DEBUG] clearing history (interactive)\n", 43);
-#endif
         clear_history();
-    }
+    gc_cleanup();
 }

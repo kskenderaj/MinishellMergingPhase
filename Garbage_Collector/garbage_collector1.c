@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 16:39:30 by kskender          #+#    #+#             */
-/*   Updated: 2025/10/15 00:00:08 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/14 23:02:16 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,9 @@ void gc_cleanup(void)
 		free(current);
 		current = next;
 	}
-	free(gc);
+	/* do not free static GC storage; just reset it */
+	gc->head = NULL;
+	gc->count = 0;
 }
 
 // Utility functions

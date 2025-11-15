@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 12:57:24 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/04 17:07:34 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/14 19:49:05 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,12 @@ char *find_in_path(char *cmd)
 		return (NULL);
 	if (ft_strchr(cmd, '/'))
 		return (gc_strdup(cmd));
-	path_env = getenv("PATH");
+	/* Use internal env so builtins like unset/export affect PATH */
+	path_env = get_env_value(g_shell.env, "PATH");
 	if (!path_env)
 		return (gc_strdup(cmd));
 	paths = gc_split(path_env, ':');
+	free(path_env);
 	if (!paths)
 		return (gc_strdup(cmd));
 	i = 0;

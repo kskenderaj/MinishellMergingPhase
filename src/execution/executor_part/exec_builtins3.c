@@ -6,13 +6,35 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:06:11 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/11 20:14:34 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/15 20:49:38 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 #include "main_helpers.h"
 #include <string.h>
+
+/* Mixed allocator safety: some env nodes/strings are GC-managed, others
+** created with plain malloc. Free appropriately to avoid double-free or leaks. */
+static int gc_contains_ptr(void *ptr)
+{
+	t_gc *gc;
+	t_gc_node *n;
+
+	if (!ptr)
+		return (0);
+	gc = get_gc();
+	if (!gc)
+		return (0);
+	n = gc->head;
+	while (n)
+	{
+		if (n->type == GC_MEM && n->ptr == ptr)
+			return (1);
+		n = n->next;
+	}
+	return (0);
+}
 
 static char *escape_export_value(const char *s)
 {
@@ -180,7 +202,9 @@ void print_exported_env(void)
 		t_env_node *m;
 
 		present = 0;
-		m = g_shell.env ? g_shell.env->head : NULL;
+		m = NULL;
+		if (g_shell.env)
+			m = g_shell.env->head;
 		while (m)
 		{
 			if (m->key && g_shell.exported_vars[i] && ft_strcmp(m->key, g_shell.exported_vars[i]) == 0)
@@ -217,13 +241,15 @@ int ft_env(char **args)
 
 	if (args[1])
 	{
-		ft_putstr_fd("env: ", STDERR_FILENO);
+		ft_putstr_fd("minishell: env: ", STDERR_FILENO);
 		ft_putstr_fd(args[1], STDERR_FILENO);
 		ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
 		g_shell.last_status = 127;
 		return (127);
 	}
-	n = g_shell.env ? g_shell.env->head : NULL;
+	n = NULL;
+	if (g_shell.env)
+		n = g_shell.env->head;
 	while (n)
 	{
 		if (n->key)
@@ -282,6 +308,26 @@ static void unset_key(const char *key)
 				g_shell.env->head = cur->next;
 			if (g_shell.env->tail == cur)
 				g_shell.env->tail = prev;
+			/* free the removed node to avoid leaks (handle GC vs malloc) */
+			if (cur->key)
+			{
+				if (gc_contains_ptr(cur->key))
+					gc_free(cur->key);
+				else
+					free(cur->key);
+			}
+			if (cur->value)
+			{
+				if (gc_contains_ptr(cur->value))
+					gc_free(cur->value);
+				else
+					free(cur->value);
+			}
+			if (gc_contains_ptr(cur))
+				gc_free(cur);
+			else
+				free(cur);
+			/* remove exported flag too */
 			remove_from_exported(key);
 			return;
 		}
@@ -301,14 +347,16 @@ int ft_unset(char **args)
 	{
 		if (!is_valid_identifier(args[i]))
 		{
-			ft_putstr_fd("unset: `", STDERR_FILENO);
+			ft_putstr_fd("minishell: unset: `", STDERR_FILENO);
 			ft_putstr_fd(args[i], STDERR_FILENO);
 			ft_putstr_fd("': not a valid identifier\n", STDERR_FILENO);
 			ret = 1;
 			i++;
 			continue;
 		}
+		/* Remove from env if present, and always drop exported flag */
 		unset_key(args[i]);
+		remove_from_exported(args[i]);
 		i++;
 	}
 	g_shell.last_status = ret;

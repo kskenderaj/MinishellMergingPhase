@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/11 03:08:59 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/11 18:08:16 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/15 21:24:49 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,18 +43,26 @@ int push_token(t_token_list *lst, t_token *token)
 }
 
 // Add token from raw slice (str,len) with given type
+static char *dup_slice(char *str, int len)
+{
+    char *slice;
+    slice = (char *)malloc(len + 1);
+    if (!slice)
+        return (NULL);
+    ft_memcpy(slice, str, len);
+    slice[len] = '\0';
+    return (slice);
+}
+
 int add_token(t_token_list *lst, t_toktype type, char *str, int len)
 {
     char *slice;
     t_token *token;
-
     if (!lst || !str || len <= 0)
         return (1);
-    slice = (char *)malloc(len + 1);
+    slice = dup_slice(str, len);
     if (!slice)
         return (1);
-    ft_memcpy(slice, str, len);
-    slice[len] = '\0';
     token = create_token(type, slice);
     if (!token)
     {
@@ -98,6 +106,7 @@ static void add_arg_to_cmd(t_cmd_node *cmd, char *arg)
     cmd->cmd = new_args;
 }
 
+// Main parsing function. Groups tokens into commands, separated by pipes.
 // Main parsing function. Groups tokens into commands, separated by pipes.
 t_cmd_list *parse_commands(t_token_list *tokens)
 {
