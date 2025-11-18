@@ -6,40 +6,58 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 16:04:59 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/06 03:38:10 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/18 17:34:34 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 
 /* forward prototypes for helpers to avoid implicit declarations under C99 */
-static int create_pipes(int pipes[64][2], int ncmds);
+static int create_pipes(int **pipes, int ncmds);
 static int spawn_pipeline_children(char ***cmds, int ncmds, char **envp,
-								   int pipes[64][2], pid_t pids[64]);
-static void setup_child_io_and_exec(int idx, int ncmds, int pipes[64][2],
+								   int **pipes, pid_t *pids, char ****per_cmd_envs);
+static void setup_child_io_and_exec(int idx, int ncmds, int **pipes,
 									int in_fd, int out_fd, char **cmd, char **envp);
-static void close_all_pipes(int pipes[64][2], int ncmds);
-static int wait_children(pid_t pids[64], int ncmds);
+static void close_all_pipes(int **pipes, int ncmds);
+static int wait_children(pid_t *pids, int ncmds);
 
-int exec_pipeline(char ***cmds, int ncmds, char **envp)
+int exec_pipeline(char ***cmds, int ncmds, char **envp, char ****per_cmd_envs)
 {
-	int pipes[64][2];
-	pid_t pids[64];
+	int **pipes;
+	pid_t *pids;
+	int ret;
+	int i;
 
 	if (ncmds <= 0)
 		return (1);
+	/* Allocate dynamic arrays for pipes and pids */
+	pipes = gc_malloc(sizeof(int *) * (ncmds - 1));
+	if (!pipes)
+		return (1);
+	i = 0;
+	while (i < ncmds - 1)
+	{
+		pipes[i] = gc_malloc(sizeof(int) * 2);
+		if (!pipes[i])
+			return (1);
+		i++;
+	}
+	pids = gc_malloc(sizeof(pid_t) * ncmds);
+	if (!pids)
+		return (1);
 	if (create_pipes(pipes, ncmds) != 0)
 		return (1);
-	if (spawn_pipeline_children(cmds, ncmds, envp, pipes, pids) != 0)
+	if (spawn_pipeline_children(cmds, ncmds, envp, pipes, pids, per_cmd_envs) != 0)
 	{
 		close_all_pipes(pipes, ncmds);
 		return (1);
 	}
 	close_all_pipes(pipes, ncmds);
-	return (wait_children(pids, ncmds));
+	ret = wait_children(pids, ncmds);
+	return (ret);
 }
 
-static int create_pipes(int pipes[64][2], int ncmds)
+static int create_pipes(int **pipes, int ncmds)
 {
 	int i;
 
@@ -54,12 +72,13 @@ static int create_pipes(int pipes[64][2], int ncmds)
 }
 
 static int spawn_pipeline_children(char ***cmds, int ncmds, char **envp,
-								   int pipes[64][2], pid_t pids[64])
+								   int **pipes, pid_t *pids, char ****per_cmd_envs)
 {
 	int i;
 	int in_fd;
 	int out_fd;
 	int redir_status;
+	char **cmd_envp;
 
 	i = 0;
 	while (i < ncmds)
@@ -72,11 +91,12 @@ static int spawn_pipeline_children(char ***cmds, int ncmds, char **envp,
 			g_shell.last_status = redir_status;
 			return (redir_status);
 		}
+		cmd_envp = (per_cmd_envs && (*per_cmd_envs)[i]) ? (*per_cmd_envs)[i] : envp;
 		pids[i] = fork();
 		if (pids[i] == 0)
 		{
 			setup_child_io_and_exec(i, ncmds, pipes, in_fd, out_fd, cmds[i],
-									envp);
+									cmd_envp);
 		}
 		if (in_fd != -1)
 			close(in_fd);
@@ -87,7 +107,7 @@ static int spawn_pipeline_children(char ***cmds, int ncmds, char **envp,
 	return (0);
 }
 
-static void setup_child_io_and_exec(int idx, int ncmds, int pipes[64][2],
+static void setup_child_io_and_exec(int idx, int ncmds, int **pipes,
 									int in_fd, int out_fd, char **cmd, char **envp)
 {
 	int j;
@@ -171,7 +191,7 @@ static void setup_child_io_and_exec(int idx, int ncmds, int pipes[64][2],
 	_exit(127);
 }
 
-static void close_all_pipes(int pipes[64][2], int ncmds)
+static void close_all_pipes(int **pipes, int ncmds)
 {
 	int i;
 
@@ -184,7 +204,7 @@ static void close_all_pipes(int pipes[64][2], int ncmds)
 	}
 }
 
-static int wait_children(pid_t pids[64], int ncmds)
+static int wait_children(pid_t *pids, int ncmds)
 {
 	int i;
 	int status;

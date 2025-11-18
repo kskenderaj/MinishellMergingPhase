@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/12 14:40:09 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/05 20:45:14 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/18 16:38:14 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ typedef struct s_file_node
 {
 	char *filename;
 	int redir_type;
+	int heredoc_quoted;
+	char *heredoc_content;
 	struct s_file_node *next;
 } t_file_node;
 
@@ -51,6 +53,13 @@ typedef struct s_file_list
 	t_file_node *tail;
 	ssize_t size;
 } t_file_list;
+
+// Heredoc information
+typedef struct s_heredoc_info
+{
+	char *delimiter;
+	int quoted;
+} t_heredoc_info;
 
 // Command structures
 typedef struct s_cmd_node
@@ -138,7 +147,7 @@ bool is_valid_quote(char *str, int *i);
 int skip_spaces(char *str, int i);
 /* helpers used in token_to_cmd */
 bool is_redirection(t_toktype t);
-//init all
+// init all
 void init_token_lst(t_token_list *lst);
 void init_cmd_lst(t_cmd_list *lst);
 void init_env_lst(t_env_list *lst);
@@ -171,11 +180,23 @@ void create_filenode(char *filename, int red_type, t_file_list *filelst);
 
 /* Environment functions */
 int get_envs(char **env, t_env_list *lst);
+int find_key(char *str, t_env_node *env);
+int find_value(char *str, t_env_node *env);
+int push_env(t_env_list *lst, t_env_node *env);
 void free_env_list(t_env_list *env);
+void remove_from_env_list(t_env_list *envlst, const char *key);
 
 /* Token to command conversion */
 int token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst, t_env_list *envlst, int last_status);
 void final_token(t_token_list *toklst, t_env_list *envlst, int last_status);
+
+/* Field splitting */
+char **split_on_spaces(char *str);
+int should_split(t_segment_list *seglst);
+
+/* Heredoc utilities */
+t_heredoc_info *process_heredoc_delimiter(char *raw_delimiter);
+char *read_heredoc_content(char *delimiter);
 
 /* Quote removal */
 // char *remove_quotes(char *str);

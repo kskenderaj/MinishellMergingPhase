@@ -4,4 +4,4 @@
 
 /* Ensure default empty exported lists */
 
-t_shell_state g_shell = {{NULL}, 0, 0, NULL};
+t_shell_state g_shell = {{NULL}, 0, 0, NULL, 0};

@@ -1,12 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
-/*                                                        :::      ::::::::   */
+/*                                         			dup2(saved_stdout, STDOUT_FILENO);
+			close(saved_stdout);
+		}
+		if (merged_envp != envp)
+			ft_free_array(merged_envp);
+		ft_free_array(envp);
+		g_shell.last_status = 0;
+		return (0); // EXIT 0, no stderr!
+	}        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/17 00:00:00 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/18 01:00:00 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/18 13:46:11 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +31,12 @@
 
 #define PROMPT "minishell$ "
 
-static char	**env_list_to_array(t_env_list *env)
+static char **env_list_to_array(t_env_list *env)
 {
-	t_env_node	*node;
-	char		**envp;
-	char		*temp;
-	int			i;
+	t_env_node *node;
+	char **envp;
+	char *temp;
+	int i;
 
 	envp = malloc(sizeof(char *) * (env->size + 1));
 	if (!envp)
@@ -51,11 +59,60 @@ static char	**env_list_to_array(t_env_list *env)
 	return (envp);
 }
 
-static char	***cmdlist_to_array(t_cmd_list *cmdlst)
+static char **merge_env_arrays(char **base_envp, t_env_list *cmd_env)
 {
-	char		***cmds;
-	t_cmd_node	*node;
-	int			i;
+	char **merged;
+	t_env_node *node;
+	char *temp;
+	int i;
+	int j;
+
+	if (!cmd_env || cmd_env->size == 0)
+		return (base_envp);
+	i = 0;
+	while (base_envp[i])
+		i++;
+	merged = malloc(sizeof(char *) * (i + cmd_env->size + 1));
+	if (!merged)
+		return (base_envp);
+	/* Duplicate all base_envp strings so cleanup is consistent */
+	i = 0;
+	while (base_envp[i])
+	{
+		merged[i] = ft_strdup(base_envp[i]);
+		if (!merged[i])
+		{
+			/* Cleanup on failure */
+			while (--i >= 0)
+				free(merged[i]);
+			free(merged);
+			return (base_envp);
+		}
+		i++;
+	}
+	node = cmd_env->head;
+	j = i;
+	while (node)
+	{
+		temp = ft_strjoin(node->key, "=");
+		if (temp)
+		{
+			merged[j] = ft_strjoin(temp, node->value);
+			free(temp);
+			if (merged[j])
+				j++;
+		}
+		node = node->next;
+	}
+	merged[j] = NULL;
+	return (merged);
+}
+
+static char ***cmdlist_to_array(t_cmd_list *cmdlst)
+{
+	char ***cmds;
+	t_cmd_node *node;
+	int i;
 
 	cmds = malloc(sizeof(char **) * (cmdlst->size + 1));
 	if (!cmds)
@@ -72,27 +129,31 @@ static char	***cmdlist_to_array(t_cmd_list *cmdlst)
 	return (cmds);
 }
 
-static int	handle_single_command(t_cmd_node *cmd, t_env_list *env)
+static int handle_single_command(t_cmd_node *cmd, t_env_list *env)
 {
-	char	**envp;
-	int		ret;
-	int		saved_stdin;
-	int		saved_stdout;
-	int		in_fd;
-	int		out_fd;
+	char **envp;
+	char **merged_envp;
+	int ret;
+	int saved_stdin;
+	int saved_stdout;
+	int in_fd;
+	int out_fd;
 
 	if (!cmd)
 		return (0);
 	envp = env_list_to_array(env);
 	if (!envp)
 		return (1);
-	
+	merged_envp = merge_env_arrays(envp, cmd->env);
+	if (!merged_envp)
+		merged_envp = envp;
+
 	// Handle file-based redirections if present
 	saved_stdin = -1;
 	saved_stdout = -1;
 	in_fd = -1;
 	out_fd = -1;
-	
+
 	if (cmd->files && cmd->files->head)
 	{
 		// Save original stdin/stdout
@@ -104,16 +165,18 @@ static int	handle_single_command(t_cmd_node *cmd, t_env_list *env)
 				close(saved_stdin);
 			if (saved_stdout >= 0)
 				close(saved_stdout);
+			if (merged_envp != envp)
+				ft_free_array(merged_envp);
 			ft_free_array(envp);
 			return (1);
 		}
-		
+
 		// Setup redirections from files list
 		// Save current last_status before redirections
 		int saved_status = g_shell.last_status;
 		in_fd = setup_input_file_from_cmd(cmd);
 		out_fd = setup_output_file_from_cmd(cmd);
-		
+
 		// Check if redirection setup failed (indicated by g_shell.last_status = 1)
 		if (g_shell.last_status == 1 && saved_status == 0)
 		{
@@ -132,10 +195,12 @@ static int	handle_single_command(t_cmd_node *cmd, t_env_list *env)
 				close(in_fd);
 			if (out_fd >= 0)
 				close(out_fd);
+			if (merged_envp != envp)
+				ft_free_array(merged_envp);
 			ft_free_array(envp);
-			return (1);  // File error = EXIT 1
+			return (1); // File error = EXIT 1
 		}
-		
+
 		// Apply redirections
 		if (in_fd >= 0 && in_fd != NO_REDIRECTION)
 		{
@@ -150,6 +215,43 @@ static int	handle_single_command(t_cmd_node *cmd, t_env_list *env)
 	}
 	if (!cmd->cmd || !cmd->cmd[0] || (cmd->cmd[0] && !cmd->cmd[0][0]))
 	{
+		/* If there are assignments but no command, set them in the shell */
+		if (cmd->env && cmd->env->size > 0)
+		{
+			t_env_node *node = cmd->env->head;
+			while (node)
+			{
+				/* Set in process environment (for child processes) */
+				setenv(node->key, node->value, 1);
+				/* Also add to shell's env list if not already there */
+				t_env_node *existing = g_shell.env->head;
+				int found = 0;
+				while (existing)
+				{
+					if (ft_strcmp(existing->key, node->key) == 0)
+					{
+						/* Update existing value */
+						free(existing->value);
+						existing->value = ft_strdup(node->value);
+						found = 1;
+						break;
+					}
+					existing = existing->next;
+				}
+				if (!found)
+				{
+					/* Add new entry to shell's env list */
+					t_env_node *new_node = malloc(sizeof(t_env_node));
+					if (new_node)
+					{
+						new_node->key = ft_strdup(node->key);
+						new_node->value = ft_strdup(node->value);
+						push_env(g_shell.env, new_node);
+					}
+				}
+				node = node->next;
+			}
+		}
 		if (saved_stdin >= 0)
 		{
 			dup2(saved_stdin, STDIN_FILENO);
@@ -162,10 +264,16 @@ static int	handle_single_command(t_cmd_node *cmd, t_env_list *env)
 		}
 		ft_free_array(envp);
 		g_shell.last_status = 0;
-		return (0);  // EXIT 0, no stderr!
+		return (0); // EXIT 0, no stderr!
 	}
-	
-	ret = table_of_builtins(cmd, envp, 1);
+
+	/* If there are per-command env vars, we need to fork even for builtins
+	 * to avoid polluting the parent shell's environment */
+	if (cmd->env && cmd->env->size > 0)
+		ret = 128; /* Force external execution path */
+	else
+		ret = table_of_builtins(cmd, envp, 1);
+
 	if (ret != 128)
 	{
 		// Restore FDs after builtin
@@ -179,12 +287,17 @@ static int	handle_single_command(t_cmd_node *cmd, t_env_list *env)
 			dup2(saved_stdout, STDOUT_FILENO);
 			close(saved_stdout);
 		}
+		if (merged_envp != envp)
+			ft_free_array(merged_envp);
 		ft_free_array(envp);
 		return (ret);
 	}
-	
-	ret = exec_pipeline(&(cmd->cmd), 1, envp);
-	
+
+	char ***per_cmd_env_array;
+	per_cmd_env_array = gc_malloc(sizeof(char **) * 1);
+	per_cmd_env_array[0] = merged_envp;
+	ret = exec_pipeline(&(cmd->cmd), 1, envp, &per_cmd_env_array);
+
 	// Restore FDs after external command
 	if (saved_stdin >= 0)
 	{
@@ -196,16 +309,21 @@ static int	handle_single_command(t_cmd_node *cmd, t_env_list *env)
 		dup2(saved_stdout, STDOUT_FILENO);
 		close(saved_stdout);
 	}
-	
+
+	if (merged_envp != envp)
+		ft_free_array(merged_envp);
 	ft_free_array(envp);
 	return (ret);
 }
 
-static int	handle_pipeline(t_cmd_list *cmdlst, t_env_list *env)
+static int handle_pipeline(t_cmd_list *cmdlst, t_env_list *env)
 {
-	char	***cmds;
-	char	**envp;
-	int		ret;
+	char ***cmds;
+	char **envp;
+	char ***per_cmd_envs;
+	int ret;
+	int i;
+	t_cmd_node *node;
 
 	cmds = cmdlist_to_array(cmdlst);
 	if (!cmds)
@@ -213,15 +331,43 @@ static int	handle_pipeline(t_cmd_list *cmdlst, t_env_list *env)
 	envp = env_list_to_array(env);
 	if (!envp)
 		return (free(cmds), 1);
-	ret = exec_pipeline(cmds, (int)cmdlst->size, envp);
+
+	/* Build per-command environment array */
+	per_cmd_envs = gc_malloc(sizeof(char **) * cmdlst->size);
+	if (!per_cmd_envs)
+		return (ft_free_array(envp), free(cmds), 1);
+
+	i = 0;
+	node = cmdlst->head;
+	while (node && i < (int)cmdlst->size)
+	{
+		if (node->env && node->env->size > 0)
+			per_cmd_envs[i] = merge_env_arrays(envp, node->env);
+		else
+			per_cmd_envs[i] = NULL; /* Will use default envp */
+		node = node->next;
+		i++;
+	}
+
+	ret = exec_pipeline(cmds, (int)cmdlst->size, envp, &per_cmd_envs);
+
+	/* Cleanup per-command envs */
+	i = 0;
+	while (i < (int)cmdlst->size)
+	{
+		if (per_cmd_envs[i] && per_cmd_envs[i] != envp)
+			ft_free_array(per_cmd_envs[i]);
+		i++;
+	}
+
 	ft_free_array(envp);
 	free(cmds);
 	return (ret);
 }
 
-int	process_command(t_cmd_list *cmdlst, t_env_list *envlst)
+int process_command(t_cmd_list *cmdlst, t_env_list *envlst)
 {
-	int	ret;
+	int ret;
 
 	if (!cmdlst || !cmdlst->head)
 		return (0);
@@ -233,10 +379,10 @@ int	process_command(t_cmd_list *cmdlst, t_env_list *envlst)
 	return (ret);
 }
 
-static int	process_input_line(char *line, t_env_list *env, int last_status)
+static int process_input_line(char *line, t_env_list *env, int last_status)
 {
-	t_token_list	toklst;
-	t_cmd_list		cmdlst;
+	t_token_list toklst;
+	t_cmd_list cmdlst;
 
 	if (!line || !*line)
 		return (last_status);
@@ -245,7 +391,11 @@ static int	process_input_line(char *line, t_env_list *env, int last_status)
 	if (tokenize(&toklst, line) != 0)
 		return (2);
 	if (token_to_cmd(&toklst, &cmdlst, env, last_status) != 0)
+	{
+		if (cmdlst.syntax_error)
+			ft_putendl_fd("minishell: syntax error", 2);
 		return (2);
+	}
 	if (cmdlst.syntax_error)
 	{
 		ft_putendl_fd("minishell: syntax error", 2);
@@ -256,13 +406,13 @@ static int	process_input_line(char *line, t_env_list *env, int last_status)
 	return (0);
 }
 
-static char	*read_line_noninteractive(void)
+static char *read_line_noninteractive(void)
 {
-	char	*line;
-	char	c;
-	int		len;
-	int		capacity;
-	ssize_t	ret;
+	char *line;
+	char c;
+	int len;
+	int capacity;
+	ssize_t ret;
 
 	line = NULL;
 	len = 0;
@@ -273,7 +423,7 @@ static char	*read_line_noninteractive(void)
 		if (ret <= 0)
 			return (line);
 		if (c == '\n')
-			break ;
+			break;
 		if (len >= capacity)
 		{
 			capacity = capacity == 0 ? 64 : capacity * 2;
@@ -291,14 +441,15 @@ static char	*read_line_noninteractive(void)
 	return (line);
 }
 
-static int	main_loop(t_env_list *env)
+static int main_loop(t_env_list *env)
 {
-	char	*line;
-	int		last_status;
-	int		interactive;
+	char *line;
+	int last_status;
+	int interactive;
 
 	last_status = 0;
 	interactive = isatty(STDIN_FILENO);
+	g_shell.is_interactive = interactive;
 	while (1)
 	{
 		if (interactive)
@@ -306,7 +457,19 @@ static int	main_loop(t_env_list *env)
 		else
 			line = read_line_noninteractive();
 		if (!line)
-			break ;
+		{
+			if (interactive && g_sigint_status == 130)
+			{
+				g_sigint_status = 0;
+				continue; // Ctrl+C: show new prompt, don't exit
+			}
+			break; // Ctrl+D or EOF: exit shell
+		}
+		if (g_sigint_status == 130)
+		{
+			last_status = 130;
+			g_sigint_status = 0;
+		}
 		if (*line)
 		{
 			if (interactive)
@@ -315,18 +478,41 @@ static int	main_loop(t_env_list *env)
 		}
 		free(line);
 	}
+	if (interactive)
+		write(STDOUT_FILENO, "exit\n", 5); // Print "exit" on Ctrl+D
 	return (last_status);
 }
 
-static t_env_list	*init_environment(char **envp)
+static void increment_shlvl(void)
 {
-	t_env_list	*env;
+	char *shlvl_str;
+	int shlvl;
+	char new_shlvl[32];
+
+	shlvl_str = getenv("SHLVL");
+	if (!shlvl_str)
+		shlvl = 0;
+	else
+		shlvl = ft_atoi(shlvl_str);
+	shlvl++;
+	snprintf(new_shlvl, sizeof(new_shlvl), "%d", shlvl);
+	setenv("SHLVL", new_shlvl, 1);
+}
+
+static t_env_list *init_environment(char **envp)
+{
+	t_env_list *env;
+	extern char **environ;
+
+	(void)envp;		   // We use environ instead
+	increment_shlvl(); // Increment SHLVL in process environment first
 
 	env = malloc(sizeof(t_env_list));
 	if (!env)
 		return (NULL);
 	init_env_lst(env);
-	if (!get_envs(envp, env))
+	// Get environment from the updated environ (which now has incremented SHLVL)
+	if (!get_envs(environ, env))
 	{
 		free_env_list(env);
 		return (NULL);
@@ -334,10 +520,10 @@ static t_env_list	*init_environment(char **envp)
 	return (env);
 }
 
-int	main(int argc, char **argv, char **envp)
+int main(int argc, char **argv, char **envp)
 {
-	t_env_list	*env;
-	int			exit_status;
+	t_env_list *env;
+	int exit_status;
 
 	(void)argc;
 	(void)argv;
@@ -350,6 +536,7 @@ int	main(int argc, char **argv, char **envp)
 		gc_cleanup();
 		return (1);
 	}
+	g_shell.env = env;
 	exit_status = main_loop(env);
 	gc_cleanup();
 	free_env_list(env);

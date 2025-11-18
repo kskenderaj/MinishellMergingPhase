@@ -1,2 +1,2 @@
-echo hi > /home/jtoumani/Desktop/JOHANN/TESTMINISHELL/tests/strict_tmp/out1
+echo hi > /Users/klejdi/Documents/42Projects/mini/MinishellMergingPhase/tests/strict_tmp/out1
 exit

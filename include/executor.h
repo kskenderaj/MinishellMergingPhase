@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 13:20:10 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/04 17:37:59 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/18 17:34:33 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,6 @@
 #include "libft.h"
 #include "minishell.h"
 
-
-
 /* Exported variables tracking*/
 #ifndef MAX_EXPORTED
 #define MAX_EXPORTED 128
@@ -40,10 +38,11 @@ typedef enum REDIR_TYPE t_REDIR_TYPE;
 
 typedef struct s_shell_state
 {
-    char *exported_vars[MAX_EXPORTED];
-    int exported_count;
-    int last_status;        // neu: speichert letzten Exit-Code
-    struct s_env_list *env; // neu: pointer auf parser-side env list
+	char *exported_vars[MAX_EXPORTED];
+	int exported_count;
+	int last_status;		// neu: speichert letzten Exit-Code
+	struct s_env_list *env; // neu: pointer auf parser-side env list
+	int is_interactive;		// whether shell is in interactive mode
 } t_shell_state;
 
 /* global shell state is defined in globals.c */
@@ -105,10 +104,11 @@ int table_of_builtins(t_cmd_node *cmd, char **envp,
 					  int flag);
 /* External/parent */
 void exec_external(char **args, char **envp);
-int exec_pipeline(char ***cmds, int ncmds, char **envp);
+int exec_pipeline(char ***cmds, int ncmds, char **envp, char ****per_cmd_envs);
 int exec_builtin_with_redir(int (*builtin)(char **),
 							char **args, int in_fd, int out_fd);
-int exec_heredoc(const char *delimiter);
+int exec_heredoc(const char *delimiter, int quoted);
+int exec_heredoc_from_content(char *content, int quoted);
 char **convert_env_to_array(t_env_list *env_list);
 char *find_in_path(char *cmd);
 void shift_left_by(char **args, int start, int by);

@@ -1,3 +1,3 @@
-echo a > /home/jtoumani/Desktop/JOHANN/TESTMINISHELL/tests/strict_tmp/out2
-echo b >> /home/jtoumani/Desktop/JOHANN/TESTMINISHELL/tests/strict_tmp/out2
+echo a > /Users/klejdi/Documents/42Projects/mini/MinishellMergingPhase/tests/strict_tmp/out2
+echo b >> /Users/klejdi/Documents/42Projects/mini/MinishellMergingPhase/tests/strict_tmp/out2
 exit

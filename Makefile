@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: kskender <kskender@student.42.fr>          +#+  +:+       +#+         #
+#    By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/04 00:00:00 by auto              #+#    #+#              #
-#    Updated: 2025/11/06 17:35:02 by kskender         ###   ########.fr        #
+#    Updated: 2025/11/18 13:46:08 by klejdi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -38,7 +38,10 @@ PARSER_SRCS = \
 	src/parsing/command/add_env.c \
 	src/parsing/command/token_to_cmd_helper.c \
 	src/parsing/command/expand_env.c \
-	src/parsing/command/cmdlst_filelst.c 
+	src/parsing/command/cmdlst_filelst.c \
+	src/parsing/command/field_split.c \
+	src/parsing/command/heredoc_utils.c \
+	src/parsing/command/read_heredoc.c 
 	
 PARSER_OBJS = $(PARSER_SRCS:.c=.o)
 
@@ -56,7 +59,6 @@ EXECUTOR_SRCS = \
 	$(EXECUTOR_DIR)/exec_external_helpers.c \
 	$(EXECUTOR_DIR)/exec_path.c \
 	$(EXECUTOR_DIR)/exec_error.c \
-	$(EXECUTOR_DIR)/exec_parent_runner.c \
 	$(EXECUTOR_DIR)/exec_args_helpers.c \
 	$(EXECUTOR_DIR)/exec_pipeline_helpers.c \
 	$(EXECUTOR_DIR)/exec_redir_helpers.c \

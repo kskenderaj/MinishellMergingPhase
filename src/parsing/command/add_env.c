@@ -92,6 +92,38 @@ char *get_expand(char *seg_str, int i, int last_status, t_env_list *envlst)
 		return (expand_env(seg_str + i, envlst));
 }
 
+void remove_from_env_list(t_env_list *envlst, const char *key)
+{
+	t_env_node *prev;
+	t_env_node *curr;
+
+	if (!envlst || !key)
+		return;
+	prev = NULL;
+	curr = envlst->head;
+	while (curr)
+	{
+		if (ft_strcmp(curr->key, key) == 0)
+		{
+			if (prev)
+				prev->next = curr->next;
+			else
+				envlst->head = curr->next;
+			if (curr == envlst->tail)
+				envlst->tail = prev;
+			if (curr->key)
+				free(curr->key);
+			if (curr->value)
+				free(curr->value);
+			free(curr);
+			envlst->size--;
+			return;
+		}
+		prev = curr;
+		curr = curr->next;
+	}
+}
+
 void free_env_list(t_env_list *env)
 {
 	t_env_node *current;

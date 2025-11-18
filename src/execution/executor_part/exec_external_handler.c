@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 17:34:28 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/06 03:21:48 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/18 16:38:16 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 void exec_external(char **args, char **envp)
 {
     char *exec_path;
-     if (!args || !args[0])
+    if (!args || !args[0])
         return;
 
     exec_path = find_in_path(args[0]);
@@ -27,23 +27,23 @@ void exec_external(char **args, char **envp)
         ft_putstr_fd(": command not found\n", STDERR_FILENO);
         exit(127);
     }
-    
+
     // Check if file exists
     if (access(exec_path, F_OK) != 0)
     {
         ft_putstr_fd(args[0], STDERR_FILENO);
         ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
-        exit(127);  // File not found
+        exit(127); // File not found
     }
-    
+
     // Check if executable
     if (access(exec_path, X_OK) != 0)
     {
         ft_putstr_fd(args[0], STDERR_FILENO);
         ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
-        exit(126);  // Permission denied
+        exit(126); // Permission denied
     }
-    
+
     execve(exec_path, args, envp);
     // If execve fails for other reasons
     perror(args[0]);
@@ -74,23 +74,138 @@ int exec_builtin_with_redir(int (*builtin)(char **), char **args, int in_fd, int
     return ret;
 }
 
-// Handles heredoc input (stub, expand as needed)
-int exec_heredoc(const char *delimiter)
+static char *expand_heredoc_line(char *line, int should_expand)
 {
-    char buffer[1024];
+    t_segment_list *seglst;
+    char *expanded;
+
+    if (!should_expand || !line)
+        return (line);
+    seglst = gc_malloc(sizeof(*seglst));
+    if (!seglst)
+        return (line);
+    init_segment_lst(seglst);
+    if (!find_segment(seglst, line))
+        return (line);
+    expanded = segments_expand(seglst, g_shell.env, g_shell.last_status);
+    if (!expanded)
+        return (line);
+    return (expanded);
+}
+
+static char *expand_heredoc_content(char *content, int quoted)
+{
+    char *line;
+    char *expanded;
+    char *result;
+    int i;
+    int start;
+
+    if (!content || quoted)
+        return (content);
+    result = gc_strdup("");
+    i = 0;
+    start = 0;
+    while (content[i])
+    {
+        if (content[i] == '\n')
+        {
+            line = gc_substr(content, start, i - start);
+            expanded = expand_heredoc_line(line, 1);
+            result = gc_strjoin(result, expanded);
+            result = gc_strjoin(result, "\n");
+            start = i + 1;
+        }
+        i++;
+    }
+    if (start < i)
+    {
+        line = gc_substr(content, start, i - start);
+        expanded = expand_heredoc_line(line, 1);
+        result = gc_strjoin(result, expanded);
+    }
+    return (result);
+}
+
+int exec_heredoc_from_content(char *content, int quoted)
+{
     int pipefd[2];
+    char *expanded;
 
     if (pipe(pipefd) == -1)
         return (-1);
+    if (!content)
+    {
+        close(pipefd[1]);
+        return (pipefd[0]);
+    }
+    expanded = expand_heredoc_content(content, quoted);
+    write(pipefd[1], expanded, ft_strlen(expanded));
+    close(pipefd[1]);
+    return (pipefd[0]);
+}
+
+static char *read_line_from_stdin(void)
+{
+    char buffer[2];
+    char *line;
+    char *tmp;
+    ssize_t bytes;
+
+    line = gc_strdup("");
+    buffer[1] = '\0';
     while (1)
     {
-        if (!fgets(buffer, sizeof(buffer), stdin))
-            break;
-        /* line ends with newline from fgets */
-        if (strncmp(buffer, delimiter, strlen(delimiter)) == 0 && buffer[strlen(delimiter)] == '\n')
-            break;
-        write(pipefd[1], buffer, strlen(buffer));
+        bytes = read(STDIN_FILENO, buffer, 1);
+        if (bytes <= 0)
+            return (NULL);
+        if (buffer[0] == '\n')
+            return (line);
+        tmp = line;
+        line = gc_strjoin(tmp, buffer);
     }
+}
+
+int exec_heredoc(const char *delimiter, int quoted)
+{
+    char *buffer;
+    int pipefd[2];
+    char *expanded;
+    size_t delim_len;
+    int is_tty;
+
+    if (pipe(pipefd) == -1)
+        return (-1);
+    delim_len = ft_strlen(delimiter);
+    is_tty = isatty(STDIN_FILENO);
+    if (is_tty)
+        start_heredoc_signals();
+    while (1)
+    {
+        if (is_tty)
+            buffer = readline("> ");
+        else
+            buffer = read_line_from_stdin();
+        if (!buffer || (is_tty && g_sigint_status == 130))
+        {
+            if (!buffer && is_tty)
+                write(STDERR_FILENO, "warning: here-document delimited by end-of-file\n", 49);
+            close(pipefd[1]);
+            if (is_tty && g_sigint_status == 130)
+            {
+                close(pipefd[0]);
+                return (-2);
+            }
+            return (pipefd[0]);
+        }
+        if (ft_strncmp(buffer, delimiter, delim_len) == 0 && buffer[delim_len] == '\0')
+            break;
+        expanded = expand_heredoc_line(buffer, !quoted);
+        write(pipefd[1], expanded, ft_strlen(expanded));
+        write(pipefd[1], "\n", 1);
+    }
+    if (is_tty)
+        start_signals();
     close(pipefd[1]);
-    return (pipefd[0]); /* read end */
+    return (pipefd[0]);
 }

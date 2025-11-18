@@ -2,6 +2,27 @@
 #include "minishell.h"
 #include "parser.h"
 
+static int is_valid_env_assignment(char *str)
+{
+	int i;
+	char *eq;
+
+	if (!str || !*str)
+		return (0);
+	eq = ft_strchr(str, '=');
+	if (!eq || eq == str)
+		return (0);
+	if (!ft_isalpha((unsigned char)str[0]) && str[0] != '_')
+		return (0);
+	i = 1;
+	while (str + i < eq)
+	{
+		if (!ft_isalnum((unsigned char)str[i]) && str[i] != '_')
+			return (0);
+		i++;
+	}
+	return (1);
+}
 
 int count_args(t_token *token)
 {
@@ -23,6 +44,24 @@ int count_args(t_token *token)
 	return (i);
 }
 
+static int handle_split_word(char **cmd_array, char *value, int *i)
+{
+	char **words;
+	int j;
+
+	words = split_on_spaces(value);
+	if (!words)
+		return (-1);
+	j = 0;
+	while (words[j])
+	{
+		cmd_array[*i] = words[j];
+		(*i)++;
+		j++;
+	}
+	return (0);
+}
+
 char **create_array(t_token *token, t_cmd_node *cmdnode, int i)
 {
 	char **cmd_array;
@@ -35,7 +74,7 @@ char **create_array(t_token *token, t_cmd_node *cmdnode, int i)
 		if (is_redirection(token->type))
 		{
 			if (!token->next || token->next->type != TK_WORD)
-                return (NULL); 
+				return (NULL);
 			if (token->next)
 				token = token->next;
 			if (token)
@@ -44,10 +83,28 @@ char **create_array(t_token *token, t_cmd_node *cmdnode, int i)
 		}
 		if (token && token->type == TK_WORD)
 		{
-			cmd_array[i] = token->value;
-			if (i == 0 && cmd_array[0] && is_built_in(cmd_array[0]))
+			/* Check if this is an env assignment BEFORE any command */
+			if (i == 0 && is_valid_env_assignment(token->value))
+			{
+				t_env_node *env_node = gc_malloc(sizeof(t_env_node));
+				if (env_node && find_key(token->value, env_node) && find_value(token->value, env_node))
+					push_env(cmdnode->env, env_node);
+				token = token->next;
+				continue;
+			}
+			/* Only split if token has segment_list and should_split returns true */
+			if (i == 0 && token->value && token->segment_list && should_split(token->segment_list) && ft_strchr(token->value, ' '))
+			{
+				if (handle_split_word(cmd_array, token->value, &i) < 0)
+					return (NULL);
+			}
+			else
+			{
+				cmd_array[i] = token->value;
+				i++;
+			}
+			if (i > 0 && cmd_array[0] && is_built_in(cmd_array[0]))
 				cmdnode->cmd_type = BUILTIN;
-			i++;
 		}
 		token = token->next;
 	}
@@ -79,35 +136,90 @@ char *look_for_cmd(t_token *token, t_token_list *toklst, t_cmd_list *cmdlst)
 	return (NULL);
 }
 
+static int validate_pipe_syntax(t_token_list *toklst)
+{
+	t_token *token;
+	t_token *prev;
+
+	if (!toklst || !toklst->head)
+		return (0);
+	token = toklst->head;
+	prev = NULL;
+
+	/* Check for pipe at the beginning */
+	if (token->type == TK_PIPE)
+		return (1);
+
+	while (token)
+	{
+		if (token->type == TK_PIPE)
+		{
+			/* Check for double pipe (|| or | |) */
+			if (prev && prev->type == TK_PIPE)
+				return (1);
+			/* Check for pipe at the end */
+			if (!token->next)
+				return (1);
+			/* Check for pipe followed immediately by another pipe */
+			if (token->next && token->next->type == TK_PIPE)
+				return (1);
+		}
+		prev = token;
+		token = token->next;
+	}
+	return (0);
+}
+
 int token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst, t_env_list *envlst, int last_status)
 {
-    if (!toklst || !cmdlst || !envlst)
-        return (1);
-    final_token(toklst, envlst, last_status);
-    look_for_cmd(toklst->head, toklst, cmdlst);
-    if (cmdlst->syntax_error)
-        return (1);
-    return (0);
+	if (!toklst || !cmdlst || !envlst)
+		return (1);
+
+	/* Validate pipe syntax before processing */
+	if (validate_pipe_syntax(toklst))
+	{
+		cmdlst->syntax_error = 1;
+		return (1);
+	}
+
+	final_token(toklst, envlst, last_status);
+	look_for_cmd(toklst->head, toklst, cmdlst);
+	if (cmdlst->syntax_error)
+		return (1);
+	return (0);
 }
 
 void final_token(t_token_list *toklst, t_env_list *envlst, int last_status)
 {
 	t_token *token;
 	t_segment_list *seglst;
+	int skip_next;
 
 	if (!toklst)
 		return;
 	token = toklst->head;
+	skip_next = 0;
 	while (token)
 	{
-		if (token->type == TK_WORD)
+		if (skip_next)
+		{
+			skip_next = 0;
+			token = token->next;
+			continue;
+		}
+		if (token->type == TK_HEREDOC)
+			skip_next = 1;
+		else if (token->type == TK_WORD)
 		{
 			seglst = gc_malloc(sizeof(*seglst));
 			if (!seglst)
 				return;
 			init_segment_lst(seglst);
 			if (find_segment(seglst, token->value))
+			{
+				token->segment_list = seglst;
 				token->value = segments_expand(seglst, envlst, last_status);
+			}
 		}
 		token = token->next;
 	}

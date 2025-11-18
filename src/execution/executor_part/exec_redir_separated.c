@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   exec_redir_separated.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 13:50:15 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/03 13:50:36 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/18 13:22:56 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 
-int	handle_output_redirection(char **args, int *i, int *out_fd)
+int handle_output_redirection(char **args, int *i, int *out_fd)
 {
-	int	flags;
+	int flags;
 
 	if (strcmp(args[*i], ">") == 0)
 		flags = O_WRONLY | O_CREAT | O_TRUNC;
@@ -33,7 +33,7 @@ int	handle_output_redirection(char **args, int *i, int *out_fd)
 	return (0);
 }
 
-int	handle_input_redirection(char **args, int *i, int *in_fd)
+int handle_input_redirection(char **args, int *i, int *in_fd)
 {
 	if (strcmp(args[*i], "<") == 0 && args[*i + 1])
 	{
@@ -45,7 +45,7 @@ int	handle_input_redirection(char **args, int *i, int *in_fd)
 	{
 		if (*in_fd != -1)
 			close(*in_fd);
-		*in_fd = exec_heredoc(args[*i + 1]);
+		*in_fd = exec_heredoc(args[*i + 1], 0);
 	}
 	else
 		return (1);
@@ -55,7 +55,7 @@ int	handle_input_redirection(char **args, int *i, int *in_fd)
 	return (0);
 }
 
-int	handle_separated_operators(char **args, int *i, int *in_fd, int *out_fd)
+int handle_separated_operators(char **args, int *i, int *in_fd, int *out_fd)
 {
 	if (handle_output_redirection(args, i, out_fd) == 0)
 		return (0);

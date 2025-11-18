@@ -6,13 +6,44 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 17:31:20 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/05 21:18:20 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/18 16:38:12 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "executor.h"
 
+/* Helper to update shell's internal environment list */
+static void update_shell_env(const char *name, const char *value)
+{
+	t_env_node *existing;
+	t_env_node *new_node;
+
+	if (!g_shell.env || !name)
+		return;
+	/* Check if variable already exists and update it */
+	existing = g_shell.env->head;
+	while (existing)
+	{
+		if (ft_strcmp(existing->key, name) == 0)
+		{
+			/* Update existing value */
+			if (existing->value)
+				free(existing->value);
+			existing->value = ft_strdup(value);
+			return;
+		}
+		existing = existing->next;
+	}
+	/* Variable doesn't exist, add new entry */
+	new_node = malloc(sizeof(t_env_node));
+	if (new_node)
+	{
+		new_node->key = ft_strdup(name);
+		new_node->value = ft_strdup(value);
+		push_env(g_shell.env, new_node);
+	}
+}
 
 static char *strip_quotes(const char *value)
 {
@@ -116,10 +147,16 @@ static int export_with_value(char *arg)
 		if (stripped)
 		{
 			setenv(name, stripped, 1);
+			/* Also update shell's internal env list for variable expansion */
+			update_shell_env(name, stripped);
 			gc_free(stripped);
 		}
 		else
+		{
 			setenv(name, value, 1);
+			/* Also update shell's internal env list for variable expansion */
+			update_shell_env(name, value);
+		}
 		/* track the name as exported */
 		if (!is_in_exported(name) && g_shell.exported_count < MAX_EXPORTED)
 			g_shell.exported_vars[g_shell.exported_count++] = gc_strdup(name);

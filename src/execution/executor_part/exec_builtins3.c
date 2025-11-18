@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:06:11 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/04 16:49:37 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/18 17:34:32 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@ int ft_unset(char **args)
 			continue;
 		}
 		unsetenv(args[i]);
+		remove_from_env_list(g_shell.env, args[i]);
 		i++;
 	}
 	g_shell.last_status = has_error;
@@ -119,21 +120,41 @@ int ft_exit(char **args)
 {
 	long exit_code;
 
-	ft_putstr_fd("exit\n", STDOUT_FILENO);
+	if (g_shell.is_interactive)
+		ft_putstr_fd("exit\n", STDOUT_FILENO);
 	if (!args[1])
 		exit(g_shell.last_status);
+	/* Check if first argument is numeric BEFORE checking arg count */
+	if (!is_numeric(args[1]))
+	{
+		ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
+		/* Print the argument - handle empty/null strings gracefully */
+		if (args[1])
+		{
+			/* Check if string contains only printable chars */
+			int i = 0;
+			int is_printable = 1;
+			while (args[1][i])
+			{
+				if (args[1][i] < 32 || args[1][i] > 126)
+				{
+					is_printable = 0;
+					break;
+				}
+				i++;
+			}
+			if (is_printable || i == 0)
+				ft_putstr_fd(args[1], STDERR_FILENO);
+		}
+		ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
+		exit(255);
+	}
+	/* Now check for too many arguments */
 	if (args[2])
 	{
 		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
 		g_shell.last_status = 1;
 		return (1);
-	}
-	if (!is_numeric(args[1]))
-	{
-		ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
-		ft_putstr_fd(args[1], STDERR_FILENO);
-		ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
-		exit(2);
 	}
 	exit_code = ft_atoi(args[1]);
 	exit((unsigned char)exit_code);

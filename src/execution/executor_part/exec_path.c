@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 12:57:24 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/04 17:07:34 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/18 16:38:14 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,5 +46,5 @@ char *find_in_path(char *cmd)
 			return (candidate);
 		i++;
 	}
-	return (gc_strdup(cmd));
+	return (NULL);
 }
