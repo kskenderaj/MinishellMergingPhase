@@ -38,8 +38,8 @@ PARSER_SRCS = \
 	src/parsing/command/add_env.c \
 	src/parsing/command/token_to_cmd_helper.c \
 	src/parsing/command/expand_env.c \
-	src/parsing/command/cmdlst_filelst.c
-
+	src/parsing/command/cmdlst_filelst.c 
+	
 PARSER_OBJS = $(PARSER_SRCS:.c=.o)
 
 # Executor sources

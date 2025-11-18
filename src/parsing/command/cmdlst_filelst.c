@@ -12,16 +12,18 @@ t_cmd_node *create_cmdnode(void)
 		return (NULL);
 	cmdnode->cmd_type = CMD;
 	cmdnode->cmd = NULL;
+	cmdnode->next = NULL;
 	cmdnode->files = (t_file_list *)gc_malloc(sizeof(t_file_list));
 	if (!cmdnode->files)
 		return NULL;
+	cmdnode->env = NULL;
 	cmdnode->files->head = NULL;
 	cmdnode->files->size = 0;
 	cmdnode->files->tail = NULL;
 	return (cmdnode);
 }
 
-void create_filenode(char *str, int red_type, t_file_list *filelst)
+void create_filenode(char *filename, int red_type, t_file_list *filelst)
 {
 	t_file_node *filenode;
 
@@ -29,7 +31,7 @@ void create_filenode(char *str, int red_type, t_file_list *filelst)
 	if (!filenode)
 		return;
 	filenode->redir_type = red_type;
-	filenode->filename = str;
+	filenode->filename = filename;
 	push_file(filelst, filenode);
 	return;
 }

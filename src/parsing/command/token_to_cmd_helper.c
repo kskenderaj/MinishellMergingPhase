@@ -41,6 +41,12 @@ int collect_redirs(t_token *token, t_cmd_node *cmdnode)
 	return 0;
 }
 
+bool is_redirection(t_toktype t)
+{
+	return (t == TK_INFILE || t == TK_OUTFILE || t == TK_APPEND || t == TK_HEREDOC);
+}
+
+
 // void	final_token(t_token_list *toklst, t_env_list *envlst, int last_status)
 // {
 // 	t_token			*token;

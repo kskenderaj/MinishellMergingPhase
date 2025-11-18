@@ -1,6 +1,5 @@
-#include "minishell.h"
 #include "parser.h"
-#include "garbage_collector.h"
+#include "minishell.h"
 
 int find_key(char *str, t_env_node *env)
 {
@@ -14,7 +13,7 @@ int find_key(char *str, t_env_node *env)
 		key_len = (size_t)(eq - str);
 	else
 		key_len = ft_strlen(str);
-	env->key = gc_substr(str, 0, key_len);
+	env->key = ft_substr(str, 0, key_len);
 	if (!env->key)
 		return (0);
 	return (1);
@@ -30,13 +29,13 @@ int find_value(char *str, t_env_node *env)
 	eq = ft_strchr(str, '=');
 	if (!eq)
 	{
-		env->value = gc_substr("", 0, 0);
+		env->value = ft_substr("", 0, 0);
 		if (!env->value)
 			return (0);
 		return (1);
 	}
 	val_len = ft_strlen(eq + 1);
-	env->value = gc_substr(str, (unsigned int)(eq - str + 1), val_len);
+	env->value = ft_substr(str, (unsigned int)(eq - str + 1), val_len);
 	if (!env->value)
 		return (0);
 	return (1);
@@ -71,7 +70,7 @@ int get_envs(char **env, t_env_list *lst)
 	i = 0;
 	while (env[i])
 	{
-		node = gc_malloc(sizeof(*node));
+		node = malloc(sizeof(*node));
 		if (!node)
 			return (0);
 		if (!find_key(env[i], node))
@@ -91,4 +90,27 @@ char *get_expand(char *seg_str, int i, int last_status, t_env_list *envlst)
 		return (gc_itoa(last_status));
 	else
 		return (expand_env(seg_str + i, envlst));
+}
+
+void free_env_list(t_env_list *env)
+{
+	t_env_node *current;
+	t_env_node *next;
+
+	if (!env)
+		return;
+	current = env->head;
+	while (current)
+	{
+		next = current->next;
+		if (current->key)
+			free(current->key);
+		if (current->value)
+			free(current->value);
+		free(current);
+		current = next;
+	}
+	if (env->pid)
+		free(env->pid);
+	free(env);
 }

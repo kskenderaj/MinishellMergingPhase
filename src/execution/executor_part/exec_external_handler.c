@@ -10,15 +10,44 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minishell.h"
 #include "executor.h"
 
 // Executes external command (execve in current process)
 void exec_external(char **args, char **envp)
 {
     char *exec_path;
+     if (!args || !args[0])
+        return;
 
     exec_path = find_in_path(args[0]);
+    if (!exec_path)
+    {
+        ft_putstr_fd(args[0], STDERR_FILENO);
+        ft_putstr_fd(": command not found\n", STDERR_FILENO);
+        exit(127);
+    }
+    
+    // Check if file exists
+    if (access(exec_path, F_OK) != 0)
+    {
+        ft_putstr_fd(args[0], STDERR_FILENO);
+        ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
+        exit(127);  // File not found
+    }
+    
+    // Check if executable
+    if (access(exec_path, X_OK) != 0)
+    {
+        ft_putstr_fd(args[0], STDERR_FILENO);
+        ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
+        exit(126);  // Permission denied
+    }
+    
     execve(exec_path, args, envp);
+    // If execve fails for other reasons
+    perror(args[0]);
+    exit(126);
 }
 
 // Sets up redirections for builtins and runs them

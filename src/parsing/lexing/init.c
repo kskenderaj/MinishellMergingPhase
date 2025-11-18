@@ -28,6 +28,7 @@ void init_cmd_lst(t_cmd_list *lst)
 	lst->head = NULL;
 	lst->tail = NULL;
 	lst->size = 0;
+	lst->syntax_error = 0;
 }
 void init_files_lst(t_file_list *lst)
 {

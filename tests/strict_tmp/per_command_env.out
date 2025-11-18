@@ -1,1 +1,1 @@
-FOO=bar
+FOO=bar: No such file or directory

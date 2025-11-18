@@ -10,12 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minishell.h"
 #include "executor.h"
 
 int table_of_builtins(t_cmd_node *cmd, char **envp, int flag)
 {
 	if (!cmd || !cmd->cmd || !cmd->cmd[0])
-		return (-1);
+		return (128);  // Not a builtin, pass to exec_pipeline
 	if (!strcmp(cmd->cmd[0], "echo"))
 		return (ft_echo(cmd->cmd));
 	if (!strcmp(cmd->cmd[0], "pwd"))
@@ -28,7 +29,8 @@ int table_of_builtins(t_cmd_node *cmd, char **envp, int flag)
 		return (ft_unset(cmd->cmd));
 	if (!strcmp(cmd->cmd[0], "env"))
 		return (ft_env(cmd->cmd));
-	/* not a builtin */
+	if (!strcmp(cmd->cmd[0], "exit"))
+		return (ft_exit(cmd->cmd));
 	(void)envp;
 	(void)flag;
 	return (128);

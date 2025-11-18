@@ -21,13 +21,54 @@
 #include <stdbool.h>
 #include "garbage_collector.h"
 
-// Forward declarations for command/parser types used across modules
-typedef struct s_cmd_node t_cmd_node;
-typedef struct s_cmd_list t_cmd_list;
-typedef struct s_env_node t_env_node;
-typedef struct s_env_list t_env_list;
-typedef struct s_file_node t_file_node;
-typedef struct s_file_list t_file_list;
+// Environment structures - FULL DEFINITIONS
+typedef struct s_env_node
+{
+	char *key;
+	char *value;
+	struct s_env_node *next;
+} t_env_node;
+
+typedef struct s_env_list
+{
+	t_env_node *head;
+	t_env_node *tail;
+	ssize_t size;
+	pid_t *pid;
+} t_env_list;
+
+// File redirection structures
+typedef struct s_file_node
+{
+	char *filename;
+	int redir_type;
+	struct s_file_node *next;
+} t_file_node;
+
+typedef struct s_file_list
+{
+	t_file_node *head;
+	t_file_node *tail;
+	ssize_t size;
+} t_file_list;
+
+// Command structures
+typedef struct s_cmd_node
+{
+	struct s_cmd_node *next;
+	int cmd_type;
+	char **cmd;
+	t_file_list *files;
+	struct s_env_list *env;
+} t_cmd_node;
+
+typedef struct s_cmd_list
+{
+	int syntax_error;
+	t_cmd_node *head;
+	t_cmd_node *tail;
+	ssize_t size;
+} t_cmd_list;
 
 // Includes -- END
 
@@ -97,6 +138,12 @@ bool is_valid_quote(char *str, int *i);
 int skip_spaces(char *str, int i);
 /* helpers used in token_to_cmd */
 bool is_redirection(t_toktype t);
+//init all
+void init_token_lst(t_token_list *lst);
+void init_cmd_lst(t_cmd_list *lst);
+void init_env_lst(t_env_list *lst);
+void init_segment_lst(t_segment_list *lst);
+
 // tokenize
 t_token *create_token(t_toktype type, char *val);
 int push_token(t_token_list *lst, t_token *token);
@@ -120,7 +167,18 @@ t_cmd_node *create_cmdnode(void);
 void push_cmd(t_cmd_list *lst, t_cmd_node *node);
 int collect_redirs(t_token *token, t_cmd_node *cmdnode);
 bool is_built_in(char *str);
-void create_filenode(char *str, int red_type, t_file_list *filelst);
+void create_filenode(char *filename, int red_type, t_file_list *filelst);
+
+/* Environment functions */
+int get_envs(char **env, t_env_list *lst);
+void free_env_list(t_env_list *env);
+
+/* Token to command conversion */
+int token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst, t_env_list *envlst, int last_status);
+void final_token(t_token_list *toklst, t_env_list *envlst, int last_status);
+
+/* Quote removal */
+// char *remove_quotes(char *str);
 
 /* Segment utilities used elsewhere */
 void init_segment_lst(t_segment_list *lst);
@@ -128,9 +186,9 @@ char *segments_expand(t_segment_list *seglst, t_env_list *envlst, int last_statu
 char *expand_env(char *str, t_env_list *env_lst);
 char *get_expand(char *seg_str, int i, int last_status, t_env_list *envlst);
 
-// debug
-void print_tokens(const t_token_list *lst);
-void print_segment_list(const t_segment_list *list);
-void init_segment_lst(t_segment_list *lst);
+// // debug
+// void print_tokens(const t_token_list *lst);
+// void print_segment_list(const t_segment_list *list);
+// void init_segment_lst(t_segment_list *lst);
 
 #endif

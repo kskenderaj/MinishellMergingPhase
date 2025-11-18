@@ -10,7 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "executor.h"
+#include "minishell.h"
+
 void print_command_error(char *cmd, char *error_msg)
 {
     ft_putstr_fd("minishell: ", STDERR_FILENO);

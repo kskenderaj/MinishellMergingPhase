@@ -59,14 +59,19 @@ static int spawn_pipeline_children(char ***cmds, int ncmds, char **envp,
 	int i;
 	int in_fd;
 	int out_fd;
+	int redir_status;
 
 	i = 0;
 	while (i < ncmds)
 	{
 		in_fd = -1;
 		out_fd = -1;
-		if (setup_redirections(cmds[i], &in_fd, &out_fd))
-			return (1);
+		redir_status = setup_redirections(cmds[i], &in_fd, &out_fd);
+		if (redir_status != 0)
+		{
+			g_shell.last_status = redir_status;
+			return (redir_status);
+		}
 		pids[i] = fork();
 		if (pids[i] == 0)
 		{
@@ -120,39 +125,47 @@ static void setup_child_io_and_exec(int idx, int ncmds, int pipes[64][2],
 			ei++;
 		}
 	}
-	/* if command is a shell builtin, run it in this child process */
-	if (cmd && cmd[0])
+	/* Check if command is empty (after redirections were handled) */
+	if (!cmd || !cmd[0] || !cmd[0][0])
 	{
-		if (!strcmp(cmd[0], "echo"))
-		{
-			ft_echo(cmd);
-			_exit(0);
-		}
-		else if (!strcmp(cmd[0], "cd"))
-		{
-			ft_cd(cmd);
-			_exit(0);
-		}
-		else if (!strcmp(cmd[0], "pwd"))
-		{
-			ft_pwd(cmd);
-			_exit(0);
-		}
-		else if (!strcmp(cmd[0], "export"))
-		{
-			ft_export(cmd);
-			_exit(0);
-		}
-		else if (!strcmp(cmd[0], "unset"))
-		{
-			ft_unset(cmd);
-			_exit(0);
-		}
-		else if (!strcmp(cmd[0], "env"))
-		{
-			ft_env(cmd);
-			_exit(0);
-		}
+		/* Empty command with successful redirections -> EXIT 0 */
+		_exit(0);
+	}
+	/* if command is a shell builtin, run it in this child process */
+	if (!strcmp(cmd[0], "echo"))
+	{
+		ft_echo(cmd);
+		_exit(0);
+	}
+	else if (!strcmp(cmd[0], "cd"))
+	{
+		ft_cd(cmd);
+		_exit(0);
+	}
+	else if (!strcmp(cmd[0], "pwd"))
+	{
+		ft_pwd(cmd);
+		_exit(0);
+	}
+	else if (!strcmp(cmd[0], "export"))
+	{
+		ft_export(cmd);
+		_exit(0);
+	}
+	else if (!strcmp(cmd[0], "unset"))
+	{
+		ft_unset(cmd);
+		_exit(0);
+	}
+	else if (!strcmp(cmd[0], "env"))
+	{
+		ft_env(cmd);
+		_exit(0);
+	}
+	else if (!strcmp(cmd[0], "exit"))
+	{
+		ft_exit(cmd);
+		_exit(0);
 	}
 	exec_external(cmd, envp);
 	_exit(127);

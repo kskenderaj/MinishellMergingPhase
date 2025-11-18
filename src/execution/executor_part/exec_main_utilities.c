@@ -10,9 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minishell.h"
 #include "executor.h"
-#include "builtins.h"
-#include <stdio.h>
 
 // Simple argument splitter
 void split_args(char *input, char **args, int max_args)
@@ -55,6 +54,12 @@ static int handle_attached_operators(char **args, int *idx, int *in_fd, int *out
             if (*out_fd != -1)
                 close(*out_fd);
             *out_fd = open(fname, O_WRONLY | O_CREAT | O_APPEND, 0644);
+            if (*out_fd < 0)
+            {
+                perror(fname);
+                g_shell.last_status = 1;
+                return (int)1;
+            }
             if (tok[2] != '\0')
                 shift_left_by(args, *idx, 1);
             else
@@ -70,6 +75,11 @@ static int handle_attached_operators(char **args, int *idx, int *in_fd, int *out
             if (*in_fd != -1)
                 close(*in_fd);
             *in_fd = exec_heredoc(delim);
+            if (*in_fd < 0)
+            {
+                g_shell.last_status = 1;
+                return (int)1;
+            }
             if (tok[2] != '\0')
                 shift_left_by(args, *idx, 1);
             else
@@ -85,6 +95,12 @@ static int handle_attached_operators(char **args, int *idx, int *in_fd, int *out
             if (*out_fd != -1)
                 close(*out_fd);
             *out_fd = open(fname, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if (*out_fd < 0)
+            {
+                perror(fname);
+                g_shell.last_status = 1;
+                return (int)1;
+            }
             if (tok[1] != '\0')
                 shift_left_by(args, *idx, 1);
             else
@@ -100,6 +116,12 @@ static int handle_attached_operators(char **args, int *idx, int *in_fd, int *out
             if (*in_fd != -1)
                 close(*in_fd);
             *in_fd = open(fname, O_RDONLY);
+            if (*in_fd < 0)
+            {
+                perror(fname);
+                g_shell.last_status = 1;
+                return (int)1;
+            }
             if (tok[1] != '\0')
                 shift_left_by(args, *idx, 1);
             else
@@ -121,6 +143,12 @@ static int handle_separated_operators(char **args, int *i, int *in_fd, int *out_
             *out_fd = -1;
         }
         *out_fd = open(args[*i + 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (*out_fd < 0)
+        {
+            perror(args[*i + 1]);
+            g_shell.last_status = 1;
+            return (1);
+        }
         args[*i] = NULL;
         args[*i + 1] = NULL;
         shift_left_by(args, *i, 2);
@@ -134,6 +162,12 @@ static int handle_separated_operators(char **args, int *i, int *in_fd, int *out_
             *out_fd = -1;
         }
         *out_fd = open(args[*i + 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+        if (*out_fd < 0)
+        {
+            perror(args[*i + 1]);
+            g_shell.last_status = 1;
+            return (1);
+        }
         args[*i] = NULL;
         args[*i + 1] = NULL;
         shift_left_by(args, *i, 2);
@@ -147,6 +181,12 @@ static int handle_separated_operators(char **args, int *i, int *in_fd, int *out_
             *in_fd = -1;
         }
         *in_fd = open(args[*i + 1], O_RDONLY);
+        if (*in_fd < 0)
+        {
+            perror(args[*i + 1]);
+            g_shell.last_status = 1;
+            return (1);
+        }
         args[*i] = NULL;
         args[*i + 1] = NULL;
         shift_left_by(args, *i, 2);
@@ -160,6 +200,11 @@ static int handle_separated_operators(char **args, int *i, int *in_fd, int *out_
             *in_fd = -1;
         }
         *in_fd = exec_heredoc(args[*i + 1]);
+        if (*in_fd < 0)
+        {
+            g_shell.last_status = 1;
+            return (1);
+        }
         args[*i] = NULL;
         args[*i + 1] = NULL;
         shift_left_by(args, *i, 2);
@@ -181,21 +226,22 @@ int setup_redirections(char **args, int *in_fd, int *out_fd)
         if ((strcmp(tok, ">") == 0 || strcmp(tok, ">>") == 0 || strcmp(tok, "<") == 0 || strcmp(tok, "<<") == 0) && args[i + 1] == NULL)
         {
             fprintf(stderr, "minishell: syntax error near unexpected token `newline`\n");
-            return (1);
+            g_shell.last_status = 2;
+            return (2);
         }
         int res;
         res = handle_attached_operators(args, &i, in_fd, out_fd, tok);
         if (res != 2)
         {
             if (res != 0)
-                return (1);
+                return (res);
             continue;
         }
         res = handle_separated_operators(args, &i, in_fd, out_fd);
         if (res != 2)
         {
             if (res != 0)
-                return (1);
+                return (res);
             continue;
         }
         i++;

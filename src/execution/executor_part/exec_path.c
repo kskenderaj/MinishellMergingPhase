@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minishell.h"
 #include "executor.h"
 
 char *find_in_path(char *cmd)
@@ -26,7 +27,7 @@ char *find_in_path(char *cmd)
 		return (gc_strdup(cmd));
 	path_env = getenv("PATH");
 	if (!path_env)
-		return (gc_strdup(cmd));
+		return (NULL);
 	paths = gc_split(path_env, ':');
 	if (!paths)
 		return (gc_strdup(cmd));

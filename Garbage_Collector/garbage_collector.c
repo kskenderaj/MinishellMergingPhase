@@ -12,24 +12,25 @@
 
 #include "garbage_collector.h"
 
+t_gc *g_gc = NULL;  // Global GC pointer (not static, so it can be used in other files)
+
 t_gc *get_gc(void)
 {
-	static t_gc gc = {0};
-
-	return (&gc);
+	return (g_gc);
 }
 
 // initializing gc
 t_gc *gc_init(void)
 {
-	t_gc *gc;
-
-	gc = malloc(sizeof(t_gc));
-	if (!gc)
+	if (g_gc)  // Already initialized
+		return (g_gc);
+	
+	g_gc = malloc(sizeof(t_gc));
+	if (!g_gc)
 		return (NULL);
-	gc->head = NULL;
-	gc->count = 0;
-	return (gc);
+	g_gc->head = NULL;
+	g_gc->count = 0;
+	return (g_gc);
 }
 
 int gc_add_node(void *ptr, int fd, t_gc_type type)

@@ -2,10 +2,6 @@
 #include "minishell.h"
 #include "parser.h"
 
-bool is_redirection(t_toktype t)
-{
-	return (t == TK_INFILE || t == TK_OUTFILE || t == TK_APPEND || t == TK_HEREDOC);
-}
 
 int count_args(t_token *token)
 {
@@ -38,6 +34,8 @@ char **create_array(t_token *token, t_cmd_node *cmdnode, int i)
 	{
 		if (is_redirection(token->type))
 		{
+			if (!token->next || token->next->type != TK_WORD)
+                return (NULL); 
 			if (token->next)
 				token = token->next;
 			if (token)
@@ -79,6 +77,17 @@ char *look_for_cmd(t_token *token, t_token_list *toklst, t_cmd_list *cmdlst)
 			token = token->next;
 	}
 	return (NULL);
+}
+
+int token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst, t_env_list *envlst, int last_status)
+{
+    if (!toklst || !cmdlst || !envlst)
+        return (1);
+    final_token(toklst, envlst, last_status);
+    look_for_cmd(toklst->head, toklst, cmdlst);
+    if (cmdlst->syntax_error)
+        return (1);
+    return (0);
 }
 
 void final_token(t_token_list *toklst, t_env_list *envlst, int last_status)

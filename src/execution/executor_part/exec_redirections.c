@@ -14,14 +14,14 @@
 
 int count_output(t_commandlist *cmd)
 {
-	t_filelist *current;
+	t_file_node *current;
 	int count;
 
 	count = 0;
-	current = cmd->files;
+	current = (t_file_node *)cmd->files;
 	while (current != NULL)
 	{
-		if (current->type == OUTFILE || current->type == OUTFILE_APPEND)
+		if (current->redir_type == OUTFILE || current->redir_type == OUTFILE_APPEND)
 			count++;
 		current = current->next;
 	}
@@ -29,16 +29,16 @@ int count_output(t_commandlist *cmd)
 }
 
 // INPUT STARTS HERE FOR REDIRECTIONS
-static t_filelist *find_last_input(t_commandlist *cmd, int input_count)
+static t_file_node *find_last_input(t_commandlist *cmd, int input_count)
 {
 	int current_count;
-	t_filelist *current;
+	t_file_node *current;
 
 	current_count = 0;
-	current = cmd->files;
+	current = (t_file_node *)cmd->files;
 	while (current != NULL)
 	{
-		if (current->type == INFILE || current->type == HEREDOC)
+		if (current->redir_type == INFILE || current->redir_type == HEREDOC)
 		{
 			current_count++;
 			if (current_count == input_count)
@@ -51,14 +51,14 @@ static t_filelist *find_last_input(t_commandlist *cmd, int input_count)
 
 int count_input(t_commandlist *cmd)
 {
-	t_filelist *current;
+	t_file_node *current;
 	int count;
 
 	count = 0;
-	current = cmd->files;
+	current = (t_file_node *)cmd->files;
 	while (current != NULL)
 	{
-		if (current->type == INFILE || current->type == HEREDOC)
+		if (current->redir_type == INFILE || current->redir_type == HEREDOC)
 			count++;
 		current = current->next;
 	}
@@ -68,7 +68,7 @@ int count_input(t_commandlist *cmd)
 int setup_input_file(t_commandlist *cmd)
 {
 	int input_count;
-	t_filelist *last_input;
+	t_file_node *last_input;
 	int fd;
 
 	// t_gc *gc; // Removed unused variable
@@ -79,20 +79,25 @@ int setup_input_file(t_commandlist *cmd)
 	if (last_input == NULL)
 		return (NO_REDIRECTION);
 	fd = gc_open(last_input->filename, O_RDONLY, 0);
+	if (fd < 0)
+	{
+		perror(last_input->filename);
+		g_shell.last_status = 1;
+	}
 	return (fd);
 }
 
 // Finds the last output redirection (for > and >>)
-static t_filelist *find_last_output(t_commandlist *cmd, int output_count)
+static t_file_node *find_last_output(t_commandlist *cmd, int output_count)
 {
 	int current_count;
-	t_filelist *current;
+	t_file_node *current;
 
 	current_count = 0;
-	current = cmd->files;
+	current = (t_file_node *)cmd->files;
 	while (current != NULL)
 	{
-		if (current->type == OUTFILE || current->type == OUTFILE_APPEND)
+		if (current->redir_type == OUTFILE || current->redir_type == OUTFILE_APPEND)
 		{
 			current_count++;
 			if (current_count == output_count)
@@ -107,7 +112,7 @@ static t_filelist *find_last_output(t_commandlist *cmd, int output_count)
 int setup_output_file(t_commandlist *cmd)
 {
 	int output_count;
-	t_filelist *last_output;
+	t_file_node *last_output;
 	int fd;
 
 	output_count = count_output(cmd);
@@ -116,11 +121,16 @@ int setup_output_file(t_commandlist *cmd)
 	last_output = find_last_output(cmd, output_count);
 	if (last_output == NULL)
 		return (NO_REDIRECTION);
-	if (last_output->type == OUTFILE)
+	if (last_output->redir_type == OUTFILE)
 		fd = gc_open(last_output->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	else
 		fd = gc_open(last_output->filename, O_WRONLY | O_CREAT | O_APPEND,
 					 0644);
+	if (fd < 0)
+	{
+		perror(last_output->filename);
+		g_shell.last_status = 1;
+	}
 	return (fd);
 }
 
@@ -129,7 +139,9 @@ int setup_input_file_from_cmd(t_cmd_node *cmd)
 {
 	t_commandlist tmp;
 
-	tmp.files = (t_filelist *)cmd->files;
+	if (!cmd || !cmd->files || !cmd->files->head)
+		return (NO_REDIRECTION);
+	tmp.files = (t_filelist *)cmd->files->head;
 	return (setup_input_file(&tmp));
 }
 
@@ -137,6 +149,8 @@ int setup_output_file_from_cmd(t_cmd_node *cmd)
 {
 	t_commandlist tmp;
 
-	tmp.files = (t_filelist *)cmd->files;
+	if (!cmd || !cmd->files || !cmd->files->head)
+		return (NO_REDIRECTION);
+	tmp.files = (t_filelist *)cmd->files->head;
 	return (setup_output_file(&tmp));
 }

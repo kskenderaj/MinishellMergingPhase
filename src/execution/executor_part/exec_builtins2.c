@@ -10,7 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minishell.h"
 #include "executor.h"
+
 
 static char *strip_quotes(const char *value)
 {
@@ -62,22 +64,24 @@ static int is_in_exported(const char *name)
 	return (0);
 }
 
-static void export_no_value(char *arg)
+static int export_no_value(char *arg)
 {
 	if (!is_valid_identifier(arg))
 	{
 		ft_putstr_fd("export: not a valid identifier: ", STDERR_FILENO);
 		ft_putstr_fd(arg, STDERR_FILENO);
 		ft_putchar_fd('\n', STDERR_FILENO);
+		return (1);
 	}
 	else
 	{
 		if (!is_in_exported(arg) && g_shell.exported_count < MAX_EXPORTED)
 			g_shell.exported_vars[g_shell.exported_count++] = gc_strdup(arg);
 	}
+	return (0);
 }
 
-static void export_with_value(char *arg)
+static int export_with_value(char *arg)
 {
 	char *eq;
 	char *value;
@@ -89,13 +93,12 @@ static void export_with_value(char *arg)
 	if (!eq)
 	{
 		/* no '=', behave like export no value */
-		export_no_value(arg);
-		return;
+		return (export_no_value(arg));
 	}
 	namelen = (size_t)(eq - arg);
 	name = (char *)gc_malloc(namelen + 1);
 	if (!name)
-		return;
+		return (1);
 	memcpy(name, arg, namelen);
 	name[namelen] = '\0';
 
@@ -104,6 +107,7 @@ static void export_with_value(char *arg)
 		ft_putstr_fd("export: not a valid identifier: ", STDERR_FILENO);
 		ft_putstr_fd(name, STDERR_FILENO);
 		ft_putchar_fd('\n', STDERR_FILENO);
+		return (1);
 	}
 	else
 	{
@@ -120,25 +124,33 @@ static void export_with_value(char *arg)
 		if (!is_in_exported(name) && g_shell.exported_count < MAX_EXPORTED)
 			g_shell.exported_vars[g_shell.exported_count++] = gc_strdup(name);
 	}
+	return (0);
 }
 
 int ft_export(char **args)
 {
 	int i;
+	int status;
+	int has_error;
 
 	i = 1;
+	has_error = 0;
 	if (!args[1])
 	{
 		print_exported_env();
+		g_shell.last_status = 0;
 		return (0);
 	}
 	while (args[i])
 	{
 		if (ft_strchr(args[i], '='))
-			export_with_value(args[i]);
+			status = export_with_value(args[i]);
 		else
-			export_no_value(args[i]);
+			status = export_no_value(args[i]);
+		if (status != 0)
+			has_error = 1;
 		i++;
 	}
-	return (0);
+	g_shell.last_status = has_error;
+	return (has_error);
 }

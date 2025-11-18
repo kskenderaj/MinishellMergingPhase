@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minishell.h"
 #include "executor.h"
 
 /* resolve_cd_target: set *target based on args and argc
@@ -66,17 +67,18 @@ int	ft_cd(char **args)
 	while (args[argc])
 		argc++;
 	if (!getcwd(oldpwd, sizeof(oldpwd)))
-		return (perror("cd: getcwd (oldpwd)"), 1);
+		return (perror("cd: getcwd (oldpwd)"), g_shell.last_status = 1, 1);
 	/* determine target and validate args */
 	if (resolve_cd_target(args, argc, &target))
-		return (1);
+		return (g_shell.last_status = 1, 1);
 	if (chdir(target) != 0)
-		return (perror("cd"), 1);
+		return (perror("cd"), g_shell.last_status = 1, 1);
 	if (!getcwd(newpwd, sizeof(newpwd)))
-		return (perror("cd: getcwd (newpwd)"), 1);
+		return (perror("cd: getcwd (newpwd)"), g_shell.last_status = 1, 1);
 	if (args[1] && strcmp(args[1], "-") == 0)
 		printf("%s\n", newpwd);
 	setenv("OLDPWD", oldpwd, 1);
 	setenv("PWD", newpwd, 1);
+	g_shell.last_status = 0;
 	return (0);
 }

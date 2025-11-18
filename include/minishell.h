@@ -14,8 +14,7 @@
 # define MINISHELL_H
 
 // Includes -- BEGIN
-// # include "executor.h"
-// # include "garbage_collector.h"
+# include "garbage_collector.h"
 # include "libft/libft.h"
 # include "parser.h"
 # include <dirent.h>
@@ -28,51 +27,7 @@
 # include <sys/ioctl.h>
 # include <termios.h>
 // Includes -- END
-typedef struct s_file_node
-{
-	char						*filename;
-	int							redir_type;
-	struct s_file_node			*next;
-}								t_file_node;
-
-typedef struct s_file_list
-{
-	t_file_node					*head;
-	t_file_node					*tail;
-	ssize_t						size;
-}								t_file_list;
-
-typedef struct s_cmd_node
-{
-	struct s_cmd_node			*next;
-	int							cmd_type;
-	char						**cmd;
-	t_file_list					*files;
-	struct s_env_list			*env;
-}								t_cmd_node;
-
-typedef struct s_cmd_list
-{
-	int							syntax_error;
-	t_cmd_node					*head;
-	t_cmd_node					*tail;
-	ssize_t						size;
-}								t_cmd_list;
-
-typedef struct s_env_node
-{
-	char						*key;
-	char						*value;
-	struct s_env_node			*next;
-}								t_env_node;
-
-typedef struct s_env_list
-{
-	t_env_node					*head;
-	t_env_node					*tail;
-	ssize_t						size;
-	pid_t						*pid;
-}								t_env_list;
+// All parser types (env, cmd, file, token) are now defined in parser.h
 
 // Structs -- BEGIN
 typedef enum CMD_TYPE
@@ -84,10 +39,10 @@ typedef enum CMD_TYPE
 
 typedef enum REDIR_TYPE
 {
-	INFILE,
-	OUTFILE,
-	HEREDOC,
-	OUTFILE_APPEND,
+	INFILE = 4,			// TK_INFILE
+	OUTFILE = 5,		// TK_OUTFILE
+	HEREDOC = 6,		// TK_HEREDOC
+	OUTFILE_APPEND = 7,	// TK_APPEND
 	NO_REDIRECTION = -1
 }								t_REDIR_TYPE;
 // Structs -- END
@@ -104,8 +59,7 @@ int								*exit_code(void);
 t_env_list						*setup_env_list(void);
 t_env_list						*initialize_shell(char **env);
 char							*get_prompt(void);
-int								process_command(char *prompt,
-									t_env_list *env_list);
+int	process_command(t_cmd_list *cmdlst, t_env_list *envlst);
 char							*get_env_value(t_env_list *env,
 									const char *key);
 // main.c -- END

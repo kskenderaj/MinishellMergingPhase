@@ -13,9 +13,6 @@
 #ifndef EXECUTOR_H
 #define EXECUTOR_H
 
-#include "garbage_collector.h"
-#include "libft.h"
-#include "minishell.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -25,16 +22,28 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "garbage_collector.h"
+#include "libft.h"
+#include "minishell.h"
+
+
 
 /* Exported variables tracking*/
 #ifndef MAX_EXPORTED
 #define MAX_EXPORTED 128
 #endif
 
+typedef struct s_file_node t_file_node;
+typedef struct s_cmd_node t_cmd_node;
+typedef struct s_env_list t_env_list;
+typedef enum REDIR_TYPE t_REDIR_TYPE;
+
 typedef struct s_shell_state
 {
-	char *exported_vars[MAX_EXPORTED];
-	int exported_count;
+    char *exported_vars[MAX_EXPORTED];
+    int exported_count;
+    int last_status;        // neu: speichert letzten Exit-Code
+    struct s_env_list *env; // neu: pointer auf parser-side env list
 } t_shell_state;
 
 /* global shell state is defined in globals.c */
@@ -88,6 +97,7 @@ int ft_pwd(char **args);
 int ft_env(char **args);
 int ft_unset(char **args);
 int ft_export(char **args);
+int ft_exit(char **args);
 void print_exported_env(void);
 /* Builtins helpers */
 char **generate_env(t_env_list *env);
@@ -113,6 +123,7 @@ int setup_redirections(char **args, int *in_fd,
 					   int *out_fd);
 /* Initialization */
 void init_shell(void);
+void cleanup_shell(void);
 /* Utility to run */
 int not_error_file(t_filelist *current, int update,
 				   t_commandlist *cmd);

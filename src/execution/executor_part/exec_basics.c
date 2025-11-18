@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minishell.h"
 #include "executor.h"
 
 void dup_and_or_close(int *prev_in_out, int *new_in_out)
@@ -43,11 +44,17 @@ int infile_redirector(t_file_node *file_node)
 	int fd;
 	fd = gc_open(file_node->filename, O_RDONLY);
 	if (fd < 0)
-		return (perror(file_node->filename), -1);
+	{
+		perror(file_node->filename);
+		g_shell.last_status = 1;
+		return (-1);
+	}
 	if (gc_dup2(fd, STDIN_FILENO) < 0)
 	{
 		gc_close(fd);
-		return (perror("dup2"), -1);
+		perror("dup2");
+		g_shell.last_status = 1;
+		return (-1);
 	}
 	gc_close(fd);
 	return (0);
@@ -58,11 +65,17 @@ int outfile_redirector(t_file_node *file_node)
 	int fd;
 	fd = gc_open(file_node->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd < 0)
-		return (perror(file_node->filename), -1);
+	{
+		perror(file_node->filename);
+		g_shell.last_status = 1;
+		return (-1);
+	}
 	if (gc_dup2(fd, STDOUT_FILENO) < 0)
 	{
 		gc_close(fd);
-		return (perror("dup2"), -1);
+		perror("dup2");
+		g_shell.last_status = 1;
+		return (-1);
 	}
 	gc_close(fd);
 	return (0);
@@ -73,11 +86,17 @@ int append_redirector(t_file_node *file_node)
 	int fd;
 	fd = gc_open(file_node->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd < 0)
-		return (perror(file_node->filename), -1);
+	{
+		perror(file_node->filename);
+		g_shell.last_status = 1;
+		return (-1);
+	}
 	if (gc_dup2(fd, STDOUT_FILENO) < 0)
 	{
 		gc_close(fd);
-		return (perror("dup2"), -1);
+		perror("dup2");
+		g_shell.last_status = 1;
+		return (-1);
 	}
 	gc_close(fd);
 	return (0);

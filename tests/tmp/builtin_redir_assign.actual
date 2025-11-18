@@ -1,1 +1,2 @@
-x
+FOO=x: No such file or directory
+cat: out2: No such file or directory

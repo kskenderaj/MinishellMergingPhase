@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "executor.h"
+#include "minishell.h"
 
 void close_and_reset(int *prev_in_out, int *new_in_out, int *reset)
 {

@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "minishell.h"
 #include "executor.h"
 
 void print_exported_env(void)
@@ -72,8 +73,10 @@ int ft_env(char **args)
 int ft_unset(char **args)
 {
 	int i;
+	int has_error;
 
 	i = 1;
+	has_error = 0;
 	while (args[i])
 	{
 		if (!is_valid_identifier(args[i]))
@@ -81,11 +84,57 @@ int ft_unset(char **args)
 			ft_putstr_fd("unset: not a valid identifier: ", STDERR_FILENO);
 			ft_putstr_fd(args[i], STDERR_FILENO);
 			ft_putchar_fd('\n', STDERR_FILENO);
+			has_error = 1;
 			i++;
 			continue;
 		}
 		unsetenv(args[i]);
 		i++;
 	}
-	return (0);
+	g_shell.last_status = has_error;
+	return (has_error);
+}
+
+static int is_numeric(const char *str)
+{
+	int i;
+
+	if (!str || !*str)
+		return (0);
+	i = 0;
+	if (str[i] == '+' || str[i] == '-')
+		i++;
+	if (!str[i])
+		return (0);
+	while (str[i])
+	{
+		if (str[i] < '0' || str[i] > '9')
+			return (0);
+		i++;
+	}
+	return (1);
+}
+
+int ft_exit(char **args)
+{
+	long exit_code;
+
+	ft_putstr_fd("exit\n", STDOUT_FILENO);
+	if (!args[1])
+		exit(g_shell.last_status);
+	if (args[2])
+	{
+		ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
+		g_shell.last_status = 1;
+		return (1);
+	}
+	if (!is_numeric(args[1]))
+	{
+		ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
+		ft_putstr_fd(args[1], STDERR_FILENO);
+		ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
+		exit(2);
+	}
+	exit_code = ft_atoi(args[1]);
+	exit((unsigned char)exit_code);
 }

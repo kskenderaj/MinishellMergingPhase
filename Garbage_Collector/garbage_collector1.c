@@ -74,6 +74,7 @@ void gc_close(int fd)
 // Cleanup everything
 void gc_cleanup(void)
 {
+	extern t_gc *g_gc;  // Access global GC pointer
 	t_gc_node *current;
 	t_gc_node *next;
 	t_gc *gc;
@@ -93,6 +94,7 @@ void gc_cleanup(void)
 		current = next;
 	}
 	free(gc);
+	g_gc = NULL;  // Reset global pointer after cleanup
 }
 
 // Utility functions
