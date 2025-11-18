@@ -6,7 +6,7 @@
 #    By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/04 00:00:00 by auto              #+#    #+#              #
-#    Updated: 2025/11/18 13:46:08 by klejdi           ###   ########.fr        #
+#    Updated: 2025/11/18 19:56:34 by klejdi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,11 +16,21 @@ CFLAGS = -Wall -Wextra -Werror
 READLINE_FLAGS = -lreadline
 
 # Include directories
-INCLUDES = -Iinclude -Iinclude/libft -Isrc/execution/executor_part -IGarbage_Collector
+INCLUDES = -Iinclude -Iinclude/libft -Isrc/execution/executor_part -IGarbage_Collector -Imain
 
-# Main source file (you need to create this)
-MAIN_SRC = main.c
-MAIN_OBJ = $(MAIN_SRC:.c=.o)
+# Main directory sources
+MAIN_SRCS = \
+	main/main.c \
+	main/main_loop.c \
+	main/input_processing.c \
+	main/env_utils.c \
+	main/env_merge.c \
+	main/single_cmd_setup.c \
+	main/single_cmd_env.c \
+	main/single_cmd.c \
+	main/pipeline.c
+
+MAIN_OBJS = $(MAIN_SRCS:.c=.o)
 
 # Globals (single definition of g_shell)
 GLOBAL_SRC = globals.c
@@ -40,6 +50,7 @@ PARSER_SRCS = \
 	src/parsing/command/expand_env.c \
 	src/parsing/command/cmdlst_filelst.c \
 	src/parsing/command/field_split.c \
+	src/parsing/command/ifs_split.c \
 	src/parsing/command/heredoc_utils.c \
 	src/parsing/command/read_heredoc.c 
 	
@@ -126,7 +137,7 @@ LIBFT_DIR = include/libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
 # All objects (executor objects and GC objects are provided by LIBEXEC)
-OBJS = $(MAIN_OBJ) $(GLOBAL_OBJ) $(PARSER_OBJS)
+OBJS = $(MAIN_OBJS) $(GLOBAL_OBJ) $(PARSER_OBJS)
 
 # Colors for output
 GREEN = \033[0;32m

@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 16:02:10 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/04 21:22:34 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/18 18:47:35 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ typedef struct s_gc
 t_gc *get_gc(void);
 // Core GC initialization and cleanup
 t_gc *gc_init(void);
+void gc_clear(void);
 void gc_cleanup(void);
 int gc_add_node(void *ptr, int fd, t_gc_type type);
 

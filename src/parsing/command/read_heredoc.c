@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/18 13:46:13 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/18 19:56:37 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,9 @@ static int is_delimiter(char *line, char *delimiter)
     if (!line || !delimiter)
         return (0);
     len = ft_strlen(delimiter);
+    // Handle empty delimiter case - should never match
+    if (len == 0)
+        return (0);
     if (ft_strncmp(line, delimiter, len) == 0 && line[len] == '\0')
         return (1);
     return (0);
@@ -59,18 +62,28 @@ char *read_heredoc_content(char *delimiter)
     while (1)
     {
         line = readline("> ");
-        if (!line || g_sigint_status == 130)
+        // Check for Ctrl+C FIRST before checking EOF
+        if (g_sigint_status == 130)
         {
-            if (!line)
-                write(2, "warning: here-document delimited by end-of-file\n", 49);
+            if (line)
+                free(line); // Free readline buffer if exists
             start_signals();
-            if (g_sigint_status == 130)
-                return (NULL);
-            return (content);
+            return (NULL); // Exit heredoc due to Ctrl+C
+        }
+        // Now check for EOF (Ctrl+D)
+        if (!line)
+        {
+            write(2, "warning: here-document delimited by end-of-file\n", 49);
+            start_signals();
+            return (content); // Return what we have so far
         }
         if (is_delimiter(line, delimiter))
+        {
+            free(line); // Free readline buffer for delimiter line
             break;
+        }
         content = append_line(content, line);
+        free(line); // Free readline buffer after appending
     }
     start_signals();
     return (content);

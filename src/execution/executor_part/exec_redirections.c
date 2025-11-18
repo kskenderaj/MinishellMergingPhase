@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 17:00:04 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/18 13:46:11 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/18 19:56:36 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,6 +149,7 @@ int setup_input_file_from_cmd(t_cmd_node *cmd)
 
 	if (!cmd || !cmd->files || !cmd->files->head)
 		return (NO_REDIRECTION);
+	ft_memset(&tmp, 0, sizeof(t_commandlist));
 	tmp.files = (t_filelist *)cmd->files->head;
 	return (setup_input_file(&tmp));
 }
@@ -159,6 +160,7 @@ int setup_output_file_from_cmd(t_cmd_node *cmd)
 
 	if (!cmd || !cmd->files || !cmd->files->head)
 		return (NO_REDIRECTION);
+	ft_memset(&tmp, 0, sizeof(t_commandlist));
 	tmp.files = (t_filelist *)cmd->files->head;
 	return (setup_output_file(&tmp));
 }

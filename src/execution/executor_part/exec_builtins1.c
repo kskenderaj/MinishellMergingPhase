@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins1.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 00:07:02 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/03 14:17:01 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/18 19:56:38 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 /* resolve_cd_target: set *target based on args and argc
    returns 0 on success, 1 on error (and prints an error message) */
-static int	resolve_cd_target(char **args, int argc, char **target)
+static int resolve_cd_target(char **args, int argc, char **target)
 {
 	if (argc > 2)
 	{
@@ -56,12 +56,12 @@ static int	resolve_cd_target(char **args, int argc, char **target)
  * - Permission denied: error
  * - Updates OLDPWD and PWD in environment
  */
-int	ft_cd(char **args)
+int ft_cd(char **args)
 {
-	char	*target;
-	char	oldpwd[PATH_MAX];
-	char	newpwd[PATH_MAX];
-	int		argc;
+	char *target;
+	char oldpwd[PATH_MAX];
+	char newpwd[PATH_MAX];
+	int argc;
 
 	argc = 0;
 	while (args[argc])
@@ -79,6 +79,9 @@ int	ft_cd(char **args)
 		printf("%s\n", newpwd);
 	setenv("OLDPWD", oldpwd, 1);
 	setenv("PWD", newpwd, 1);
+	/* Update shell's internal environment list for variable expansion */
+	update_shell_env("OLDPWD", oldpwd);
+	update_shell_env("PWD", newpwd);
 	g_shell.last_status = 0;
 	return (0);
 }

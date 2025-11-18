@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 16:39:30 by kskender          #+#    #+#             */
-/*   Updated: 2025/10/15 00:00:08 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/18 18:47:34 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,35 @@ void gc_close(int fd)
 	}
 }
 
-// Cleanup everything
+// Clear all memory but keep GC structure alive (for per-command cleanup)
+void gc_clear(void)
+{
+	t_gc_node *current;
+	t_gc_node *next;
+	t_gc *gc;
+
+	gc = get_gc();
+	if (!gc)
+		return;
+	current = gc->head;
+	while (current)
+	{
+		next = current->next;
+		if (current->type == GC_MEM)
+			free(current->ptr);
+		else if (current->type == GC_FD)
+			close(current->fd);
+		free(current);
+		current = next;
+	}
+	gc->head = NULL;
+	gc->count = 0;
+}
+
+// Cleanup everything (for final shutdown)
 void gc_cleanup(void)
 {
-	extern t_gc *g_gc;  // Access global GC pointer
+	extern t_gc *g_gc; // Access global GC pointer
 	t_gc_node *current;
 	t_gc_node *next;
 	t_gc *gc;
@@ -94,7 +119,7 @@ void gc_cleanup(void)
 		current = next;
 	}
 	free(gc);
-	g_gc = NULL;  // Reset global pointer after cleanup
+	g_gc = NULL; // Reset global pointer after cleanup
 }
 
 // Utility functions

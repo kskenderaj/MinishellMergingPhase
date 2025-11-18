@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 13:20:10 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/18 17:34:33 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/18 19:56:36 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,7 @@ void print_exported_env(void);
 char **generate_env(t_env_list *env);
 int table_of_builtins(t_cmd_node *cmd, char **envp,
 					  int flag);
+void update_shell_env(const char *name, const char *value);
 /* External/parent */
 void exec_external(char **args, char **envp);
 int exec_pipeline(char ***cmds, int ncmds, char **envp, char ****per_cmd_envs);

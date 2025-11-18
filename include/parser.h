@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/12 14:40:09 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/18 16:38:14 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/18 19:56:33 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,6 +193,7 @@ void final_token(t_token_list *toklst, t_env_list *envlst, int last_status);
 /* Field splitting */
 char **split_on_spaces(char *str);
 int should_split(t_segment_list *seglst);
+char *ifs_field_split(char *str);
 
 /* Heredoc utilities */
 t_heredoc_info *process_heredoc_delimiter(char *raw_delimiter);

@@ -6,7 +6,7 @@
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 17:31:20 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/18 16:38:12 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/18 19:56:37 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "executor.h"
 
 /* Helper to update shell's internal environment list */
-static void update_shell_env(const char *name, const char *value)
+void update_shell_env(const char *name, const char *value)
 {
 	t_env_node *existing;
 	t_env_node *new_node;

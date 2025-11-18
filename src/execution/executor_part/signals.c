@@ -53,6 +53,8 @@ void handle_ctrlc_heredoc(int signal_nb)
     (void)signal_nb;
     g_sigint_status = 130; // Set exit status to 130 (128 + SIGINT)
     write(STDOUT_FILENO, "\n", 1);
+    // Note: We can't reliably interrupt readline() here in a portable way.
+    // The heredoc reading loop checks g_sigint_status after each readline() call.
 }
 
 static void set_sigint_handler(void (*handler)(int))

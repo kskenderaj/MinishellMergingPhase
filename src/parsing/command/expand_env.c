@@ -82,6 +82,9 @@ char *expand_or_not(char *seg_str, t_seg_type seg_type, t_env_list *envlst,
 				continue;
 			}
 			expand = get_expand(seg_str, i, last_status, envlst);
+			/* Apply IFS field splitting only for unquoted variable expansions */
+			if (seg_type == SEG_NO_QUOTE && expand && ft_strchr(expand, ' '))
+				expand = ifs_field_split(expand);
 			new = gc_strjoin(old, expand);
 			old = new;
 			i += (skip_var(seg_str + i) - 1);
