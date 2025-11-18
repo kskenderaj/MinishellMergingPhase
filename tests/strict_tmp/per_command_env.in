@@ -1,1 +1,0 @@
-FOO=bar env | grep FOO

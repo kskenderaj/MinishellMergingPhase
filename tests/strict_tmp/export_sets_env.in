@@ -1,2 +1,0 @@
-export XO=YY
-env | grep XO
