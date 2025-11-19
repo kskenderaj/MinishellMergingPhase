@@ -62,8 +62,8 @@ int handle_single_command(t_cmd_node *cmd, t_env_list *env)
     apply_cmd_redirections(&data.fds);
     if (is_empty_command(cmd))
     {
-        if (handle_assignment_only(cmd))
-            restore_cmd_fds(&data.fds);
+        handle_assignment_only(cmd);
+        restore_cmd_fds(&data.fds);
         ft_free_array(data.envp);
         return (0);
     }

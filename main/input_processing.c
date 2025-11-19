@@ -36,7 +36,10 @@ int process_input_line(char *line, t_env_list *env, int last_status)
     init_token_lst(&toklst);
     init_cmd_lst(&cmdlst);
     if (tokenize(&toklst, line) != 0)
+    {
+        ft_putendl_fd("minishell: syntax error", 2);
         return (2);
+    }
     if (token_to_cmd(&toklst, &cmdlst, env, last_status) != 0)
     {
         if (cmdlst.syntax_error)

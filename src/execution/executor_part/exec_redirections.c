@@ -65,6 +65,32 @@ int count_input(t_commandlist *cmd)
 	return (count);
 }
 
+// Check all input files exist before opening (bash behavior)
+// Returns 0 on success, -1 if any file doesn't exist
+static int check_all_input_files(t_commandlist *cmd)
+{
+	t_file_node *current;
+	int fd;
+
+	current = (t_file_node *)cmd->files;
+	while (current != NULL)
+	{
+		if (current->redir_type == INFILE)
+		{
+			fd = open(current->filename, O_RDONLY);
+			if (fd < 0)
+			{
+				perror(current->filename);
+				g_shell.last_status = 1;
+				return (-1);
+			}
+			close(fd);
+		}
+		current = current->next;
+	}
+	return (0);
+}
+
 int setup_input_file(t_commandlist *cmd)
 {
 	int input_count;
@@ -74,6 +100,8 @@ int setup_input_file(t_commandlist *cmd)
 	input_count = count_input(cmd);
 	if (input_count == 0)
 		return (NO_REDIRECTION);
+	if (check_all_input_files(cmd) == -1)
+		return (-1);
 	last_input = find_last_input(cmd, input_count);
 	if (last_input == NULL)
 		return (NO_REDIRECTION);
@@ -93,6 +121,35 @@ int setup_input_file(t_commandlist *cmd)
 		g_shell.last_status = 1;
 	}
 	return (fd);
+}
+
+// Opens all output files (bash behavior: all files are created)
+// Returns 0 on success, -1 if any file fails to open
+static int open_all_output_files(t_commandlist *cmd)
+{
+	t_file_node *current;
+	int fd;
+
+	current = (t_file_node *)cmd->files;
+	while (current != NULL)
+	{
+		if (current->redir_type == OUTFILE || current->redir_type == OUTFILE_APPEND)
+		{
+			if (current->redir_type == OUTFILE)
+				fd = gc_open(current->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			else
+				fd = gc_open(current->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
+			if (fd < 0)
+			{
+				perror(current->filename);
+				g_shell.last_status = 1;
+				return (-1);
+			}
+			close(fd);
+		}
+		current = current->next;
+	}
+	return (0);
 }
 
 // Finds the last output redirection (for > and >>)
@@ -126,6 +183,8 @@ int setup_output_file(t_commandlist *cmd)
 	output_count = count_output(cmd);
 	if (output_count == 0)
 		return (NO_REDIRECTION);
+	if (open_all_output_files(cmd) == -1)
+		return (-1);
 	last_output = find_last_output(cmd, output_count);
 	if (last_output == NULL)
 		return (NO_REDIRECTION);

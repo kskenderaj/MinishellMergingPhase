@@ -40,8 +40,10 @@ int setup_cmd_redirections(t_cmd_node *cmd, t_redir_fds *fds)
     if (save_std_fds(&fds->saved_stdin, &fds->saved_stdout) == -1)
         return (-1);
     saved_status = g_shell.last_status;
-    fds->in_fd = setup_input_file_from_cmd(cmd);
     fds->out_fd = setup_output_file_from_cmd(cmd);
+    if (g_shell.last_status == 1 && saved_status == 0)
+        return (-1);
+    fds->in_fd = setup_input_file_from_cmd(cmd);
     if (g_shell.last_status == 1 && saved_status == 0)
         return (-1);
     return (0);
