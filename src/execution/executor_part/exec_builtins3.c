@@ -3,22 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins3.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:06:11 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/18 17:34:32 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/19 14:10:46 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "executor.h"
+#include "minishell.h"
 
-void print_exported_env(void)
+void	print_exported_env(void)
 {
-	extern char **environ;
-	int i;
-	char *eq;
-	int j;
+	extern char	**environ;
+	int			i;
+	char		*eq;
+	int			j;
 
 	i = 0;
 	while (environ[i])
@@ -47,17 +47,17 @@ void print_exported_env(void)
 		{
 			write(STDOUT_FILENO, "declare -x ", 11);
 			write(STDOUT_FILENO, g_shell.exported_vars[j],
-				  ft_strlen(g_shell.exported_vars[j]));
+				ft_strlen(g_shell.exported_vars[j]));
 			write(STDOUT_FILENO, "\n", 1);
 		}
 		j++;
 	}
 }
 
-int ft_env(char **args)
+int	ft_env(char **args)
 {
-	extern char **environ;
-	int i;
+	extern char	**environ;
+	int			i;
 
 	i = 0;
 	(void)args;
@@ -70,10 +70,10 @@ int ft_env(char **args)
 	return (0);
 }
 
-int ft_unset(char **args)
+int	ft_unset(char **args)
 {
-	int i;
-	int has_error;
+	int	i;
+	int	has_error;
 
 	i = 1;
 	has_error = 0;
@@ -86,7 +86,7 @@ int ft_unset(char **args)
 			ft_putchar_fd('\n', STDERR_FILENO);
 			has_error = 1;
 			i++;
-			continue;
+			continue ;
 		}
 		unsetenv(args[i]);
 		remove_from_env_list(g_shell.env, args[i]);
@@ -96,9 +96,9 @@ int ft_unset(char **args)
 	return (has_error);
 }
 
-static int is_numeric(const char *str)
+static int	is_numeric(const char *str)
 {
-	int i;
+	int	i;
 
 	if (!str || !*str)
 		return (0);
@@ -116,9 +116,11 @@ static int is_numeric(const char *str)
 	return (1);
 }
 
-int ft_exit(char **args)
+int	ft_exit(char **args)
 {
-	long exit_code;
+	long	exit_code;
+	int		i;
+	int		is_printable;
 
 	if (g_shell.is_interactive)
 		ft_putstr_fd("exit\n", STDOUT_FILENO);
@@ -132,14 +134,14 @@ int ft_exit(char **args)
 		if (args[1])
 		{
 			/* Check if string contains only printable chars */
-			int i = 0;
-			int is_printable = 1;
+			i = 0;
+			is_printable = 1;
 			while (args[1][i])
 			{
 				if (args[1][i] < 32 || args[1][i] > 126)
 				{
 					is_printable = 0;
-					break;
+					break ;
 				}
 				i++;
 			}

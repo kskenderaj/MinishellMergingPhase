@@ -3,24 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins2.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 17:31:20 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/18 19:56:37 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/19 14:10:41 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "executor.h"
+#include "minishell.h"
 
 /* Helper to update shell's internal environment list */
-void update_shell_env(const char *name, const char *value)
+void	update_shell_env(const char *name, const char *value)
 {
-	t_env_node *existing;
-	t_env_node *new_node;
+	t_env_node	*existing;
+	t_env_node	*new_node;
 
 	if (!g_shell.env || !name)
-		return;
+		return ;
 	/* Check if variable already exists and update it */
 	existing = g_shell.env->head;
 	while (existing)
@@ -31,7 +31,7 @@ void update_shell_env(const char *name, const char *value)
 			if (existing->value)
 				free(existing->value);
 			existing->value = ft_strdup(value);
-			return;
+			return ;
 		}
 		existing = existing->next;
 	}
@@ -45,13 +45,14 @@ void update_shell_env(const char *name, const char *value)
 	}
 }
 
-static char *strip_quotes(const char *value)
+static char	*strip_quotes(const char *value)
 {
-	int len;
-	char *stripped;
+	int		len;
+	char	*stripped;
 
 	len = ft_strlen(value);
-	if (len >= 2 && ((value[0] == '"' && value[len - 1] == '"') || (value[0] == '\'' && value[len - 1] == '\'')))
+	if (len >= 2 && ((value[0] == '"' && value[len - 1] == '"')
+			|| (value[0] == '\'' && value[len - 1] == '\'')))
 	{
 		stripped = (char *)gc_malloc((size_t)len - 1);
 		if (stripped)
@@ -65,25 +66,28 @@ static char *strip_quotes(const char *value)
 	return (NULL);
 }
 
-int is_valid_identifier(const char *name)
+int	is_valid_identifier(const char *name)
 {
-	int i;
+	int	i;
 
-	if (!name || !(name[0] == '_' || (name[0] >= 'A' && name[0] <= 'Z') || (name[0] >= 'a' && name[0] <= 'z')))
+	if (!name || !(name[0] == '_' || (name[0] >= 'A' && name[0] <= 'Z')
+			|| (name[0] >= 'a' && name[0] <= 'z')))
 		return (0);
 	i = 1;
 	while (name[i])
 	{
-		if (!(name[i] == '_' || (name[i] >= 'A' && name[i] <= 'Z') || (name[i] >= 'a' && name[i] <= 'z') || (name[i] >= '0' && name[i] <= '9')))
+		if (!(name[i] == '_' || (name[i] >= 'A' && name[i] <= 'Z')
+				|| (name[i] >= 'a' && name[i] <= 'z') || (name[i] >= '0'
+					&& name[i] <= '9')))
 			return (0);
 		i++;
 	}
 	return (1);
 }
 
-static int is_in_exported(const char *name)
+static int	is_in_exported(const char *name)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < g_shell.exported_count)
@@ -95,7 +99,7 @@ static int is_in_exported(const char *name)
 	return (0);
 }
 
-static int export_no_value(char *arg)
+static int	export_no_value(char *arg)
 {
 	if (!is_valid_identifier(arg))
 	{
@@ -112,13 +116,13 @@ static int export_no_value(char *arg)
 	return (0);
 }
 
-static int export_with_value(char *arg)
+static int	export_with_value(char *arg)
 {
-	char *eq;
-	char *value;
-	char *stripped;
-	char *name;
-	size_t namelen;
+	char	*eq;
+	char	*value;
+	char	*stripped;
+	char	*name;
+	size_t	namelen;
 
 	eq = ft_strchr(arg, '=');
 	if (!eq)
@@ -132,7 +136,6 @@ static int export_with_value(char *arg)
 		return (1);
 	memcpy(name, arg, namelen);
 	name[namelen] = '\0';
-
 	if (!is_valid_identifier(name))
 	{
 		ft_putstr_fd("export: not a valid identifier: ", STDERR_FILENO);
@@ -164,11 +167,11 @@ static int export_with_value(char *arg)
 	return (0);
 }
 
-int ft_export(char **args)
+int	ft_export(char **args)
 {
-	int i;
-	int status;
-	int has_error;
+	int	i;
+	int	status;
+	int	has_error;
 
 	i = 1;
 	has_error = 0;

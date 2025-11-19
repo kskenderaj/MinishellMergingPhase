@@ -3,23 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   exec_path.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 12:57:24 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/18 16:38:14 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/19 16:36:21 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "executor.h"
+#include "minishell.h"
 
-char *find_in_path(char *cmd)
+char	*find_in_path(char *cmd)
 {
-	char **paths;
-	char *path_env;
-	char *candidate;
-	size_t len;
-	int i;
+	char	**paths;
+	char	*path_env;
+	char	*candidate;
+	size_t	len;
+	int		i;
 
 	if (!cmd)
 		return (NULL);
@@ -37,7 +37,7 @@ char *find_in_path(char *cmd)
 		len = ft_strlen(paths[i]) + 1 + ft_strlen(cmd) + 1;
 		candidate = gc_malloc(len);
 		if (!candidate)
-			break;
+			break ;
 		ft_strlcpy(candidate, paths[i], len);
 		if (candidate[ft_strlen(candidate) - 1] != '/')
 			ft_strlcat(candidate, "/", len);

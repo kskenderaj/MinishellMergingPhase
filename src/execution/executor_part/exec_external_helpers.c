@@ -6,12 +6,12 @@
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:26:38 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/03 15:44:20 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/19 14:11:20 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "executor.h"
+#include "minishell.h"
 
 // Searches $PATH for executable
 char	*find_command_path(char *cmd, t_env_list *env)

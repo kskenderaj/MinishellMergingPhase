@@ -1,11 +1,11 @@
 #include "minishell.h"
 
 /* forward prototype for local helper */
-static void push_file(t_file_list *lst, t_file_node *node);
+static void	push_file(t_file_list *lst, t_file_node *node);
 
-t_cmd_node *create_cmdnode(void)
+t_cmd_node	*create_cmdnode(void)
 {
-	t_cmd_node *cmdnode;
+	t_cmd_node	*cmdnode;
 
 	cmdnode = gc_malloc(sizeof(*cmdnode));
 	if (!cmdnode)
@@ -15,10 +15,10 @@ t_cmd_node *create_cmdnode(void)
 	cmdnode->next = NULL;
 	cmdnode->files = (t_file_list *)gc_malloc(sizeof(t_file_list));
 	if (!cmdnode->files)
-		return NULL;
+		return (NULL);
 	cmdnode->env = (t_env_list *)gc_malloc(sizeof(t_env_list));
 	if (!cmdnode->env)
-		return NULL;
+		return (NULL);
 	init_env_lst(cmdnode->env);
 	cmdnode->files->head = NULL;
 	cmdnode->files->size = 0;
@@ -26,17 +26,18 @@ t_cmd_node *create_cmdnode(void)
 	return (cmdnode);
 }
 
-void create_filenode(char *filename, int red_type, t_file_list *filelst)
+void	create_filenode(char *filename, int red_type, t_file_list *filelst)
 {
-	t_file_node *filenode;
-	t_heredoc_info *hdoc_info;
+	t_file_node		*filenode;
+	t_heredoc_info	*hdoc_info;
 
 	filenode = gc_malloc(sizeof(*filenode));
 	if (!filenode)
-		return;
+		return ;
 	filenode->redir_type = red_type;
 	filenode->heredoc_quoted = 0;
 	filenode->heredoc_content = NULL;
+	filenode->next = NULL;
 	if (red_type == 6)
 	{
 		hdoc_info = process_heredoc_delimiter(filename);
@@ -53,13 +54,13 @@ void create_filenode(char *filename, int red_type, t_file_list *filelst)
 	else
 		filenode->filename = filename;
 	push_file(filelst, filenode);
-	return;
+	return ;
 }
 
-void push_cmd(t_cmd_list *lst, t_cmd_node *node)
+void	push_cmd(t_cmd_list *lst, t_cmd_node *node)
 {
 	if (!lst || !node)
-		return;
+		return ;
 	if (!lst->head)
 	{
 		lst->head = node;
@@ -73,10 +74,10 @@ void push_cmd(t_cmd_list *lst, t_cmd_node *node)
 	lst->size++;
 }
 
-void push_file(t_file_list *lst, t_file_node *node)
+void	push_file(t_file_list *lst, t_file_node *node)
 {
 	if (!lst || !node)
-		return;
+		return ;
 	if (!lst->head)
 	{
 		lst->head = node;

@@ -6,12 +6,12 @@
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 15:22:40 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/06 17:46:31 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/19 14:10:57 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "executor.h"
+#include "minishell.h"
 
 static int	is_n_option(char *arg)
 {

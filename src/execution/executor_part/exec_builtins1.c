@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins1.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 00:07:02 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/18 19:56:38 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/19 14:10:22 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "executor.h"
+#include "minishell.h"
 
 /* resolve_cd_target: set *target based on args and argc
    returns 0 on success, 1 on error (and prints an error message) */
-static int resolve_cd_target(char **args, int argc, char **target)
+static int	resolve_cd_target(char **args, int argc, char **target)
 {
 	if (argc > 2)
 	{
@@ -56,12 +56,12 @@ static int resolve_cd_target(char **args, int argc, char **target)
  * - Permission denied: error
  * - Updates OLDPWD and PWD in environment
  */
-int ft_cd(char **args)
+int	ft_cd(char **args)
 {
-	char *target;
-	char oldpwd[PATH_MAX];
-	char newpwd[PATH_MAX];
-	int argc;
+	char	*target;
+	char	oldpwd[PATH_MAX];
+	char	newpwd[PATH_MAX];
+	int		argc;
 
 	argc = 0;
 	while (args[argc])

@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   exec_basics1.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 17:08:24 by kskender          #+#    #+#             */
-/*   Updated: 2025/10/23 17:50:43 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/19 14:10:01 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void close_and_reset(int *prev_in_out, int *new_in_out, int *reset)
+void	close_and_reset(int *prev_in_out, int *new_in_out, int *reset)
 {
 	if (prev_in_out[0] != NO_REDIRECTION)
 	{

@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   exec_basics.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 14:53:50 by kskender          #+#    #+#             */
-/*   Updated: 2025/10/17 16:11:24 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/19 14:09:58 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "executor.h"
+#include "minishell.h"
 
-void dup_and_or_close(int *prev_in_out, int *new_in_out)
+void	dup_and_or_close(int *prev_in_out, int *new_in_out)
 {
 	if (prev_in_out[0] != NO_REDIRECTION)
 	{
@@ -39,9 +39,10 @@ void dup_and_or_close(int *prev_in_out, int *new_in_out)
 	}
 }
 
-int infile_redirector(t_file_node *file_node)
+int	infile_redirector(t_file_node *file_node)
 {
-	int fd;
+	int	fd;
+
 	fd = gc_open(file_node->filename, O_RDONLY);
 	if (fd < 0)
 	{
@@ -60,9 +61,10 @@ int infile_redirector(t_file_node *file_node)
 	return (0);
 }
 
-int outfile_redirector(t_file_node *file_node)
+int	outfile_redirector(t_file_node *file_node)
 {
-	int fd;
+	int	fd;
+
 	fd = gc_open(file_node->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd < 0)
 	{
@@ -81,9 +83,10 @@ int outfile_redirector(t_file_node *file_node)
 	return (0);
 }
 
-int append_redirector(t_file_node *file_node)
+int	append_redirector(t_file_node *file_node)
 {
-	int fd;
+	int	fd;
+
 	fd = gc_open(file_node->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd < 0)
 	{
@@ -102,9 +105,9 @@ int append_redirector(t_file_node *file_node)
 	return (0);
 }
 
-int pipe_handler(t_cmd_node *command)
+int	pipe_handler(t_cmd_node *command)
 {
-	int pipefd[2];
+	int	pipefd[2];
 
 	if (command->next)
 	{

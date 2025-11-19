@@ -1,9 +1,9 @@
-#include "parser.h"
 #include "garbage_collector.h"
+#include "parser.h"
 
-t_token *create_token(t_toktype type, char *val)
+t_token	*create_token(t_toktype type, char *val)
 {
-	t_token *t;
+	t_token	*t;
 
 	t = gc_malloc(sizeof(*t));
 	if (!t)
@@ -14,7 +14,7 @@ t_token *create_token(t_toktype type, char *val)
 	return (t);
 }
 
-int push_token(t_token_list *lst, t_token *token)
+int	push_token(t_token_list *lst, t_token *token)
 {
 	if (!lst || !token)
 		return (1);
@@ -32,10 +32,10 @@ int push_token(t_token_list *lst, t_token *token)
 	return (0);
 }
 
-int add_token(t_token_list *lst, t_toktype type, char *str, int len)
+int	add_token(t_token_list *lst, t_toktype type, char *str, int len)
 {
-	char *copy;
-	t_token *tok;
+	char	*copy;
+	t_token	*tok;
 
 	if (!lst || !str || len <= 0)
 		return (1);
@@ -48,13 +48,15 @@ int add_token(t_token_list *lst, t_toktype type, char *str, int len)
 	return (push_token(lst, tok));
 }
 
-int handle_word(t_token_list *lst, char *input, int *i)
+int	handle_word(t_token_list *lst, char *input, int *i)
 {
-	int next;
-	int start;
+	int	next;
+	int	start;
 
 	start = *i;
-	while (input[*i] && input[*i] != ' ' && input[*i] != '\t' && input[*i] != '|' && input[*i] != '<' && input[*i] != '>' && input[*i] != '|')
+	while (input[*i] && input[*i] != ' ' && input[*i] != '\t'
+		&& input[*i] != '|' && input[*i] != '<' && input[*i] != '>'
+		&& input[*i] != '|')
 	{
 		if (input[*i] == '\'' || input[*i] == '\"')
 		{
@@ -71,16 +73,16 @@ int handle_word(t_token_list *lst, char *input, int *i)
 	return (add_token(lst, TK_WORD, input + start, *i - start));
 }
 
-int tokenize(t_token_list *lst, char *input)
+int	tokenize(t_token_list *lst, char *input)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (input[i])
 	{
 		i = skip_spaces(input, i);
 		if (!input[i])
-			break;
+			break ;
 		if (input[i] == '|')
 		{
 			if (add_token(lst, TK_PIPE, input + i, 1) != 0)
