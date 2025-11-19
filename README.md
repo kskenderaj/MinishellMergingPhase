@@ -795,22 +795,6 @@ minishell> cat file.txt | grep pattern | sort > output.txt
 
 ---
 
-## 🐛 Known Limitations
-
-These features are NOT implemented (as per project requirements):
-
-- `\` (backslash) for line continuation
-- `;` (semicolon) for command separation
-- `&&` and `||` (logical operators)
-- `*` (wildcards) for pattern matching
-- Command substitution `$(command)` or `` `command` ``
-- Arithmetic expansion `$((expression))`
-- Job control (`bg`, `fg`, `jobs`)
-- Subshells `(command)`
-- Brace expansion `{a,b,c}`
-
----
-
 ## 👥 Contributors
 
 - **Klejdi Skenderaj** - [@kskenderaj](https://github.com/kskenderaj)
