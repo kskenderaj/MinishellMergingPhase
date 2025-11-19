@@ -6,7 +6,7 @@
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/19 16:34:46 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/19 18:52:11 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ int	main_loop(t_env_list *env)
 				continue ;
 			break ;
 		}
+		g_shell.current_line = line;
 		handle_sigint(&last_status);
 		if (*line)
 		{
@@ -60,7 +61,7 @@ int	main_loop(t_env_list *env)
 			last_status = process_input_line(line, env, last_status);
 		}
 		free(line);
-		gc_clear();
+		g_shell.current_line = NULL;
 	}
 	if (interactive)
 	{

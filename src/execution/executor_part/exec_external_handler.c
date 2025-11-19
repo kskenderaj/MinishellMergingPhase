@@ -6,7 +6,7 @@
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 17:34:28 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/19 14:11:16 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/19 20:17:22 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ void	exec_external(char **args, char **envp)
 	{
 		ft_putstr_fd(args[0], STDERR_FILENO);
 		ft_putstr_fd(": command not found\n", STDERR_FILENO);
+		gc_free(exec_path);
 		exit(127);
 	}
 	// Check if file exists
@@ -32,6 +33,7 @@ void	exec_external(char **args, char **envp)
 	{
 		ft_putstr_fd(args[0], STDERR_FILENO);
 		ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
+		gc_free(exec_path);
 		exit(127); // File not found
 	}
 	// Check if executable
@@ -39,11 +41,12 @@ void	exec_external(char **args, char **envp)
 	{
 		ft_putstr_fd(args[0], STDERR_FILENO);
 		ft_putstr_fd(": Permission denied\n", STDERR_FILENO);
+		gc_free(exec_path);
 		exit(126); // Permission denied
 	}
 	execve(exec_path, args, envp);
-	// If execve fails for other reasons
 	perror(args[0]);
+	gc_cleanup();
 	exit(126);
 }
 

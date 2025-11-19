@@ -2,10 +2,10 @@
 #include "minishell.h"
 #include "parser.h"
 
-static int is_valid_env_assignment(char *str)
+static int	is_valid_env_assignment(char *str)
 {
-	int i;
-	char *eq;
+	int		i;
+	char	*eq;
 
 	if (!str || !*str)
 		return (0);
@@ -24,9 +24,9 @@ static int is_valid_env_assignment(char *str)
 	return (1);
 }
 
-int count_args(t_token *token)
+int	count_args(t_token *token)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (token && token->type != TK_PIPE)
@@ -44,10 +44,10 @@ int count_args(t_token *token)
 	return (i);
 }
 
-static int handle_split_word(char **cmd_array, char *value, int *i)
+static int	handle_split_word(char **cmd_array, char *value, int *i)
 {
-	char **words;
-	int j;
+	char	**words;
+	int		j;
 
 	words = split_on_spaces(value);
 	if (!words)
@@ -62,9 +62,10 @@ static int handle_split_word(char **cmd_array, char *value, int *i)
 	return (0);
 }
 
-char **create_array(t_token *token, t_cmd_node *cmdnode, int i)
+char	**create_array(t_token *token, t_cmd_node *cmdnode, int i)
 {
-	char **cmd_array;
+	char		**cmd_array;
+	t_env_node	*env_node;
 
 	cmd_array = gc_malloc(sizeof(char *) * ((size_t)count_args(token) + 1));
 	if (!cmd_array)
@@ -79,21 +80,24 @@ char **create_array(t_token *token, t_cmd_node *cmdnode, int i)
 				token = token->next;
 			if (token)
 				token = token->next;
-			continue;
+			continue ;
 		}
 		if (token && token->type == TK_WORD)
 		{
 			/* Check if this is an env assignment BEFORE any command */
 			if (i == 0 && is_valid_env_assignment(token->value))
 			{
-				t_env_node *env_node = gc_malloc(sizeof(t_env_node));
-				if (env_node && find_key(token->value, env_node) && find_value(token->value, env_node))
+				env_node = gc_malloc(sizeof(t_env_node));
+				if (env_node && find_key(token->value, env_node)
+					&& find_value(token->value, env_node))
 					push_env(cmdnode->env, env_node);
 				token = token->next;
-				continue;
+				continue ;
 			}
 			/* Only split if token has segment_list and should_split returns true */
-			if (i == 0 && token->value && token->segment_list && should_split(token->segment_list) && ft_strchr(token->value, ' '))
+			if (i == 0 && token->value && token->segment_list
+				&& should_split(token->segment_list) && ft_strchr(token->value,
+					' '))
 			{
 				if (handle_split_word(cmd_array, token->value, &i) < 0)
 					return (NULL);
@@ -111,9 +115,9 @@ char **create_array(t_token *token, t_cmd_node *cmdnode, int i)
 	return (cmd_array[i] = NULL, cmd_array);
 }
 
-char *look_for_cmd(t_token *token, t_token_list *toklst, t_cmd_list *cmdlst)
+char	*look_for_cmd(t_token *token, t_token_list *toklst, t_cmd_list *cmdlst)
 {
-	t_cmd_node *cmdnode;
+	t_cmd_node	*cmdnode;
 
 	token = toklst->head;
 	while (token)
@@ -136,20 +140,18 @@ char *look_for_cmd(t_token *token, t_token_list *toklst, t_cmd_list *cmdlst)
 	return (NULL);
 }
 
-static int validate_pipe_syntax(t_token_list *toklst)
+static int	validate_pipe_syntax(t_token_list *toklst)
 {
-	t_token *token;
-	t_token *prev;
+	t_token	*token;
+	t_token	*prev;
 
 	if (!toklst || !toklst->head)
 		return (0);
 	token = toklst->head;
 	prev = NULL;
-
 	/* Check for pipe at the beginning */
 	if (token->type == TK_PIPE)
 		return (1);
-
 	while (token)
 	{
 		if (token->type == TK_PIPE)
@@ -170,18 +172,17 @@ static int validate_pipe_syntax(t_token_list *toklst)
 	return (0);
 }
 
-int token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst, t_env_list *envlst, int last_status)
+int	token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst, t_env_list *envlst,
+		int last_status)
 {
 	if (!toklst || !cmdlst || !envlst)
 		return (1);
-
 	/* Validate pipe syntax before processing */
 	if (validate_pipe_syntax(toklst))
 	{
 		cmdlst->syntax_error = 1;
 		return (1);
 	}
-
 	final_token(toklst, envlst, last_status);
 	look_for_cmd(toklst->head, toklst, cmdlst);
 	if (cmdlst->syntax_error)
@@ -189,14 +190,14 @@ int token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst, t_env_list *envlst, i
 	return (0);
 }
 
-void final_token(t_token_list *toklst, t_env_list *envlst, int last_status)
+void	final_token(t_token_list *toklst, t_env_list *envlst, int last_status)
 {
-	t_token *token;
-	t_segment_list *seglst;
-	int skip_next;
+	t_token			*token;
+	t_segment_list	*seglst;
+	int				skip_next;
 
 	if (!toklst)
-		return;
+		return ;
 	token = toklst->head;
 	skip_next = 0;
 	while (token)
@@ -205,7 +206,7 @@ void final_token(t_token_list *toklst, t_env_list *envlst, int last_status)
 		{
 			skip_next = 0;
 			token = token->next;
-			continue;
+			continue ;
 		}
 		if (token->type == TK_HEREDOC)
 			skip_next = 1;
@@ -213,7 +214,7 @@ void final_token(t_token_list *toklst, t_env_list *envlst, int last_status)
 		{
 			seglst = gc_malloc(sizeof(*seglst));
 			if (!seglst)
-				return;
+				return ;
 			init_segment_lst(seglst);
 			if (find_segment(seglst, token->value))
 			{

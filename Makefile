@@ -3,16 +3,16 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+         #
+#    By: kskender <kskender@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/04 00:00:00 by auto              #+#    #+#              #
-#    Updated: 2025/11/18 19:56:34 by klejdi           ###   ########.fr        #
+#    Updated: 2025/11/19 17:54:55 by kskender         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = minishell
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g
 READLINE_FLAGS = -lreadline
 
 # Include directories

@@ -6,7 +6,7 @@
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:06:11 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/19 14:10:46 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/19 18:52:13 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -116,6 +116,18 @@ static int	is_numeric(const char *str)
 	return (1);
 }
 
+static void	cleanup_and_exit(int exit_code)
+{
+	if (g_shell.current_line)
+		free(g_shell.current_line);
+	if (g_shell.current_envp)
+		ft_free_array(g_shell.current_envp);
+	gc_cleanup();
+	if (g_shell.env)
+		free_env_list(g_shell.env);
+	exit(exit_code);
+}
+
 int	ft_exit(char **args)
 {
 	long	exit_code;
@@ -125,7 +137,7 @@ int	ft_exit(char **args)
 	if (g_shell.is_interactive)
 		ft_putstr_fd("exit\n", STDOUT_FILENO);
 	if (!args[1])
-		exit(g_shell.last_status);
+		cleanup_and_exit(g_shell.last_status);
 	/* Check if first argument is numeric BEFORE checking arg count */
 	if (!is_numeric(args[1]))
 	{
@@ -149,7 +161,7 @@ int	ft_exit(char **args)
 				ft_putstr_fd(args[1], STDERR_FILENO);
 		}
 		ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
-		exit(255);
+		cleanup_and_exit(255);
 	}
 	/* Now check for too many arguments */
 	if (args[2])
@@ -159,5 +171,6 @@ int	ft_exit(char **args)
 		return (1);
 	}
 	exit_code = ft_atoi(args[1]);
-	exit((unsigned char)exit_code);
+	cleanup_and_exit((unsigned char)exit_code);
+	return (0);
 }

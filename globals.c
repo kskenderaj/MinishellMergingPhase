@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   globals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 20:04:05 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/18 20:04:07 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/19 18:52:09 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,4 +16,4 @@
 
 /* Ensure default empty exported lists */
 
-t_shell_state g_shell = {{NULL}, 0, 0, NULL, 0};
+t_shell_state	g_shell = {{NULL}, 0, 0, NULL, 0, NULL, NULL};
