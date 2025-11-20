@@ -60,13 +60,11 @@ int	handle_pipeline(t_cmd_list *cmdlst, t_env_list *env)
 		return (1);
 	envp = env_list_to_array(env);
 	if (!envp)
-		return (free(cmds), 1);
+		return (1);
 	per_cmd_envs = build_per_cmd_envs(cmdlst, envp);
 	if (!per_cmd_envs)
-		return (ft_free_array(envp), free(cmds), 1);
+		return (1);
 	ret = exec_pipeline(cmds, (int)cmdlst->size, envp, &per_cmd_envs);
 	cleanup_per_cmd_envs(per_cmd_envs, (int)cmdlst->size, envp);
-	ft_free_array(envp);
-	free(cmds);
 	return (ret);
 }

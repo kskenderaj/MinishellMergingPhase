@@ -79,12 +79,12 @@ void	restore_cmd_fds(t_redir_fds *fds)
 
 void	cleanup_cmd_redir_failure(t_redir_fds *fds, char **envp, char **merged)
 {
+	(void)envp;
+	(void)merged;
 	restore_cmd_fds(fds);
 	if (fds->in_fd >= 0)
 		close(fds->in_fd);
 	if (fds->out_fd >= 0)
 		close(fds->out_fd);
-	if (merged != envp)
-		ft_free_array(merged);
-	ft_free_array(envp);
+	// Don't free gc-allocated envp arrays
 }

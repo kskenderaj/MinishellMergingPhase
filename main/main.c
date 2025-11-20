@@ -41,7 +41,7 @@ static t_env_list	*init_environment(char **envp)
 	init_env_lst(env);
 	if (!get_envs(environ, env))
 	{
-		free_env_list(env);
+		free(env);
 		return (NULL);
 	}
 	return (env);
@@ -65,7 +65,7 @@ int	main(int argc, char **argv, char **envp)
 	}
 	g_shell.env = env;
 	exit_status = main_loop(env);
-	gc_cleanup();
 	free_env_list(env);
+	gc_cleanup();
 	return (exit_status);
 }

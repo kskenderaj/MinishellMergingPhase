@@ -45,6 +45,7 @@ void	handle_sig_int(int signal_nb)
 #ifdef RL_REPLACE_LINE
 	rl_replace_line("", 0);
 #endif
+	rl_redisplay();
 }
 
 /* SIGINT handler used while reading a heredoc */

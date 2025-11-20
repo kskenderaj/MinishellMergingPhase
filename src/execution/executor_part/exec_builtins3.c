@@ -120,8 +120,6 @@ static void	cleanup_and_exit(int exit_code)
 {
 	if (g_shell.current_line)
 		free(g_shell.current_line);
-	if (g_shell.current_envp)
-		ft_free_array(g_shell.current_envp);
 	gc_cleanup();
 	if (g_shell.env)
 		free_env_list(g_shell.env);

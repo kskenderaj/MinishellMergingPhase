@@ -17,11 +17,10 @@ static char	*create_env_string(t_env_node *node)
 	char	*temp;
 	char	*result;
 
-	temp = ft_strjoin(node->key, "=");
+	temp = gc_strjoin(node->key, "=");
 	if (!temp)
 		return (NULL);
-	result = ft_strjoin(temp, node->value);
-	free(temp);
+	result = gc_strjoin(temp, node->value);
 	return (result);
 }
 
@@ -31,7 +30,7 @@ char	**env_list_to_array(t_env_list *env)
 	char		**envp;
 	int			i;
 
-	envp = malloc(sizeof(char *) * (env->size + 1));
+	envp = gc_malloc(sizeof(char *) * (env->size + 1));
 	if (!envp)
 		return (NULL);
 	node = env->head;
@@ -40,7 +39,7 @@ char	**env_list_to_array(t_env_list *env)
 	{
 		envp[i] = create_env_string(node);
 		if (!envp[i])
-			return (ft_free_array(envp), NULL);
+			return (NULL);
 		node = node->next;
 		i++;
 	}
@@ -54,7 +53,7 @@ char	***cmdlist_to_array(t_cmd_list *cmdlst)
 	t_cmd_node	*node;
 	int			i;
 
-	cmds = malloc(sizeof(char **) * (cmdlst->size + 1));
+	cmds = gc_malloc(sizeof(char **) * (cmdlst->size + 1));
 	if (!cmds)
 		return (NULL);
 	node = cmdlst->head;

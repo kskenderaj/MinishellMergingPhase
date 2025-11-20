@@ -5,6 +5,7 @@ int find_key(char *str, t_env_node *env)
 {
 	char *eq;
 	size_t key_len;
+	char *temp;
 
 	if (!str || !env)
 		return (0);
@@ -13,7 +14,11 @@ int find_key(char *str, t_env_node *env)
 		key_len = (size_t)(eq - str);
 	else
 		key_len = ft_strlen(str);
-	env->key = ft_substr(str, 0, key_len);
+	temp = ft_substr(str, 0, key_len);
+	if (!temp)
+		return (0);
+	env->key = ft_strdup(temp);
+	free(temp);
 	if (!env->key)
 		return (0);
 	return (1);
@@ -23,19 +28,24 @@ int find_value(char *str, t_env_node *env)
 {
 	char *eq;
 	size_t val_len;
+	char *temp;
 
 	if (!str || !env)
 		return (0);
 	eq = ft_strchr(str, '=');
 	if (!eq)
 	{
-		env->value = ft_substr("", 0, 0);
+		env->value = ft_strdup("");
 		if (!env->value)
 			return (0);
 		return (1);
 	}
 	val_len = ft_strlen(eq + 1);
-	env->value = ft_substr(str, (unsigned int)(eq - str + 1), val_len);
+	temp = ft_substr(str, (unsigned int)(eq - str + 1), val_len);
+	if (!temp)
+		return (0);
+	env->value = ft_strdup(temp);
+	free(temp);
 	if (!env->value)
 		return (0);
 	return (1);

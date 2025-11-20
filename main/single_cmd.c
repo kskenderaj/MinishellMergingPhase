@@ -65,7 +65,6 @@ int	handle_single_command(t_cmd_node *cmd, t_env_list *env)
 	{
 		handle_assignment_only(cmd);
 		restore_cmd_fds(&data.fds);
-		ft_free_array(data.envp);
 		g_shell.current_envp = NULL;
 		return (0);
 	}
@@ -73,17 +72,11 @@ int	handle_single_command(t_cmd_node *cmd, t_env_list *env)
 	if (data.ret != 128)
 	{
 		restore_cmd_fds(&data.fds);
-		if (data.merged_envp != data.envp)
-			ft_free_array(data.merged_envp);
-		ft_free_array(data.envp);
 		g_shell.current_envp = NULL;
 		return (data.ret);
 	}
 	data.ret = execute_external(cmd, data.envp, data.merged_envp);
 	restore_cmd_fds(&data.fds);
-	if (data.merged_envp != data.envp)
-		ft_free_array(data.merged_envp);
-	ft_free_array(data.envp);
 	g_shell.current_envp = NULL;
 	return (data.ret);
 }

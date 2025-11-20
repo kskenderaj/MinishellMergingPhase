@@ -156,43 +156,43 @@ static void	setup_child_io_and_exec(int idx, int ncmds, int **pipes, int in_fd,
 	if (!cmd || !cmd[0] || !cmd[0][0])
 	{
 		/* Empty command with successful redirections -> EXIT 0 */
-		_exit(0);
+		exit(0);
 	}
 	/* if command is a shell builtin, run it in this child process */
 	if (!strcmp(cmd[0], "echo"))
 	{
 		ft_echo(cmd);
-		_exit(0);
+		exit(0);
 	}
 	else if (!strcmp(cmd[0], "cd"))
 	{
 		ft_cd(cmd);
-		_exit(0);
+		exit(0);
 	}
 	else if (!strcmp(cmd[0], "pwd"))
 	{
 		ft_pwd(cmd);
-		_exit(0);
+		exit(0);
 	}
 	else if (!strcmp(cmd[0], "export"))
 	{
 		ft_export(cmd);
-		_exit(0);
+		exit(0);
 	}
 	else if (!strcmp(cmd[0], "unset"))
 	{
 		ft_unset(cmd);
-		_exit(0);
+		exit(0);
 	}
 	else if (!strcmp(cmd[0], "env"))
 	{
 		ft_env(cmd);
-		_exit(0);
+		exit(0);
 	}
 	else if (!strcmp(cmd[0], "exit"))
 	{
 		ft_exit(cmd);
-		_exit(0);
+		exit(0);
 	}
 	exec_external(cmd, envp);
 	_exit(127);
@@ -217,13 +217,20 @@ static int	wait_children(pid_t *pids, int ncmds)
 	int	status;
 
 	status = 0;
+	/* Ignore signals while waiting for children - let child handle them */
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
 	i = 0;
 	while (i < ncmds)
 	{
 		waitpid(pids[i], &status, 0);
 		i++;
 	}
+	/* Restore interactive signal handlers */
+	start_signals();
 	if (WIFEXITED(status))
 		return (WEXITSTATUS(status));
+	if (WIFSIGNALED(status))
+		return (128 + WTERMSIG(status));
 	return (128);
 }

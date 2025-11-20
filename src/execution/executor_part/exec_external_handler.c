@@ -20,6 +20,7 @@ void	exec_external(char **args, char **envp)
 
 	if (!args || !args[0])
 		return ;
+	reset_signals_for_child();
 	exec_path = find_in_path(args[0]);
 	if (!exec_path)
 	{
