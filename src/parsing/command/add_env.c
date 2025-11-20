@@ -1,11 +1,23 @@
-#include "parser.h"
-#include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   read_heredoc.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
+/*   Updated: 2025/11/18 19:56:37 by klejdi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-int find_key(char *str, t_env_node *env)
+#include "minishell.h"
+#include "parser.h"
+
+int	find_key(char *str, t_env_node *env)
 {
-	char *eq;
-	size_t key_len;
-	char *temp;
+	char	*eq;
+	size_t	key_len;
+	char	*temp;
 
 	if (!str || !env)
 		return (0);
@@ -24,11 +36,11 @@ int find_key(char *str, t_env_node *env)
 	return (1);
 }
 
-int find_value(char *str, t_env_node *env)
+int	find_value(char *str, t_env_node *env)
 {
-	char *eq;
-	size_t val_len;
-	char *temp;
+	char	*eq;
+	size_t	val_len;
+	char	*temp;
 
 	if (!str || !env)
 		return (0);
@@ -51,7 +63,7 @@ int find_value(char *str, t_env_node *env)
 	return (1);
 }
 
-int push_env(t_env_list *lst, t_env_node *env)
+int	push_env(t_env_list *lst, t_env_node *env)
 {
 	if (!lst || !env)
 		return (0);
@@ -70,10 +82,10 @@ int push_env(t_env_list *lst, t_env_node *env)
 	return (1);
 }
 
-int get_envs(char **env, t_env_list *lst)
+int	get_envs(char **env, t_env_list *lst)
 {
-	int i;
-	t_env_node *node;
+	int			i;
+	t_env_node	*node;
 
 	if (!env || !lst)
 		return (0);
@@ -94,7 +106,7 @@ int get_envs(char **env, t_env_list *lst)
 	return (1);
 }
 
-char *get_expand(char *seg_str, int i, int last_status, t_env_list *envlst)
+char	*get_expand(char *seg_str, int i, int last_status, t_env_list *envlst)
 {
 	if (seg_str[i + 1] == '?')
 		return (gc_itoa(last_status));
@@ -102,13 +114,13 @@ char *get_expand(char *seg_str, int i, int last_status, t_env_list *envlst)
 		return (expand_env(seg_str + i, envlst));
 }
 
-void remove_from_env_list(t_env_list *envlst, const char *key)
+void	remove_from_env_list(t_env_list *envlst, const char *key)
 {
-	t_env_node *prev;
-	t_env_node *curr;
+	t_env_node	*prev;
+	t_env_node	*curr;
 
 	if (!envlst || !key)
-		return;
+		return ;
 	prev = NULL;
 	curr = envlst->head;
 	while (curr)
@@ -127,20 +139,20 @@ void remove_from_env_list(t_env_list *envlst, const char *key)
 				free(curr->value);
 			free(curr);
 			envlst->size--;
-			return;
+			return ;
 		}
 		prev = curr;
 		curr = curr->next;
 	}
 }
 
-void free_env_list(t_env_list *env)
+void	free_env_list(t_env_list *env)
 {
-	t_env_node *current;
-	t_env_node *next;
+	t_env_node	*current;
+	t_env_node	*next;
 
 	if (!env)
-		return;
+		return ;
 	current = env->head;
 	while (current)
 	{

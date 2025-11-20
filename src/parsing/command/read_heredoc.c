@@ -40,7 +40,6 @@ static int is_delimiter(char *line, char *delimiter)
     if (!line || !delimiter)
         return (0);
     len = ft_strlen(delimiter);
-    // Handle empty delimiter case - should never match
     if (len == 0)
         return (0);
     if (ft_strncmp(line, delimiter, len) == 0 && line[len] == '\0')
@@ -62,30 +61,26 @@ char *read_heredoc_content(char *delimiter)
     while (1)
     {
         line = readline("> ");
-        // Check for Ctrl+C FIRST before checking EOF
         if (g_sigint_status == 130)
         {
             if (line)
-                free(line); // Free readline buffer if exists
+                free(line);
             start_signals();
-            return (NULL); // Exit heredoc due to Ctrl+C
+            return (NULL);
         }
-        // Now check for EOF (Ctrl+D)
         if (!line)
         {
             write(2, "warning: here-document delimited by end-of-file\n", 49);
             start_signals();
-            return (content); // Return what we have so far
+            return (content);
         }
         if (is_delimiter(line, delimiter))
         {
-            free(line); // Free readline buffer for delimiter line
+            free(line);
             break;
         }
         content = append_line(content, line);
-        free(line); // Free readline buffer after appending
+        free(line);
     }
-    start_signals();
-    // Don't use rl_on_new_line() or rl_redisplay() here - they mess up the prompt
-    return (content);
+    return (start_signals(), content);
 }

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   read_heredoc.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
+/*   Updated: 2025/11/18 19:56:37 by klejdi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "garbage_collector.h"
 #include "minishell.h"
 
@@ -74,7 +86,6 @@ char	*expand_or_not(char *seg_str, t_seg_type seg_type, t_env_list *envlst,
 		if (seg_str[i] == '$' && (seg_type == SEG_DOUBLE
 				|| seg_type == SEG_NO_QUOTE))
 		{
-			/* determine length of the variable/placeholder starting at i */
 			len = skip_var(seg_str + i);
 			if (len == 1)
 			{
@@ -84,7 +95,6 @@ char	*expand_or_not(char *seg_str, t_seg_type seg_type, t_env_list *envlst,
 				continue ;
 			}
 			expand = get_expand(seg_str, i, last_status, envlst);
-			/* Apply IFS field splitting only for unquoted variable expansions */
 			if (seg_type == SEG_NO_QUOTE && expand && ft_strchr(expand, ' '))
 				expand = ifs_field_split(expand);
 			new = gc_strjoin(old, expand);

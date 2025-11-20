@@ -16,8 +16,8 @@ int	red_len(char *input, int i)
 {
 	if (!input[i])
 		return (0);
-	if ((input[i] == '<' && input[i + 1] == '<') || (input[i] == '>' && input[i
-			+ 1] == '>'))
+	if ((input[i] == '<' && input[i + 1] == '<') || (input[i] == '>'
+			&& input[i + 1] == '>'))
 	{
 		return (2);
 	}
@@ -72,10 +72,6 @@ int	word_end(char *input, int i)
 
 int	handle_redir(t_token_list *lst, char *input, int *i, int red_len)
 {
-	int	start;
-	int	next;
-	int	end;
-
 	if (!red_len)
 		return (1);
 	if (add_token(lst, red_type(input, *i), input + *i, red_len) != 0)
@@ -84,23 +80,5 @@ int	handle_redir(t_token_list *lst, char *input, int *i, int red_len)
 	*i = skip_spaces(input, *i);
 	if (!input[*i] || input[*i] == '|' || input[*i] == '<' || input[*i] == '>')
 		return (1);
-	if (input[*i] == '\'' || input[*i] == '\"')
-	{
-		start = *i;
-		next = scan_quote(input, *i);
-		if (next < 0)
-			return (1);
-		if (add_token(lst, TK_WORD, input + start, next - start))
-			return (1);
-		*i = next;
-		return (0);
-	}
-	start = *i;
-	end = word_end(input, *i);
-	if (end <= start)
-		return (1);
-	if (add_token(lst, TK_WORD, input + start, end - start) != 0)
-		return (1);
-	*i = end;
-	return (0);
+	return (add_redir_filename(lst, input, i));
 }

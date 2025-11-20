@@ -42,11 +42,13 @@ PARSER_SRCS = \
 	src/parsing/lexing/token_utils.c \
 	src/parsing/lexing/tokenize.c \
 	src/parsing/lexing/tokenize_helper.c \
+	src/parsing/lexing/tokenize_helper2.c \
 	src/parsing/lexing/init.c \
 	src/parsing/command/token_to_cmd.c \
 	src/parsing/command/find_token.c \
 	src/parsing/command/add_env.c \
 	src/parsing/command/token_to_cmd_helper.c \
+	src/parsing/command/token_to_cmd_helper2.c \
 	src/parsing/command/expand_env.c \
 	src/parsing/command/cmdlst_filelst.c \
 	src/parsing/command/field_split.c \

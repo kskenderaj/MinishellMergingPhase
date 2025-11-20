@@ -10,43 +10,36 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "parser.h"
 
-void	init_segment_lst(t_segment_list *lst)
+int	handle_quoted_redir_file(t_token_list *lst, char *input, int *i)
 {
-	lst->head = NULL;
-	lst->tail = NULL;
-	lst->size = 0;
+	int	start;
+	int	next;
+
+	start = *i;
+	next = scan_quote(input, *i);
+	if (next < 0)
+		return (1);
+	if (add_token(lst, TK_WORD, input + start, next - start))
+		return (1);
+	*i = next;
+	return (0);
 }
 
-void	init_token_lst(t_token_list *lst)
+int	add_redir_filename(t_token_list *lst, char *input, int *i)
 {
-	lst->head = NULL;
-	lst->tail = NULL;
-	lst->size = 0;
-	lst->syntax_error = 0;
-}
+	int	start;
+	int	end;
 
-void	init_env_lst(t_env_list *lst)
-{
-	lst->head = NULL;
-	lst->tail = NULL;
-	lst->size = 0;
-	lst->pid = NULL;
-}
-
-void	init_cmd_lst(t_cmd_list *lst)
-{
-	lst->head = NULL;
-	lst->tail = NULL;
-	lst->size = 0;
-	lst->syntax_error = 0;
-}
-
-void	init_files_lst(t_file_list *lst)
-{
-	lst->head = NULL;
-	lst->tail = NULL;
-	lst->size = 0;
+	if (input[*i] == '\'' || input[*i] == '\"')
+		return (handle_quoted_redir_file(lst, input, i));
+	start = *i;
+	end = word_end(input, *i);
+	if (end <= start)
+		return (1);
+	if (add_token(lst, TK_WORD, input + start, end - start) != 0)
+		return (1);
+	*i = end;
+	return (0);
 }

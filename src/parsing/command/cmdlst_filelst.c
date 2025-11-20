@@ -1,8 +1,19 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   read_heredoc.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
+/*   Updated: 2025/11/18 19:56:37 by klejdi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 #include <unistd.h>
 
 /* forward prototype for local helper */
-static void	push_file(t_file_list *lst, t_file_node *node);
 
 t_cmd_node	*create_cmdnode(void)
 {
@@ -90,7 +101,6 @@ void	push_file(t_file_list *lst, t_file_node *node)
 	lst->size++;
 }
 
-// Read ALL heredocs but return the last one
 static t_file_node	*read_all_heredocs_in_cmd(t_cmd_node *cmd)
 {
 	t_file_node	*current;
@@ -102,14 +112,11 @@ static t_file_node	*read_all_heredocs_in_cmd(t_cmd_node *cmd)
 	current = cmd->files->head;
 	while (current)
 	{
-		if (current->redir_type == 6)  // HEREDOC
+		if (current->redir_type == 6) 
 		{
-			// Read this heredoc (bash reads ALL heredocs)
 			if (isatty(STDIN_FILENO))
 			{
-				// Read the heredoc content and store it
 				current->heredoc_content = read_heredoc_content(current->filename);
-				// Discard the previous heredoc's content (keep only the last)
 				if (last_heredoc)
 					last_heredoc->heredoc_content = NULL;
 			}
@@ -122,15 +129,13 @@ static t_file_node	*read_all_heredocs_in_cmd(t_cmd_node *cmd)
 
 void	process_all_heredocs(t_cmd_list *cmdlst)
 {
-	t_cmd_node	*cmd;
+	t_cmd_node *cmd;
 
 	if (!cmdlst)
 		return ;
 	cmd = cmdlst->head;
 	while (cmd)
 	{
-		// Read all heredocs for this command (bash behavior)
-		// Only the last one will be used, but all must be read
 		read_all_heredocs_in_cmd(cmd);
 		cmd = cmd->next;
 	}

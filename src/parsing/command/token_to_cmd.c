@@ -1,28 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   read_heredoc.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
+/*   Updated: 2025/11/18 19:56:37 by klejdi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
-
-static int	is_valid_env_assignment(char *str)
-{
-	int		i;
-	char	*eq;
-
-	if (!str || !*str)
-		return (0);
-	eq = ft_strchr(str, '=');
-	if (!eq || eq == str)
-		return (0);
-	if (!ft_isalpha((unsigned char)str[0]) && str[0] != '_')
-		return (0);
-	i = 1;
-	while (str + i < eq)
-	{
-		if (!ft_isalnum((unsigned char)str[i]) && str[i] != '_')
-			return (0);
-		i++;
-	}
-	return (1);
-}
 
 int	count_args(t_token *token)
 {
@@ -84,7 +73,6 @@ char	**create_array(t_token *token, t_cmd_node *cmdnode, int i)
 		}
 		if (token && token->type == TK_WORD)
 		{
-			/* Check if this is an env assignment BEFORE any command */
 			if (i == 0 && is_valid_env_assignment(token->value))
 			{
 				env_node = gc_malloc(sizeof(t_env_node));
@@ -94,7 +82,6 @@ char	**create_array(t_token *token, t_cmd_node *cmdnode, int i)
 				token = token->next;
 				continue ;
 			}
-			/* Only split if token has segment_list and should_split returns true */
 			if (i == 0 && token->value && token->segment_list
 				&& should_split(token->segment_list) && ft_strchr(token->value,
 					' '))
@@ -140,44 +127,13 @@ char	*look_for_cmd(t_token *token, t_token_list *toklst, t_cmd_list *cmdlst)
 	return (NULL);
 }
 
-static int	validate_pipe_syntax(t_token_list *toklst)
-{
-	t_token	*token;
-	t_token	*prev;
 
-	if (!toklst || !toklst->head)
-		return (0);
-	token = toklst->head;
-	prev = NULL;
-	/* Check for pipe at the beginning */
-	if (token->type == TK_PIPE)
-		return (1);
-	while (token)
-	{
-		if (token->type == TK_PIPE)
-		{
-			/* Check for double pipe (|| or | |) */
-			if (prev && prev->type == TK_PIPE)
-				return (1);
-			/* Check for pipe at the end */
-			if (!token->next)
-				return (1);
-			/* Check for pipe followed immediately by another pipe */
-			if (token->next && token->next->type == TK_PIPE)
-				return (1);
-		}
-		prev = token;
-		token = token->next;
-	}
-	return (0);
-}
 
 int	token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst, t_env_list *envlst,
 		int last_status)
 {
 	if (!toklst || !cmdlst || !envlst)
 		return (1);
-	/* Validate pipe syntax before processing */
 	if (validate_pipe_syntax(toklst))
 	{
 		cmdlst->syntax_error = 1;

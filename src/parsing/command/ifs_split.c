@@ -36,7 +36,6 @@ char *ifs_field_split(char *str)
     i = 0;
     j = 0;
     prev_was_space = 0;
-    /* Process string, collapsing consecutive whitespace to single space */
     while (str[i])
     {
         if (str[i] == ' ' || str[i] == '\t' || str[i] == '\n')

@@ -145,6 +145,11 @@ bool					we_have_token(const char *str, int *i);
 int						scan_quote(const char *str, int i);
 bool					is_valid_quote(char *str, int *i);
 int						skip_spaces(char *str, int i);
+int						add_redir_filename(t_token_list *lst, char *input,
+							int *i);
+int						handle_quoted_redir_file(t_token_list *lst, char *input,
+							int *i);
+
 /* helpers used in token_to_cmd */
 bool					is_redirection(t_toktype t);
 // init all
@@ -152,6 +157,8 @@ void					init_token_lst(t_token_list *lst);
 void					init_cmd_lst(t_cmd_list *lst);
 void					init_env_lst(t_env_list *lst);
 void					init_segment_lst(t_segment_list *lst);
+int						validate_pipe_syntax(t_token_list *toklst);
+int						is_valid_env_assignment(char *str);
 
 // tokenize
 t_token					*create_token(t_toktype type, char *val);
@@ -180,6 +187,7 @@ int						collect_redirs(t_token *token, t_cmd_node *cmdnode);
 bool					is_built_in(char *str);
 void					create_filenode(char *filename, int red_type,
 							t_file_list *filelst);
+void					push_file(t_file_list *lst, t_file_node *node);
 
 /* Environment functions */
 int						get_envs(char **env, t_env_list *lst);

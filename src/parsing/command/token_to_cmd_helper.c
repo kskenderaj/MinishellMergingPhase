@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   read_heredoc.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
+/*   Updated: 2025/11/18 19:56:37 by klejdi           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 #include "parser.h"
 
@@ -46,26 +58,52 @@ bool is_redirection(t_toktype t)
 	return (t == TK_INFILE || t == TK_OUTFILE || t == TK_APPEND || t == TK_HEREDOC);
 }
 
+int	validate_pipe_syntax(t_token_list *toklst)
+{
+	t_token	*token;
+	t_token	*prev;
 
-// void	final_token(t_token_list *toklst, t_env_list *envlst, int last_status)
-// {
-// 	t_token			*token;
-// 	t_segment_list	*seglst;
+	if (!toklst || !toklst->head)
+		return (0);
+	token = toklst->head;
+	prev = NULL;
+	if (token->type == TK_PIPE)
+		return (1);
+	while (token)
+	{
+		if (token->type == TK_PIPE)
+		{
+			if (prev && prev->type == TK_PIPE)
+				return (1);
+			if (!token->next)
+				return (1);
+			if (token->next && token->next->type == TK_PIPE)
+				return (1);
+		}
+		prev = token;
+		token = token->next;
+	}
+	return (0);
+}
 
-// 	if (!toklst)
-// 		return ;
-// 	token = toklst->head;
-// 	while (token)
-// 	{
-// 		if (token->type == TK_WORD)
-// 		{
-// 			seglst = gc_malloc(sizeof(*seglst));
-// 			if(!seglst)
-// 				return;
-// 			init_segment_lst(seglst);
-// 			if (find_segment(seglst, token->value))
-// 				token->value = segments_expand(seglst, envlst, last_status);
-// 		}
-// 		token = token->next;
-// 	}
-// }
+int	is_valid_env_assignment(char *str)
+{
+	int		i;
+	char	*eq;
+
+	if (!str || !*str)
+		return (0);
+	eq = ft_strchr(str, '=');
+	if (!eq || eq == str)
+		return (0);
+	if (!ft_isalpha((unsigned char)str[0]) && str[0] != '_')
+		return (0);
+	i = 1;
+	while (str + i < eq)
+	{
+		if (!ft_isalnum((unsigned char)str[i]) && str[i] != '_')
+			return (0);
+		i++;
+	}
+	return (1);
+}
