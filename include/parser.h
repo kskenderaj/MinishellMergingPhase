@@ -204,6 +204,7 @@ char					*ifs_field_split(char *str);
 /* Heredoc utilities */
 t_heredoc_info			*process_heredoc_delimiter(char *raw_delimiter);
 char					*read_heredoc_content(char *delimiter);
+void					process_all_heredocs(t_cmd_list *cmdlst);
 
 /* Quote removal */
 // char *remove_quotes(char *str);

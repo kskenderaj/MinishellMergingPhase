@@ -107,12 +107,10 @@ int setup_input_file(t_commandlist *cmd)
 		return (NO_REDIRECTION);
 	if (last_input->redir_type == HEREDOC)
 	{
-		if (last_input->heredoc_content)
-			return (exec_heredoc_from_content(last_input->heredoc_content,
-											  last_input->heredoc_quoted));
-		else
-			return (exec_heredoc(last_input->filename,
-								 last_input->heredoc_quoted));
+		// Always use heredoc_content (read during parsing)
+		// Even empty heredocs have content (empty string or NULL for truly empty)
+		return (exec_heredoc_from_content(last_input->heredoc_content,
+										  last_input->heredoc_quoted));
 	}
 	fd = gc_open(last_input->filename, O_RDONLY, 0);
 	if (fd < 0)

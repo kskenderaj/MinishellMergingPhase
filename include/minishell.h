@@ -70,6 +70,7 @@ void							remove_ctrlc_echo(void);
 void							handle_ctrlc_heredoc(int signal_nb);
 void							start_heredoc_signals(void);
 void							start_signals(void);
+void							reset_signals_for_child(void);
 // signals.c -- END
 
 // Functions -- END

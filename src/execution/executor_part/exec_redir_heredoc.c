@@ -16,13 +16,13 @@
 int	count_heredoc(t_commandlist *cmd)
 {
 	int			count;
-	t_filelist	*cur;
+	t_file_node	*cur;
 
 	count = 0;
-	cur = cmd->files;
+	cur = (t_file_node *)cmd->files;
 	while (cur)
 	{
-		if (cur->type == HEREDOC)
+		if (cur->redir_type == HEREDOC)
 			count++;
 		cur = cur->next;
 	}
@@ -30,16 +30,16 @@ int	count_heredoc(t_commandlist *cmd)
 }
 
 // Finds the last heredoc
-static t_filelist	*find_last_heredoc(t_commandlist *cmd, int heredoc_count)
+static t_file_node	*find_last_heredoc(t_commandlist *cmd, int heredoc_count)
 {
 	int			cur_count;
-	t_filelist	*cur;
+	t_file_node	*cur;
 
 	cur_count = 0;
-	cur = cmd->files;
+	cur = (t_file_node *)cmd->files;
 	while (cur)
 	{
-		if (cur->type == HEREDOC)
+		if (cur->redir_type == HEREDOC)
 		{
 			cur_count++;
 			if (cur_count == heredoc_count)
@@ -54,12 +54,10 @@ static t_filelist	*find_last_heredoc(t_commandlist *cmd, int heredoc_count)
 int	setup_heredoc_fd(t_commandlist *cmd)
 {
 	int			heredoc_count;
-	t_filelist	*last_heredoc;
+	t_file_node	*last_heredoc;
 	int			tmpfd;
 	char		template[] = "/tmp/minishell_heredoc_XXXXXX";
-	char		buffer[1024];
 	size_t		len;
-	int			d;
 
 	heredoc_count = count_heredoc(cmd);
 	if (heredoc_count == 0)
@@ -67,33 +65,17 @@ int	setup_heredoc_fd(t_commandlist *cmd)
 	last_heredoc = find_last_heredoc(cmd, heredoc_count);
 	if (!last_heredoc)
 		return (-1);
+	// Create temp file for heredoc content (even if empty)
+	tmpfd = mkstemp(template);
+	if (tmpfd == -1)
+		return (-1);
+	// Write the heredoc content to the temp file (if not empty)
+	if (last_heredoc->heredoc_content)
 	{
-		/* ensure len is initialized before any debug use */
-		len = strlen(last_heredoc->filename);
-		tmpfd = mkstemp(template);
-		if (tmpfd == -1)
-			return (-1);
-		/* Debug: write the heredoc delimiter to /tmp/heredoc_debug.txt */
-		{
-			d = open("tests/strict_tmp/heredoc_debug.txt",
-					O_WRONLY | O_CREAT | O_TRUNC, 0644);
-			if (d != -1)
-			{
-				printf("delimiter='%s' len=%zu\n", last_heredoc->filename, len);
-				close(d);
-			}
-		}
-		/* write heredoc content from stdin until delimiter */
-		len = strlen(last_heredoc->filename);
-		while (fgets(buffer, sizeof(buffer), stdin))
-		{
-			if (strncmp(buffer, last_heredoc->filename, len) == 0
-				&& buffer[len] == '\n')
-				break ;
-			write(tmpfd, buffer, strlen(buffer));
-		}
-		/* reopen for reading at start */
-		lseek(tmpfd, 0, SEEK_SET);
-		return (tmpfd);
+		len = ft_strlen(last_heredoc->heredoc_content);
+		if (len > 0)
+			write(tmpfd, last_heredoc->heredoc_content, len);
 	}
+	lseek(tmpfd, 0, SEEK_SET);
+	return (tmpfd);
 }

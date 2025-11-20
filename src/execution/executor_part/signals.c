@@ -45,7 +45,6 @@ void	handle_sig_int(int signal_nb)
 #ifdef RL_REPLACE_LINE
 	rl_replace_line("", 0);
 #endif
-	rl_redisplay();
 }
 
 /* SIGINT handler used while reading a heredoc */
@@ -63,8 +62,8 @@ static void	set_sigint_handler(void (*handler)(int))
 	memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = handler;
 	sigemptyset(&sa.sa_mask);
-	/* SA_RESTART: auto-restart interrupted syscalls (needed for Linux readline) */
-	sa.sa_flags = SA_RESTART;
+	/* Don't use SA_RESTART so readline() returns NULL on SIGINT */
+	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
 }
 
@@ -92,4 +91,17 @@ void	start_heredoc_signals(void)
 {
 	set_sigint_handler(handle_ctrlc_heredoc);
 	set_sigquit_ignore();
+}
+
+/* Reset signal handlers to default for child processes */
+void	reset_signals_for_child(void)
+{
+	struct sigaction	sa;
+
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = SIG_DFL;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
 }

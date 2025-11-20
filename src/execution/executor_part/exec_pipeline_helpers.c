@@ -97,6 +97,7 @@ static int	spawn_pipeline_children(char ***cmds, int ncmds, char **envp,
 		pids[i] = fork();
 		if (pids[i] == 0)
 		{
+			reset_signals_for_child();
 			setup_child_io_and_exec(i, ncmds, pipes, in_fd, out_fd, cmds[i],
 				cmd_envp);
 		}

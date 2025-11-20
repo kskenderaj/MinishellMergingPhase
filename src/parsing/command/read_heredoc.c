@@ -86,5 +86,6 @@ char *read_heredoc_content(char *delimiter)
         free(line); // Free readline buffer after appending
     }
     start_signals();
+    // Don't use rl_on_new_line() or rl_redisplay() here - they mess up the prompt
     return (content);
 }

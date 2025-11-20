@@ -1,4 +1,5 @@
 #include "minishell.h"
+#include <unistd.h>
 
 /* forward prototype for local helper */
 static void	push_file(t_file_list *lst, t_file_node *node);
@@ -45,8 +46,6 @@ void	create_filenode(char *filename, int red_type, t_file_list *filelst)
 		{
 			filenode->filename = hdoc_info->delimiter;
 			filenode->heredoc_quoted = hdoc_info->quoted;
-			if (isatty(STDIN_FILENO))
-				filenode->heredoc_content = read_heredoc_content(hdoc_info->delimiter);
 		}
 		else
 			filenode->filename = filename;
@@ -89,4 +88,50 @@ void	push_file(t_file_list *lst, t_file_node *node)
 		lst->tail = node;
 	}
 	lst->size++;
+}
+
+// Read ALL heredocs but return the last one
+static t_file_node	*read_all_heredocs_in_cmd(t_cmd_node *cmd)
+{
+	t_file_node	*current;
+	t_file_node	*last_heredoc;
+
+	if (!cmd || !cmd->files)
+		return (NULL);
+	last_heredoc = NULL;
+	current = cmd->files->head;
+	while (current)
+	{
+		if (current->redir_type == 6)  // HEREDOC
+		{
+			// Read this heredoc (bash reads ALL heredocs)
+			if (isatty(STDIN_FILENO))
+			{
+				// Read the heredoc content and store it
+				current->heredoc_content = read_heredoc_content(current->filename);
+				// Discard the previous heredoc's content (keep only the last)
+				if (last_heredoc)
+					last_heredoc->heredoc_content = NULL;
+			}
+			last_heredoc = current;
+		}
+		current = current->next;
+	}
+	return (last_heredoc);
+}
+
+void	process_all_heredocs(t_cmd_list *cmdlst)
+{
+	t_cmd_node	*cmd;
+
+	if (!cmdlst)
+		return ;
+	cmd = cmdlst->head;
+	while (cmd)
+	{
+		// Read all heredocs for this command (bash behavior)
+		// Only the last one will be used, but all must be read
+		read_all_heredocs_in_cmd(cmd);
+		cmd = cmd->next;
+	}
 }

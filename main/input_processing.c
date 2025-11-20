@@ -52,6 +52,8 @@ int	process_input_line(char *line, t_env_list *env, int last_status)
 		gc_clear();
 		return (2);
 	}
+	// Process heredocs: only read the last heredoc per command
+	process_all_heredocs(&cmdlst);
 	if (cmdlst.head)
 	{
 		last_status = process_command(&cmdlst, env);
