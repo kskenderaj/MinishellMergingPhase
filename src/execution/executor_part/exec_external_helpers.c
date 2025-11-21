@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_external_helpers.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:26:38 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/19 14:11:20 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:37:03 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,10 +36,7 @@ char	*find_command_path(char *cmd, t_env_list *env)
 		ft_strlcat(full_path, "/", sizeof(full_path));
 		ft_strlcat(full_path, cmd, sizeof(full_path));
 		if (access(full_path, X_OK) == 0)
-		{
-			ft_free_array(dirs);
-			return (ft_strdup(full_path));
-		}
+			return (ft_free_array(dirs), ft_strdup(full_path));
 		i++;
 	}
 	ft_free_array(dirs);

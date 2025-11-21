@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 13:20:10 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/19 20:16:22 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:31:48 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,15 @@ typedef struct s_commandlist
 {
 	t_filelist				*files;
 }							t_commandlist;
+
+typedef struct s_parse_state
+{
+	char					*scan;
+	char					*p;
+	int						total;
+	char					first_quote;
+	int						all_quoted;
+}							t_parse_state;
 
 typedef struct s_redir_data
 {
@@ -127,6 +136,19 @@ int							handle_separated_operators(char **args, int *i,
 pid_t						exec_parent_runner(t_cmd_node *cmd, int *io_data);
 /* Main utilities */
 void						split_args(char *input, char **args, int max_args);
+void						init_parse_state(t_parse_state *state, char **str,
+								char delim);
+void						handle_escape_seq(t_parse_state *state);
+void						handle_quoted_segment(t_parse_state *state);
+int							calculate_word_length(t_parse_state *state,
+								char delim);
+char						*allocate_result_buffer(t_parse_state *state);
+void						copy_escape_char(char **p, char *out, int *idx,
+								int marker);
+void						copy_quoted_content(char **p, char *out, int *idx,
+								int marker);
+void						fill_result_buffer(t_parse_state *state,
+								char *result, char delim);
 int							setup_redirections(char **args, int *in_fd,
 								int *out_fd);
 /* Initialization */

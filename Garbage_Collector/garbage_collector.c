@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 16:08:39 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/21 12:24:47 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:54:57 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ t_gc	*get_gc(void)
 // initializing gc
 t_gc	*gc_init(void)
 {
-	if (g_gc) // Already initialized
+	if (g_gc)
 		return (g_gc);
 	g_gc = malloc(sizeof(t_gc));
 	if (!g_gc)
@@ -65,6 +65,7 @@ void	*gc_malloc(size_t size)
 	}
 	return (ptr);
 }
+
 void	*gc_calloc(size_t count, size_t size)
 {
 	void	*ptr;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   garbage_collector_utils.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 17:51:02 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/04 22:17:06 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/21 17:57:04 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ char	*gc_strdup(const char *s)
 
 	if (!s)
 		return (NULL);
-	/* compute length without NUL, allocate space for NUL */
 	len = ft_strlen(s);
 	dup = gc_malloc(len + 1);
 	if (!dup)
@@ -47,7 +46,6 @@ char	*gc_strndup(const char *s, size_t n)
 	return (dup);
 }
 
-// string splitting helpers
 static size_t	count_words(const char *s, char c)
 {
 	size_t	count;

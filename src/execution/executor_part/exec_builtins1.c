@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins1.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 00:07:02 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/19 14:10:22 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:34:29 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,7 @@ static int	resolve_cd_target(char **args, int argc, char **target)
 	{
 		*target = getenv("HOME");
 		if (!*target)
-		{
-			ft_putstr_fd("cd: HOME not set\n", STDERR_FILENO);
-			return (1);
-		}
+			return (ft_putstr_fd("cd: HOME not set\n", STDERR_FILENO), 1);
 		return (0);
 	}
 	if (strcmp(args[1], "-") == 0)
@@ -68,7 +65,6 @@ int	ft_cd(char **args)
 		argc++;
 	if (!getcwd(oldpwd, sizeof(oldpwd)))
 		return (perror("cd: getcwd (oldpwd)"), g_shell.last_status = 1, 1);
-	/* determine target and validate args */
 	if (resolve_cd_target(args, argc, &target))
 		return (g_shell.last_status = 1, 1);
 	if (chdir(target) != 0)
@@ -79,7 +75,6 @@ int	ft_cd(char **args)
 		printf("%s\n", newpwd);
 	setenv("OLDPWD", oldpwd, 1);
 	setenv("PWD", newpwd, 1);
-	/* Update shell's internal environment list for variable expansion */
 	update_shell_env("OLDPWD", oldpwd);
 	update_shell_env("PWD", newpwd);
 	g_shell.last_status = 0;

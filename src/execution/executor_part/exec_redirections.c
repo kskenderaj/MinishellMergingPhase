@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_redirections.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 17:00:04 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/18 19:56:36 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/21 17:48:04 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,8 +108,6 @@ int	setup_input_file(t_commandlist *cmd)
 		return (NO_REDIRECTION);
 	if (last_input->redir_type == HEREDOC)
 	{
-		// Always use heredoc_content (read during parsing)
-		// Even empty heredocs have content (empty string or NULL for truly empty)
 		return (exec_heredoc_from_content(last_input->heredoc_content,
 				last_input->heredoc_quoted));
 	}
@@ -144,8 +142,7 @@ static int	open_all_output_files(t_commandlist *cmd)
 			if (fd < 0)
 			{
 				perror(current->filename);
-				g_shell.last_status = 1;
-				return (-1);
+				return (g_shell.last_status = 1, (-1));
 			}
 			close(fd);
 		}

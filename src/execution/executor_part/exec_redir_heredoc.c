@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_redir_heredoc.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 17:28:18 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/06 14:52:04 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:45:15 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,11 +65,9 @@ int	setup_heredoc_fd(t_commandlist *cmd)
 	last_heredoc = find_last_heredoc(cmd, heredoc_count);
 	if (!last_heredoc)
 		return (-1);
-	// Create temp file for heredoc content (even if empty)
 	tmpfd = mkstemp(template);
 	if (tmpfd == -1)
 		return (-1);
-	// Write the heredoc content to the temp file (if not empty)
 	if (last_heredoc->heredoc_content)
 	{
 		len = ft_strlen(last_heredoc->heredoc_content);

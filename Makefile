@@ -6,7 +6,7 @@
 #    By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/04 00:00:00 by auto              #+#    #+#              #
-#    Updated: 2025/11/21 14:55:06 by jtoumani         ###   ########.fr        #
+#    Updated: 2025/11/21 17:31:54 by jtoumani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -77,6 +77,8 @@ EXECUTOR_SRCS = \
 	$(EXECUTOR_DIR)/exec_path.c \
 	$(EXECUTOR_DIR)/exec_error.c \
 	$(EXECUTOR_DIR)/exec_args_helpers.c \
+	$(EXECUTOR_DIR)/exec_args_helpers2.c \
+	$(EXECUTOR_DIR)/exec_args_helpers3.c \
 	$(EXECUTOR_DIR)/exec_pipeline_helpers.c \
 	$(EXECUTOR_DIR)/exec_redir_helpers.c \
 	$(EXECUTOR_DIR)/exec_redir_attached.c \

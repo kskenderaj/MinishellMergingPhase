@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins2.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 17:31:20 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/19 14:10:41 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:35:03 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,11 @@ void	update_shell_env(const char *name, const char *value)
 
 	if (!g_shell.env || !name)
 		return ;
-	/* Check if variable already exists and update it */
 	existing = g_shell.env->head;
 	while (existing)
 	{
 		if (ft_strcmp(existing->key, name) == 0)
 		{
-			/* Update existing value */
 			if (existing->value)
 				free(existing->value);
 			existing->value = ft_strdup(value);
@@ -35,7 +33,6 @@ void	update_shell_env(const char *name, const char *value)
 		}
 		existing = existing->next;
 	}
-	/* Variable doesn't exist, add new entry */
 	new_node = malloc(sizeof(t_env_node));
 	if (new_node)
 	{
@@ -57,7 +54,6 @@ static char	*strip_quotes(const char *value)
 		stripped = (char *)gc_malloc((size_t)len - 1);
 		if (stripped)
 		{
-			/* copy inner content, ensure null-termination */
 			ft_strlcpy(stripped, value + 1, (size_t)len - 1);
 			stripped[len - 2] = '\0';
 		}
@@ -126,10 +122,7 @@ static int	export_with_value(char *arg)
 
 	eq = ft_strchr(arg, '=');
 	if (!eq)
-	{
-		/* no '=', behave like export no value */
 		return (export_no_value(arg));
-	}
 	namelen = (size_t)(eq - arg);
 	name = (char *)gc_malloc(namelen + 1);
 	if (!name)
@@ -150,17 +143,14 @@ static int	export_with_value(char *arg)
 		if (stripped)
 		{
 			setenv(name, stripped, 1);
-			/* Also update shell's internal env list for variable expansion */
 			update_shell_env(name, stripped);
 			gc_free(stripped);
 		}
 		else
 		{
 			setenv(name, value, 1);
-			/* Also update shell's internal env list for variable expansion */
 			update_shell_env(name, value);
 		}
-		/* track the name as exported */
 		if (!is_in_exported(name) && g_shell.exported_count < MAX_EXPORTED)
 			g_shell.exported_vars[g_shell.exported_count++] = gc_strdup(name);
 	}

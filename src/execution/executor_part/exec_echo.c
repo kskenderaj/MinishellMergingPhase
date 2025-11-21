@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_echo.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 15:22:40 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/19 14:10:57 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:35:29 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,8 @@ static void	echo_print_range(char **args, int start_index)
 
 int	ft_echo(char **args)
 {
-	int nl_option;
-	int start_index;
+	int	nl_option;
+	int	start_index;
 
 	nl_option = 0;
 	start_index = 1;

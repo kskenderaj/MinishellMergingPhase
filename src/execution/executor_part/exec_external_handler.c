@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_external_handler.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 17:34:28 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/19 20:17:22 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:47:48 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ void	exec_external(char **args, char **envp)
 		gc_free(exec_path);
 		exit(127);
 	}
-	// Check if file exists
 	if (access(exec_path, F_OK) != 0)
 	{
 		ft_putstr_fd(args[0], STDERR_FILENO);
@@ -37,7 +36,6 @@ void	exec_external(char **args, char **envp)
 		gc_free(exec_path);
 		exit(127); // File not found
 	}
-	// Check if executable
 	if (access(exec_path, X_OK) != 0)
 	{
 		ft_putstr_fd(args[0], STDERR_FILENO);
@@ -182,9 +180,8 @@ int	exec_heredoc(const char *delimiter, int quoted)
 	if (pipe(pipefd) == -1)
 		return (-1);
 	delim_len = ft_strlen(delimiter);
-	// Handle empty delimiter - should never match (can't close heredoc)
 	if (delim_len == 0)
-		delim_len = (size_t)-1; // Set to max value so it never matches
+		delim_len = (size_t)-1;
 	is_tty = isatty(STDIN_FILENO);
 	if (is_tty)
 		start_heredoc_signals();
@@ -194,36 +191,34 @@ int	exec_heredoc(const char *delimiter, int quoted)
 			buffer = readline("> ");
 		else
 			buffer = read_line_from_stdin();
-		// Check for Ctrl+C FIRST before checking EOF
 		if (is_tty && g_sigint_status == 130)
 		{
 			if (buffer)
-				free(buffer); // Free readline buffer if exists
+				free(buffer);
 			close(pipefd[1]);
 			close(pipefd[0]);
-			return (-2); // Exit heredoc due to Ctrl+C
+			return (-2);
 		}
-		// Now check for EOF (Ctrl+D or end of input)
 		if (!buffer)
 		{
 			if (is_tty)
 				write(STDERR_FILENO,
 					"warning: here-document delimited by end-of-file\n", 49);
 			close(pipefd[1]);
-			return (pipefd[0]); // Return what we have so far
+			return (pipefd[0]);
 		}
 		if (ft_strncmp(buffer, delimiter, delim_len) == 0
 			&& buffer[delim_len] == '\0')
 		{
 			if (is_tty)
-				free(buffer); // Free readline buffer for delimiter line
+				free(buffer);
 			break ;
 		}
 		expanded = expand_heredoc_line(buffer, !quoted);
 		write(pipefd[1], expanded, ft_strlen(expanded));
 		write(pipefd[1], "\n", 1);
 		if (is_tty)
-			free(buffer); // Free readline buffer after use
+			free(buffer);
 	}
 	if (is_tty)
 		start_signals();

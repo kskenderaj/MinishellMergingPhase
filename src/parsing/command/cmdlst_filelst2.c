@@ -28,8 +28,7 @@ t_file_node	*read_all_heredocs_in_cmd(t_cmd_node *cmd)
 		{
 			if (isatty(STDIN_FILENO))
 			{
-				current->heredoc_content = read_heredoc_content(
-						current->filename);
+				current->heredoc_content = read_heredoc_content(current->filename);
 				if (last_heredoc)
 					last_heredoc->heredoc_content = NULL;
 			}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   garbage_collector_parser.c                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/17 15:59:49 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/19 17:54:17 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:56:41 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,4 +62,14 @@ char	*gc_strjoin(const char *s1, const char *s2)
 	res = gc_strdup(tmp);
 	free(tmp);
 	return (res);
+}
+
+size_t	gc_count(void)
+{
+	t_gc	*gc;
+
+	gc = get_gc();
+	if (!gc)
+		return (0);
+	return (gc->count);
 }

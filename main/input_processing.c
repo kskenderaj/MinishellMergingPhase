@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   input_processing.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/19 20:16:43 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:52:00 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ int	process_input_line(char *line, t_env_list *env, int last_status)
 		gc_clear();
 		return (2);
 	}
-	// Process heredocs: only read the last heredoc per command
 	process_all_heredocs(&cmdlst);
 	if (cmdlst.head)
 	{

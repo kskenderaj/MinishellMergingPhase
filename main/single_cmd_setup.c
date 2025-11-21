@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   single_cmd_setup.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/19 17:42:58 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:49:38 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,5 +86,4 @@ void	cleanup_cmd_redir_failure(t_redir_fds *fds, char **envp, char **merged)
 		close(fds->in_fd);
 	if (fds->out_fd >= 0)
 		close(fds->out_fd);
-	// Don't free gc-allocated envp arrays
 }

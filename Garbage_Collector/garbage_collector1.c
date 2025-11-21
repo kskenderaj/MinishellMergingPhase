@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   garbage_collector1.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 16:39:30 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/19 20:18:30 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:53:54 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,14 +147,4 @@ void	gc_print(void)
 		current = current->next;
 		i++;
 	}
-}
-
-size_t	gc_count(void)
-{
-	t_gc	*gc;
-
-	gc = get_gc();
-	if (!gc)
-		return (0);
-	return (gc->count);
 }

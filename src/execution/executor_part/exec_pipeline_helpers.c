@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 16:04:59 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/21 13:07:22 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:37:41 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ int	exec_pipeline(char ***cmds, int ncmds, char **envp, char ****per_cmd_envs)
 
 	if (ncmds <= 0)
 		return (1);
-	/* Allocate dynamic arrays for pipes and pids */
 	pipes = gc_malloc(sizeof(int *) * (ncmds - 1));
 	if (!pipes)
 		return (1);
@@ -134,8 +133,6 @@ static void	setup_child_io_and_exec(int idx, int ncmds, int **pipes, int in_fd,
 		close(pipes[j][1]);
 		j++;
 	}
-	/* If a per-command envp was provided, apply it in this child so builtins
-		* see the modified environment. It's safe because we're in the child. */
 	if (envp)
 	{
 		ei = 0;
@@ -152,13 +149,10 @@ static void	setup_child_io_and_exec(int idx, int ncmds, int **pipes, int in_fd,
 			ei++;
 		}
 	}
-	/* Check if command is empty (after redirections were handled) */
 	if (!cmd || !cmd[0] || !cmd[0][0])
 	{
-		/* Empty command with successful redirections -> EXIT 0 */
 		exit(0);
 	}
-	/* if command is a shell builtin, run it in this child process */
 	if (!strcmp(cmd[0], "echo"))
 	{
 		ft_echo(cmd);

@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/12 14:40:09 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/21 16:01:49 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:52:50 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -250,8 +250,7 @@ t_file_node				*read_all_heredocs_in_cmd(t_cmd_node *cmd);
 int						has_quotes(char *str);
 char					*remove_quotes_heredoc(char *str);
 
-/* Quote removal */
-// char *remove_quotes(char *str);
+
 
 /* Segment utilities used elsewhere */
 void					init_segment_lst(t_segment_list *lst);
@@ -264,9 +263,6 @@ char					*process_dollar(char *seg_str, t_seg_type seg_type,
 						t_env_list *envlst, int i);
 void					process_char(char **old, t_expand_ctx *ctx, int *i);
 char					*expand_or_not(char *seg_str, t_seg_type seg_type,
-						t_env_list *envlst, int last_status);// // debug
-// void print_tokens(const t_token_list *lst);
-// void print_segment_list(const t_segment_list *list);
-// void init_segment_lst(t_segment_list *lst);
+						t_env_list *envlst, int last_status);
 
 #endif

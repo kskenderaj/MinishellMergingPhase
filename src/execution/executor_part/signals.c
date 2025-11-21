@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 16:36:04 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/21 13:06:59 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 17:59:27 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,6 @@ void	remove_ctrlc_echo(void)
 
 	if (tcgetattr(STDIN_FILENO, &term) == -1)
 		return ;
-#ifdef ECHOCTL
-	term.c_lflag &= ~ECHOCTL;
-	(void)tcsetattr(STDIN_FILENO, TCSANOW, &term);
-#endif
 }
 
 /* SIGINT handler for interactive prompt */
@@ -42,9 +38,6 @@ void	handle_sig_int(int signal_nb)
 	g_sigint_status = 130; // Set exit status to 130 (128 + SIGINT)
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
-#ifdef RL_REPLACE_LINE
-	rl_replace_line("", 0);
-#endif
 	rl_redisplay();
 }
 
@@ -63,7 +56,6 @@ static void	set_sigint_handler(void (*handler)(int))
 	memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = handler;
 	sigemptyset(&sa.sa_mask);
-	/* Don't use SA_RESTART so readline() returns NULL on SIGINT */
 	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
 }
