@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   read_heredoc.c                                     :+:      :+:    :+:   */
+/*   cmdlst_filelst.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/18 19:56:37 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/21 12:21:38 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ static t_file_node	*read_all_heredocs_in_cmd(t_cmd_node *cmd)
 	current = cmd->files->head;
 	while (current)
 	{
-		if (current->redir_type == 6) 
+		if (current->redir_type == 6)
 		{
 			if (isatty(STDIN_FILENO))
 			{
@@ -129,7 +129,7 @@ static t_file_node	*read_all_heredocs_in_cmd(t_cmd_node *cmd)
 
 void	process_all_heredocs(t_cmd_list *cmdlst)
 {
-	t_cmd_node *cmd;
+	t_cmd_node	*cmd;
 
 	if (!cmdlst)
 		return ;

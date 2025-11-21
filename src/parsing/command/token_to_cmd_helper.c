@@ -1,61 +1,62 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   read_heredoc.c                                     :+:      :+:    :+:   */
+/*   token_to_cmd_helper.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/18 19:56:37 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/21 12:21:16 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
 
-bool is_built_in(char *str)
+bool	is_built_in(char *str)
 {
 	if (!str)
-		return false;
+		return (false);
 	if (ft_strncmp(str, "echo", 5) == 0)
-		return true;
+		return (true);
 	if (ft_strncmp(str, "cd", 3) == 0)
-		return true;
+		return (true);
 	if (ft_strncmp(str, "pwd", 4) == 0)
-		return true;
+		return (true);
 	if (ft_strncmp(str, "export", 7) == 0)
-		return true;
+		return (true);
 	if (ft_strncmp(str, "unset", 6) == 0)
-		return true;
+		return (true);
 	if (ft_strncmp(str, "env", 4) == 0)
-		return true;
+		return (true);
 	if (ft_strncmp(str, "exit", 5) == 0)
-		return true;
-	return false;
+		return (true);
+	return (false);
 }
 
-int collect_redirs(t_token *token, t_cmd_node *cmdnode)
+int	collect_redirs(t_token *token, t_cmd_node *cmdnode)
 {
 	while (token && token->type != TK_PIPE)
 	{
 		if (is_redirection(token->type))
 		{
 			if (!token->next || token->next->type != TK_WORD)
-				return -1;
+				return (-1);
 			create_filenode(token->next->value, token->type, cmdnode->files);
 			token = token->next;
 			if (token)
 				token = token->next;
-			continue;
+			continue ;
 		}
 		token = token->next;
 	}
-	return 0;
+	return (0);
 }
 
-bool is_redirection(t_toktype t)
+bool	is_redirection(t_toktype t)
 {
-	return (t == TK_INFILE || t == TK_OUTFILE || t == TK_APPEND || t == TK_HEREDOC);
+	return (t == TK_INFILE || t == TK_OUTFILE || t == TK_APPEND
+		|| t == TK_HEREDOC);
 }
 
 int	validate_pipe_syntax(t_token_list *toklst)

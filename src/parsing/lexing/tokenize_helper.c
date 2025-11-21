@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenize_helper.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 14:08:07 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/19 14:08:20 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 12:20:50 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,8 @@ int	red_len(char *input, int i)
 {
 	if (!input[i])
 		return (0);
-	if ((input[i] == '<' && input[i + 1] == '<') || (input[i] == '>'
-			&& input[i + 1] == '>'))
+	if ((input[i] == '<' && input[i + 1] == '<') || (input[i] == '>' && input[i
+				+ 1] == '>'))
 	{
 		return (2);
 	}

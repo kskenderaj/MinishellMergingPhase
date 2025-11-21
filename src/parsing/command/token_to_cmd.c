@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   read_heredoc.c                                     :+:      :+:    :+:   */
+/*   token_to_cmd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/18 19:56:37 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/21 12:21:09 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,8 +126,6 @@ char	*look_for_cmd(t_token *token, t_token_list *toklst, t_cmd_list *cmdlst)
 	}
 	return (NULL);
 }
-
-
 
 int	token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst, t_env_list *envlst,
 		int last_status)
