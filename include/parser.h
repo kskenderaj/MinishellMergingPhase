@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/12 14:40:09 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/21 12:35:01 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 15:03:21 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,9 +97,9 @@ typedef enum e_toktype
 
 typedef enum seg_type
 {
-	SEG_NO_QUOTE,
-	SEG_SINGLE,
-	SEG_DOUBLE,
+	SEG_NO,
+	SEG_SING,
+	SEG_DOU,
 }						t_seg_type;
 
 typedef struct s_segment
@@ -115,6 +115,13 @@ typedef struct s_segment_list
 	t_segment			*tail;
 	ssize_t				size;
 }						t_segment_list;
+
+typedef struct s_expand_ctx
+{
+	char				*seg_str;
+	t_seg_type			type;
+	t_env_list			*envlst;
+}						t_expand_ctx;
 
 typedef struct s_token
 {
@@ -199,8 +206,14 @@ int						find_key(char *str, t_env_node *env);
 int						find_value(char *str, t_env_node *env);
 int						push_env(t_env_list *lst, t_env_node *env);
 void					free_env_list(t_env_list *env);
+void					free_env_node(t_env_node *node);
 void					remove_from_env_list(t_env_list *envlst,
 							const char *key);
+
+/* IFS split helpers */
+int						is_ifs_char(char c);
+void					process_ifs_char(char *result, int *j,
+							int *prev_was_space);
 
 /* Token to command conversion */
 int						token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst,
@@ -246,8 +259,11 @@ char					*segments_expand(t_segment_list *seglst,
 char					*expand_env(char *str, t_env_list *env_lst);
 char					*get_expand(char *seg_str, int i, int last_status,
 							t_env_list *envlst);
-
-// // debug
+char					*process_dollar(char *seg_str, t_seg_type seg_type,
+						t_env_list *envlst, int i);
+void					process_char(char **old, t_expand_ctx *ctx, int *i);
+char					*expand_or_not(char *seg_str, t_seg_type seg_type,
+						t_env_list *envlst, int last_status);// // debug
 // void print_tokens(const t_token_list *lst);
 // void print_segment_list(const t_segment_list *list);
 // void init_segment_lst(t_segment_list *lst);

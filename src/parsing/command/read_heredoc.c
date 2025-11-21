@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 12:34:52 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 14:45:14 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,40 +47,50 @@ int	is_delimiter(char *line, char *delimiter)
 	return (0);
 }
 
+int	handle_heredoc_line(char **content, char *line, char *delimiter)
+{
+	if (g_sigint_status == 130)
+	{
+		if (line)
+			free(line);
+		return (-1);
+	}
+	if (!line)
+	{
+		write(2, "warning: here-document delimited by end-of-file\n", 49);
+		return (1);
+	}
+	if (is_delimiter(line, delimiter))
+	{
+		free(line);
+		return (2);
+	}
+	*content = append_line(*content, line);
+	free(line);
+	return (0);
+}
+
 char	*read_heredoc_content(char *delimiter)
 {
 	char	*content;
 	char	*line;
+	int		ret;
 
-	if (!delimiter)
-		return (NULL);
-	if (!isatty(STDIN_FILENO))
+	if (!delimiter || !isatty(STDIN_FILENO))
 		return (NULL);
 	content = NULL;
 	start_heredoc_signals();
 	while (1)
 	{
 		line = readline("> ");
-		if (g_sigint_status == 130)
+		ret = handle_heredoc_line(&content, line, delimiter);
+		if (ret == -1)
 		{
-			if (line)
-				free(line);
 			start_signals();
 			return (NULL);
 		}
-		if (!line)
-		{
-			write(2, "warning: here-document delimited by end-of-file\n", 49);
-			start_signals();
-			return (content);
-		}
-		if (is_delimiter(line, delimiter))
-		{
-			free(line);
+		if (ret == 1 || ret == 2)
 			break ;
-		}
-		content = append_line(content, line);
-		free(line);
 	}
 	return (start_signals(), content);
 }

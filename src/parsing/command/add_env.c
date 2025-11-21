@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 12:21:42 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 14:19:59 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,67 +104,4 @@ int	get_envs(char **env, t_env_list *lst)
 		i++;
 	}
 	return (1);
-}
-
-char	*get_expand(char *seg_str, int i, int last_status, t_env_list *envlst)
-{
-	if (seg_str[i + 1] == '?')
-		return (gc_itoa(last_status));
-	else
-		return (expand_env(seg_str + i, envlst));
-}
-
-void	remove_from_env_list(t_env_list *envlst, const char *key)
-{
-	t_env_node	*prev;
-	t_env_node	*curr;
-
-	if (!envlst || !key)
-		return ;
-	prev = NULL;
-	curr = envlst->head;
-	while (curr)
-	{
-		if (ft_strcmp(curr->key, key) == 0)
-		{
-			if (prev)
-				prev->next = curr->next;
-			else
-				envlst->head = curr->next;
-			if (curr == envlst->tail)
-				envlst->tail = prev;
-			if (curr->key)
-				free(curr->key);
-			if (curr->value)
-				free(curr->value);
-			free(curr);
-			envlst->size--;
-			return ;
-		}
-		prev = curr;
-		curr = curr->next;
-	}
-}
-
-void	free_env_list(t_env_list *env)
-{
-	t_env_node	*current;
-	t_env_node	*next;
-
-	if (!env)
-		return ;
-	current = env->head;
-	while (current)
-	{
-		next = current->next;
-		if (current->key)
-			free(current->key);
-		if (current->value)
-			free(current->value);
-		free(current);
-		current = next;
-	}
-	if (env->pid)
-		free(env->pid);
-	free(env);
 }

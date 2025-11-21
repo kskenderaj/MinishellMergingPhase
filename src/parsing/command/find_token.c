@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 12:24:08 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 14:36:32 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ int	no_quote_segment(t_segment_list *lst, char *str, int *i)
 		(*i)++;
 	if (*i > start)
 	{
-		segment = create_segment(str + start, (*i - start), SEG_NO_QUOTE);
+		segment = create_segment(str + start, (*i - start), SEG_NO);
 		if (!segment || !push_segment(lst, segment))
 			return (0);
 	}
@@ -46,9 +46,9 @@ int	quote_segment(t_segment_list *lst, char *str, int *i)
 	if (!str[*i])
 		return (0);
 	if (q == '\'')
-		type = SEG_SINGLE;
+		type = SEG_SING;
 	else
-		type = SEG_DOUBLE;
+		type = SEG_DOU;
 	segment = create_segment(str + start, *i - start, type);
 	if (!segment || !push_segment(lst, segment))
 		return (0);

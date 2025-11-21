@@ -6,21 +6,27 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 12:21:22 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 14:50:55 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
 
-/*
-** ifs_field_split: Performs IFS field splitting on a string
-** - Collapses consecutive whitespace to SINGLE space
-** - PRESERVES leading/trailing spaces as field delimiters
-** - Used only for unquoted variable expansions when adjacent to other segments
-**
-** Example: "  A  B  " -> " A B " (single spaces, but keeps boundary spaces)
-*/
+int	is_ifs_char(char c)
+{
+	return (c == ' ' || c == '\t' || c == '\n');
+}
+
+void	process_ifs_char(char *result, int *j, int *prev_was_space)
+{
+	if (!(*prev_was_space))
+	{
+		result[(*j)++] = ' ';
+		*prev_was_space = 1;
+	}
+}
+
 char	*ifs_field_split(char *str)
 {
 	char	*result;
@@ -33,23 +39,16 @@ char	*ifs_field_split(char *str)
 	result = gc_malloc(ft_strlen(str) + 1);
 	if (!result)
 		return (NULL);
-	i = 0;
+	i = -1;
 	j = 0;
 	prev_was_space = 0;
-	while (str[i])
+	while (str[++i])
 	{
-		if (str[i] == ' ' || str[i] == '\t' || str[i] == '\n')
-		{
-			if (!prev_was_space)
-			{
-				result[j++] = ' ';
-				prev_was_space = 1;
-			}
-			i++;
-		}
+		if (is_ifs_char(str[i]))
+			process_ifs_char(result, &j, &prev_was_space);
 		else
 		{
-			result[j++] = str[i++];
+			result[j++] = str[i];
 			prev_was_space = 0;
 		}
 	}

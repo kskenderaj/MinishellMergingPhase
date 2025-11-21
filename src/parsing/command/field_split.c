@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 12:21:32 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 14:54:25 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,7 @@ int	should_split(t_segment_list *seglst)
 	seg = seglst->head;
 	while (seg)
 	{
-		if (seg->type == SEG_NO_QUOTE)
+		if (seg->type == SEG_NO)
 		{
 			has_unquoted = 1;
 			break ;

@@ -6,7 +6,7 @@
 #    By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/04 00:00:00 by auto              #+#    #+#              #
-#    Updated: 2025/11/21 12:31:58 by jtoumani         ###   ########.fr        #
+#    Updated: 2025/11/21 14:55:06 by jtoumani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -47,11 +47,14 @@ PARSER_SRCS = \
 	src/parsing/command/token_to_cmd.c \
 	src/parsing/command/find_token.c \
 	src/parsing/command/add_env.c \
+	src/parsing/command/add_env2.c \
 	src/parsing/command/token_to_cmd_helper.c \
 	src/parsing/command/token_to_cmd_helper2.c \
 	src/parsing/command/token_to_cmd_helper3.c \
 	src/parsing/command/expand_env.c \
+	src/parsing/command/expand_env2.c \
 	src/parsing/command/cmdlst_filelst.c \
+	src/parsing/command/cmdlst_filelst2.c \
 	src/parsing/command/field_split.c \
 	src/parsing/command/ifs_split.c \
 	src/parsing/command/heredoc_utils.c \

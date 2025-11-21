@@ -16,12 +16,12 @@
 int	count_args(t_token *token)
 {
 	int	i;
-	
+
 	i = 0;
 	while (token && token->type != TK_PIPE)
 	{
 		if (token->type == TK_WORD)
-		i++;
+			i++;
 		else if (is_redirection(token->type))
 		{
 			if (!token->next || token->next->type != TK_WORD)
@@ -35,7 +35,7 @@ int	count_args(t_token *token)
 
 char	**create_array(t_token *token, t_cmd_node *cmdnode, int i)
 {
-	char		**cmd_array;
+	char	**cmd_array;
 
 	cmd_array = gc_malloc(sizeof(char *) * ((size_t)count_args(token) + 1));
 	if (!cmd_array)
@@ -84,7 +84,6 @@ int	token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst, t_env_list *envlst,
 		return (1);
 	return (0);
 }
-
 
 void	final_token(t_token_list *toklst, t_env_list *envlst, int last_status)
 {

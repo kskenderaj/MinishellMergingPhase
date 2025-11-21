@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 12:21:38 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 14:20:41 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,44 +99,4 @@ void	push_file(t_file_list *lst, t_file_node *node)
 		lst->tail = node;
 	}
 	lst->size++;
-}
-
-t_file_node	*read_all_heredocs_in_cmd(t_cmd_node *cmd)
-{
-	t_file_node	*current;
-	t_file_node	*last_heredoc;
-
-	if (!cmd || !cmd->files)
-		return (NULL);
-	last_heredoc = NULL;
-	current = cmd->files->head;
-	while (current)
-	{
-		if (current->redir_type == 6)
-		{
-			if (isatty(STDIN_FILENO))
-			{
-				current->heredoc_content = read_heredoc_content(current->filename);
-				if (last_heredoc)
-					last_heredoc->heredoc_content = NULL;
-			}
-			last_heredoc = current;
-		}
-		current = current->next;
-	}
-	return (last_heredoc);
-}
-
-void	process_all_heredocs(t_cmd_list *cmdlst)
-{
-	t_cmd_node	*cmd;
-
-	if (!cmdlst)
-		return ;
-	cmd = cmdlst->head;
-	while (cmd)
-	{
-		read_all_heredocs_in_cmd(cmd);
-		cmd = cmd->next;
-	}
 }

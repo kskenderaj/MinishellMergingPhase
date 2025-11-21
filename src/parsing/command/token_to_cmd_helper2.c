@@ -46,8 +46,8 @@ int	handle_env_assignment(t_token *token, t_cmd_node *cmdnode)
 	return (0);
 }
 
-int	handle_word_token(t_token *token, t_cmd_node *cmdnode,
-		char **cmd_array, int *i)
+int	handle_word_token(t_token *token, t_cmd_node *cmdnode, char **cmd_array,
+		int *i)
 {
 	if (*i == 0 && is_valid_env_assignment(token->value))
 		return (handle_env_assignment(token, cmdnode));
@@ -76,8 +76,8 @@ t_token	*skip_to_next_pipe(t_token *token)
 	return (token);
 }
 
-int	process_single_token(t_token *token, int *skip_next,
-		t_env_list *envlst, int last_status)
+int	process_single_token(t_token *token, int *skip_next, t_env_list *envlst,
+		int last_status)
 {
 	t_segment_list	*seglst;
 

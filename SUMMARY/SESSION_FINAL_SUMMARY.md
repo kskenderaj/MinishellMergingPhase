@@ -73,7 +73,7 @@ echo $PWD                # Shows current dir again ✅
 **Solution:**
 ```c
 // In expand_or_not() for unquoted segments
-if (seg_type == SEG_NO_QUOTE && expand && ft_strchr(expand, ' '))
+if (seg_type == SEG_NO && expand && ft_strchr(expand, ' '))
     expand = ifs_field_split(expand);
 ```
 

@@ -6,12 +6,14 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 12:21:35 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 15:04:46 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "garbage_collector.h"
 #include "minishell.h"
+
+static int	g_last_status_cache = 0;
 
 int	skip_var(char *str)
 {
@@ -69,69 +71,36 @@ char	*expand_env(char *str, t_env_list *env_lst)
 	return (gc_strdup(""));
 }
 
-char	*expand_or_not(char *seg_str, t_seg_type seg_type, t_env_list *envlst,
-		int last_status, int i)
+char	*process_dollar(char *seg_str, t_seg_type seg_type, t_env_list *envlst,
+		int i)
 {
-	char	*old;
 	char	*expand;
-	char	*new;
-	int		len;
+
+	expand = get_expand(seg_str, i, g_last_status_cache, envlst);
+	if (seg_type == SEG_NO && expand && ft_strchr(expand, ' '))
+		expand = ifs_field_split(expand);
+	return (expand);
+}
+
+char	*expand_or_not(char *seg_str, t_seg_type seg_type, t_env_list *envlst,
+		int last_status)
+{
+	t_expand_ctx	ctx;
+	char			*old;
+	int				i;
 
 	if (!seg_str)
 		return (NULL);
+	g_last_status_cache = last_status;
+	ctx.seg_str = seg_str;
+	ctx.type = seg_type;
+	ctx.envlst = envlst;
 	old = gc_strdup("");
-	new = old;
+	i = 0;
 	while (seg_str[i])
 	{
-		if (seg_str[i] == '$' && (seg_type == SEG_DOUBLE
-				|| seg_type == SEG_NO_QUOTE))
-		{
-			len = skip_var(seg_str + i);
-			if (len == 1)
-			{
-				new = gc_strjoin(old, gc_substr(seg_str + i, 0, 1));
-				old = new;
-				i += 1;
-				continue ;
-			}
-			expand = get_expand(seg_str, i, last_status, envlst);
-			if (seg_type == SEG_NO_QUOTE && expand && ft_strchr(expand, ' '))
-				expand = ifs_field_split(expand);
-			new = gc_strjoin(old, expand);
-			old = new;
-			i += (skip_var(seg_str + i) - 1);
-		}
-		else
-		{
-			new = gc_strjoin(old, gc_substr(seg_str + i, 0, 1));
-			old = new;
-		}
+		process_char(&old, &ctx, &i);
 		i++;
 	}
-	return (new);
-}
-
-char	*segments_expand(t_segment_list *seglst, t_env_list *envlst,
-		int last_status)
-{
-	t_segment	*curr;
-	char		*tmp;
-	char		*expansion;
-	char		*new_segment;
-
-	if (!seglst)
-		return (NULL);
-	tmp = gc_substr("", 0, 0);
-	curr = seglst->head;
-	while (curr)
-	{
-		expansion = expand_or_not(curr->value, curr->type, envlst, last_status,
-				0);
-		if (!expansion)
-			return (NULL);
-		new_segment = gc_strjoin(tmp, expansion);
-		tmp = new_segment;
-		curr = curr->next;
-	}
-	return (tmp);
+	return (old);
 }
