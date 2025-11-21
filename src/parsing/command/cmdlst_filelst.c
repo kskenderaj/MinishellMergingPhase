@@ -101,7 +101,7 @@ void	push_file(t_file_list *lst, t_file_node *node)
 	lst->size++;
 }
 
-static t_file_node	*read_all_heredocs_in_cmd(t_cmd_node *cmd)
+t_file_node	*read_all_heredocs_in_cmd(t_cmd_node *cmd)
 {
 	t_file_node	*current;
 	t_file_node	*last_heredoc;

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: kskender <kskender@student.42.fr>          +#+  +:+       +#+         #
+#    By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/04 00:00:00 by auto              #+#    #+#              #
-#    Updated: 2025/11/19 17:54:55 by kskender         ###   ########.fr        #
+#    Updated: 2025/11/21 12:31:58 by jtoumani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -49,6 +49,7 @@ PARSER_SRCS = \
 	src/parsing/command/add_env.c \
 	src/parsing/command/token_to_cmd_helper.c \
 	src/parsing/command/token_to_cmd_helper2.c \
+	src/parsing/command/token_to_cmd_helper3.c \
 	src/parsing/command/expand_env.c \
 	src/parsing/command/cmdlst_filelst.c \
 	src/parsing/command/field_split.c \

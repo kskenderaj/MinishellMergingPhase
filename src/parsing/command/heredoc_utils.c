@@ -6,14 +6,14 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 12:21:25 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 12:34:54 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
 
-static int	has_quotes(char *str)
+int	has_quotes(char *str)
 {
 	int	i;
 
@@ -27,7 +27,7 @@ static int	has_quotes(char *str)
 	return (0);
 }
 
-static char	*remove_quotes_heredoc(char *str)
+char	*remove_quotes_heredoc(char *str)
 {
 	char	*result;
 	int		i;

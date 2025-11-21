@@ -12,10 +12,10 @@
 
 #include "executor.h"
 
-static int handle_attached_append(char **args, int *idx, int *out_fd,
-								  char *tok)
+static int	handle_attached_append(char **args, int *idx, int *out_fd,
+		char *tok)
 {
-	char *fname;
+	char	*fname;
 
 	if (tok[2] != '\0')
 		fname = tok + 2;
@@ -33,10 +33,10 @@ static int handle_attached_append(char **args, int *idx, int *out_fd,
 	return (0);
 }
 
-static int handle_attached_heredoc(char **args, int *idx, int *in_fd,
-								   char *tok)
+static int	handle_attached_heredoc(char **args, int *idx, int *in_fd,
+		char *tok)
 {
-	char *delim;
+	char	*delim;
 
 	if (tok[2] != '\0')
 		delim = tok + 2;
@@ -54,10 +54,10 @@ static int handle_attached_heredoc(char **args, int *idx, int *in_fd,
 	return (0);
 }
 
-static int handle_attached_outfile(char **args, int *idx, int *out_fd,
-								   char *tok)
+static int	handle_attached_outfile(char **args, int *idx, int *out_fd,
+		char *tok)
 {
-	char *fname;
+	char	*fname;
 
 	if (tok[1] != '\0')
 		fname = tok + 1;
@@ -75,9 +75,9 @@ static int handle_attached_outfile(char **args, int *idx, int *out_fd,
 	return (0);
 }
 
-static int handle_attached_infile(char **args, int *idx, int *in_fd, char *tok)
+static int	handle_attached_infile(char **args, int *idx, int *in_fd, char *tok)
 {
-	char *fname;
+	char	*fname;
 
 	if (tok[1] != '\0')
 		fname = tok + 1;
@@ -95,19 +95,19 @@ static int handle_attached_infile(char **args, int *idx, int *in_fd, char *tok)
 	return (0);
 }
 
-int handle_attached_operators(t_redir_data *data, char *tok)
+int	handle_attached_operators(t_redir_data *data, char *tok)
 {
 	if (strncmp(tok, ">>", 2) == 0)
 		return (handle_attached_append(data->args, data->idx, data->out_fd,
-									   tok));
+				tok));
 	if (strncmp(tok, "<<", 2) == 0)
 		return (handle_attached_heredoc(data->args, data->idx, data->in_fd,
-										tok));
+				tok));
 	if (tok[0] == '>' && tok[1] != '>')
 		return (handle_attached_outfile(data->args, data->idx, data->out_fd,
-										tok));
+				tok));
 	if (tok[0] == '<' && tok[1] != '<')
 		return (handle_attached_infile(data->args, data->idx, data->in_fd,
-									   tok));
+				tok));
 	return (2);
 }

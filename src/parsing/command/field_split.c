@@ -13,7 +13,7 @@
 #include "minishell.h"
 #include "parser.h"
 
-static int	count_words(char *str)
+int	count_words(char *str)
 {
 	int	count;
 	int	in_word;
@@ -36,7 +36,7 @@ static int	count_words(char *str)
 	return (count);
 }
 
-static char	*extract_word(char *str, int *pos)
+char	*extract_word(char *str, int *pos)
 {
 	int		start;
 	int		len;

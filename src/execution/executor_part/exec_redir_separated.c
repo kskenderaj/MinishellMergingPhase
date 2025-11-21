@@ -12,9 +12,9 @@
 
 #include "executor.h"
 
-int handle_output_redirection(char **args, int *i, int *out_fd)
+int	handle_output_redirection(char **args, int *i, int *out_fd)
 {
-	int flags;
+	int	flags;
 
 	if (strcmp(args[*i], ">") == 0)
 		flags = O_WRONLY | O_CREAT | O_TRUNC;
@@ -33,7 +33,7 @@ int handle_output_redirection(char **args, int *i, int *out_fd)
 	return (0);
 }
 
-int handle_input_redirection(char **args, int *i, int *in_fd)
+int	handle_input_redirection(char **args, int *i, int *in_fd)
 {
 	if (strcmp(args[*i], "<") == 0 && args[*i + 1])
 	{
@@ -55,7 +55,7 @@ int handle_input_redirection(char **args, int *i, int *in_fd)
 	return (0);
 }
 
-int handle_separated_operators(char **args, int *i, int *in_fd, int *out_fd)
+int	handle_separated_operators(char **args, int *i, int *in_fd, int *out_fd)
 {
 	if (handle_output_redirection(args, i, out_fd) == 0)
 		return (0);

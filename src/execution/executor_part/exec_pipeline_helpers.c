@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipeline_helpers.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 16:04:59 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/19 20:17:30 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 13:07:22 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,6 +220,7 @@ static int	wait_children(pid_t *pids, int ncmds)
 	/* Ignore signals while waiting for children - let child handle them */
 	signal(SIGINT, SIG_IGN);
 	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTSTP, SIG_IGN);
 	i = 0;
 	while (i < ncmds)
 	{

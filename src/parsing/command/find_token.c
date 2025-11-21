@@ -6,13 +6,13 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 12:21:28 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 12:24:08 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.h"
 
-static int	no_quote_segment(t_segment_list *lst, char *str, int *i)
+int	no_quote_segment(t_segment_list *lst, char *str, int *i)
 {
 	int			start;
 	t_segment	*segment;
@@ -29,7 +29,7 @@ static int	no_quote_segment(t_segment_list *lst, char *str, int *i)
 	return (1);
 }
 
-static int	quote_segment(t_segment_list *lst, char *str, int *i)
+int	quote_segment(t_segment_list *lst, char *str, int *i)
 {
 	char		q;
 	int			start;

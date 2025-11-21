@@ -3,28 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   garbage_collector.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 16:08:39 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/04 22:17:07 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/21 12:24:47 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "garbage_collector.h"
 
-t_gc *g_gc = NULL;  // Global GC pointer (not static, so it can be used in other files)
+t_gc	*g_gc = NULL; // Global GC pointer (not static,
 
-t_gc *get_gc(void)
+t_gc	*get_gc(void)
 {
 	return (g_gc);
 }
 
 // initializing gc
-t_gc *gc_init(void)
+t_gc	*gc_init(void)
 {
-	if (g_gc)  // Already initialized
+	if (g_gc) // Already initialized
 		return (g_gc);
-	
 	g_gc = malloc(sizeof(t_gc));
 	if (!g_gc)
 		return (NULL);
@@ -33,10 +32,10 @@ t_gc *gc_init(void)
 	return (g_gc);
 }
 
-int gc_add_node(void *ptr, int fd, t_gc_type type)
+int	gc_add_node(void *ptr, int fd, t_gc_type type)
 {
-	t_gc *gc;
-	t_gc_node *new_node;
+	t_gc		*gc;
+	t_gc_node	*new_node;
 
 	gc = get_gc();
 	new_node = malloc(sizeof(t_gc_node));
@@ -52,9 +51,9 @@ int gc_add_node(void *ptr, int fd, t_gc_type type)
 }
 
 // memory allocations Basics
-void *gc_malloc(size_t size)
+void	*gc_malloc(size_t size)
 {
-	void *ptr;
+	void	*ptr;
 
 	ptr = malloc(size);
 	if (!ptr)
@@ -66,9 +65,9 @@ void *gc_malloc(size_t size)
 	}
 	return (ptr);
 }
-void *gc_calloc(size_t count, size_t size)
+void	*gc_calloc(size_t count, size_t size)
 {
-	void *ptr;
+	void	*ptr;
 
 	ptr = calloc(count, size);
 	if (!ptr)
@@ -80,4 +79,3 @@ void *gc_calloc(size_t count, size_t size)
 	}
 	return (ptr);
 }
-

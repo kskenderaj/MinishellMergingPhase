@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 16:36:04 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/19 16:36:05 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 13:06:59 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,11 +79,23 @@ static void	set_sigquit_ignore(void)
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
+static void	set_sigtstp_ignore(void)
+{
+	struct sigaction	sa;
+
+	memset(&sa, 0, sizeof(sa));
+	sa.sa_handler = SIG_IGN;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGTSTP, &sa, NULL);
+}
+
 /* Install handlers for interactive prompt */
 void	start_signals(void)
 {
 	set_sigint_handler(handle_sig_int);
 	set_sigquit_ignore();
+	set_sigtstp_ignore();
 	remove_ctrlc_echo();
 }
 
@@ -92,6 +104,7 @@ void	start_heredoc_signals(void)
 {
 	set_sigint_handler(handle_ctrlc_heredoc);
 	set_sigquit_ignore();
+	set_sigtstp_ignore();
 }
 
 /* Reset signal handlers to default for child processes */
@@ -105,4 +118,5 @@ void	reset_signals_for_child(void)
 	sa.sa_flags = 0;
 	sigaction(SIGINT, &sa, NULL);
 	sigaction(SIGQUIT, &sa, NULL);
+	sigaction(SIGTSTP, &sa, NULL);
 }

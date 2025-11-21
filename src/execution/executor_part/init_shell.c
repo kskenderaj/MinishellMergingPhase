@@ -12,15 +12,15 @@
 
 #include "executor.h"
 
-void init_shell(void)
+void	init_shell(void)
 {
-    int i;
+	int i;
 
-    g_shell.exported_count = 0;
-    i = 0;
-    while (i < MAX_EXPORTED)
-    {
-        g_shell.exported_vars[i] = NULL;
-        i++;
-    }
+	g_shell.exported_count = 0;
+	i = 0;
+	while (i < MAX_EXPORTED)
+	{
+		g_shell.exported_vars[i] = NULL;
+		i++;
+	}
 }

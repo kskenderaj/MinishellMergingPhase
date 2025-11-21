@@ -12,16 +12,17 @@
 
 #include "executor.h"
 
-int count_output(t_commandlist *cmd)
+int	count_output(t_commandlist *cmd)
 {
-	t_file_node *current;
-	int count;
+	t_file_node	*current;
+	int			count;
 
 	count = 0;
 	current = (t_file_node *)cmd->files;
 	while (current != NULL)
 	{
-		if (current->redir_type == OUTFILE || current->redir_type == OUTFILE_APPEND)
+		if (current->redir_type == OUTFILE
+			|| current->redir_type == OUTFILE_APPEND)
 			count++;
 		current = current->next;
 	}
@@ -29,10 +30,10 @@ int count_output(t_commandlist *cmd)
 }
 
 // INPUT STARTS HERE FOR REDIRECTIONS
-static t_file_node *find_last_input(t_commandlist *cmd, int input_count)
+static t_file_node	*find_last_input(t_commandlist *cmd, int input_count)
 {
-	int current_count;
-	t_file_node *current;
+	int			current_count;
+	t_file_node	*current;
 
 	current_count = 0;
 	current = (t_file_node *)cmd->files;
@@ -49,10 +50,10 @@ static t_file_node *find_last_input(t_commandlist *cmd, int input_count)
 	return (NULL);
 }
 
-int count_input(t_commandlist *cmd)
+int	count_input(t_commandlist *cmd)
 {
-	t_file_node *current;
-	int count;
+	t_file_node	*current;
+	int			count;
 
 	count = 0;
 	current = (t_file_node *)cmd->files;
@@ -67,10 +68,10 @@ int count_input(t_commandlist *cmd)
 
 // Check all input files exist before opening (bash behavior)
 // Returns 0 on success, -1 if any file doesn't exist
-static int check_all_input_files(t_commandlist *cmd)
+static int	check_all_input_files(t_commandlist *cmd)
 {
-	t_file_node *current;
-	int fd;
+	t_file_node	*current;
+	int			fd;
 
 	current = (t_file_node *)cmd->files;
 	while (current != NULL)
@@ -91,11 +92,11 @@ static int check_all_input_files(t_commandlist *cmd)
 	return (0);
 }
 
-int setup_input_file(t_commandlist *cmd)
+int	setup_input_file(t_commandlist *cmd)
 {
-	int input_count;
-	t_file_node *last_input;
-	int fd;
+	int			input_count;
+	t_file_node	*last_input;
+	int			fd;
 
 	input_count = count_input(cmd);
 	if (input_count == 0)
@@ -110,7 +111,7 @@ int setup_input_file(t_commandlist *cmd)
 		// Always use heredoc_content (read during parsing)
 		// Even empty heredocs have content (empty string or NULL for truly empty)
 		return (exec_heredoc_from_content(last_input->heredoc_content,
-										  last_input->heredoc_quoted));
+				last_input->heredoc_quoted));
 	}
 	fd = gc_open(last_input->filename, O_RDONLY, 0);
 	if (fd < 0)
@@ -123,20 +124,23 @@ int setup_input_file(t_commandlist *cmd)
 
 // Opens all output files (bash behavior: all files are created)
 // Returns 0 on success, -1 if any file fails to open
-static int open_all_output_files(t_commandlist *cmd)
+static int	open_all_output_files(t_commandlist *cmd)
 {
-	t_file_node *current;
-	int fd;
+	t_file_node	*current;
+	int			fd;
 
 	current = (t_file_node *)cmd->files;
 	while (current != NULL)
 	{
-		if (current->redir_type == OUTFILE || current->redir_type == OUTFILE_APPEND)
+		if (current->redir_type == OUTFILE
+			|| current->redir_type == OUTFILE_APPEND)
 		{
 			if (current->redir_type == OUTFILE)
-				fd = gc_open(current->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+				fd = gc_open(current->filename, O_WRONLY | O_CREAT | O_TRUNC,
+						0644);
 			else
-				fd = gc_open(current->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
+				fd = gc_open(current->filename, O_WRONLY | O_CREAT | O_APPEND,
+						0644);
 			if (fd < 0)
 			{
 				perror(current->filename);
@@ -151,16 +155,17 @@ static int open_all_output_files(t_commandlist *cmd)
 }
 
 // Finds the last output redirection (for > and >>)
-static t_file_node *find_last_output(t_commandlist *cmd, int output_count)
+static t_file_node	*find_last_output(t_commandlist *cmd, int output_count)
 {
-	int current_count;
-	t_file_node *current;
+	int			current_count;
+	t_file_node	*current;
 
 	current_count = 0;
 	current = (t_file_node *)cmd->files;
 	while (current != NULL)
 	{
-		if (current->redir_type == OUTFILE || current->redir_type == OUTFILE_APPEND)
+		if (current->redir_type == OUTFILE
+			|| current->redir_type == OUTFILE_APPEND)
 		{
 			current_count++;
 			if (current_count == output_count)
@@ -172,11 +177,11 @@ static t_file_node *find_last_output(t_commandlist *cmd, int output_count)
 }
 
 // Opens the last output file with correct flags and returns fd
-int setup_output_file(t_commandlist *cmd)
+int	setup_output_file(t_commandlist *cmd)
 {
-	int output_count;
-	t_file_node *last_output;
-	int fd;
+	int			output_count;
+	t_file_node	*last_output;
+	int			fd;
 
 	output_count = count_output(cmd);
 	if (output_count == 0)
@@ -190,7 +195,7 @@ int setup_output_file(t_commandlist *cmd)
 		fd = gc_open(last_output->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	else
 		fd = gc_open(last_output->filename, O_WRONLY | O_CREAT | O_APPEND,
-					 0644);
+				0644);
 	if (fd < 0)
 	{
 		perror(last_output->filename);
@@ -200,9 +205,9 @@ int setup_output_file(t_commandlist *cmd)
 }
 
 /* Wrapper helpers to allow passing parser-side command node */
-int setup_input_file_from_cmd(t_cmd_node *cmd)
+int	setup_input_file_from_cmd(t_cmd_node *cmd)
 {
-	t_commandlist tmp;
+	t_commandlist	tmp;
 
 	if (!cmd || !cmd->files || !cmd->files->head)
 		return (NO_REDIRECTION);
@@ -211,9 +216,9 @@ int setup_input_file_from_cmd(t_cmd_node *cmd)
 	return (setup_input_file(&tmp));
 }
 
-int setup_output_file_from_cmd(t_cmd_node *cmd)
+int	setup_output_file_from_cmd(t_cmd_node *cmd)
 {
-	t_commandlist tmp;
+	t_commandlist	tmp;
 
 	if (!cmd || !cmd->files || !cmd->files->head)
 		return (NO_REDIRECTION);

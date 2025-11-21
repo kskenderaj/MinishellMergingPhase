@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 12:21:19 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 12:34:52 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <readline/readline.h>
 #include <unistd.h>
 
-static char	*append_line(char *content, char *line)
+char	*append_line(char *content, char *line)
 {
 	char	*new_content;
 	char	*with_newline;
@@ -33,7 +33,7 @@ static char	*append_line(char *content, char *line)
 	return (new_content);
 }
 
-static int	is_delimiter(char *line, char *delimiter)
+int	is_delimiter(char *line, char *delimiter)
 {
 	size_t	len;
 

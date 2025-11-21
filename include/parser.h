@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/12 14:40:09 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/19 20:16:33 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/21 12:35:01 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,10 +175,14 @@ int						handle_redir(t_token_list *lst, char *input, int *i,
 int						word_end(char *input, int i);
 // token to command
 int						find_segment(t_segment_list *lst, char *str);
-// static int quote_segment(t_segment_list *lst, char *str, int *i);
-// static int no_quote_segment(t_segment_list *lst, char *str, int *i);
+int quote_segment(t_segment_list *lst, char *str, int *i);
+int no_quote_segment(t_segment_list *lst, char *str, int *i);
 int						push_segment(t_segment_list *lst, t_segment *segment);
 t_segment				*create_segment(char *start, int len, t_seg_type type);
+int	handle_split_word(char **cmd_array, char *value, int *i);
+int	count_args(t_token *token);
+int	handle_split_word(char **cmd_array, char *value, int *i);
+
 
 /* Command/list helpers (implemented in parsing/command) */
 t_cmd_node				*create_cmdnode(void);
@@ -203,16 +207,34 @@ int						token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst,
 							t_env_list *envlst, int last_status);
 void					final_token(t_token_list *toklst, t_env_list *envlst,
 							int last_status);
+int						process_tokens_to_array(t_token *token,
+							t_cmd_node *cmdnode, char **cmd_array, int *i);
+t_token					*skip_to_next_pipe(t_token *token);
+int						process_single_token(t_token *token, int *skip_next,
+							t_env_list *envlst, int last_status);
+int						skip_redirection(t_token **token);
+int						process_word_result(t_token *token, int ret, int *i);
+int						handle_env_assignment(t_token *token,
+							t_cmd_node *cmdnode);
+int						handle_word_token(t_token *token, t_cmd_node *cmdnode,
+							char **cmd_array, int *i);
 
 /* Field splitting */
 char					**split_on_spaces(char *str);
 int						should_split(t_segment_list *seglst);
 char					*ifs_field_split(char *str);
+int						count_words(char *str);
+char					*extract_word(char *str, int *pos);
 
 /* Heredoc utilities */
 t_heredoc_info			*process_heredoc_delimiter(char *raw_delimiter);
 char					*read_heredoc_content(char *delimiter);
 void					process_all_heredocs(t_cmd_list *cmdlst);
+char					*append_line(char *content, char *line);
+int						is_delimiter(char *line, char *delimiter);
+t_file_node				*read_all_heredocs_in_cmd(t_cmd_node *cmd);
+int						has_quotes(char *str);
+char					*remove_quotes_heredoc(char *str);
 
 /* Quote removal */
 // char *remove_quotes(char *str);

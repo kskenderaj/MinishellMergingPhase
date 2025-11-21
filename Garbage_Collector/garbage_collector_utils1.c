@@ -13,11 +13,11 @@
 #include "garbage_collector.h"
 
 // File descriptor utilities/helpers
-int gc_open(const char *pathname, int flags, ...)
+int	gc_open(const char *pathname, int flags, ...)
 {
-	int fd;
-	mode_t mode;
-	va_list args;
+	int		fd;
+	mode_t	mode;
+	va_list	args;
 
 	if (flags & O_CREAT)
 	{
@@ -34,7 +34,7 @@ int gc_open(const char *pathname, int flags, ...)
 	return (fd);
 }
 
-int gc_pipe(int pipefd[2])
+int	gc_pipe(int pipefd[2])
 {
 	if (pipe(pipefd) == -1)
 		return (-1);
@@ -43,9 +43,9 @@ int gc_pipe(int pipefd[2])
 	return (0);
 }
 
-int gc_dup(int oldfd)
+int	gc_dup(int oldfd)
 {
-	int newfd;
+	int	newfd;
 
 	newfd = dup(oldfd);
 	if (newfd < 0)
@@ -54,9 +54,9 @@ int gc_dup(int oldfd)
 	return (newfd);
 }
 
-int gc_dup2(int oldfd, int newfd)
+int	gc_dup2(int oldfd, int newfd)
 {
-	int result;
+	int	result;
 
 	result = dup2(oldfd, newfd);
 	if (result < 0)
@@ -66,9 +66,9 @@ int gc_dup2(int oldfd, int newfd)
 	return (result);
 }
 
-void gc_register_fd(int fd)
+void	gc_register_fd(int fd)
 {
 	if (fd < 0)
-		return;
+		return ;
 	gc_add_node(NULL, fd, GC_FD);
 }
