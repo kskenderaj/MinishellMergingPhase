@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/12 14:40:09 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/21 15:03:21 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/21 16:01:49 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,6 +189,7 @@ t_segment				*create_segment(char *start, int len, t_seg_type type);
 int	handle_split_word(char **cmd_array, char *value, int *i);
 int	count_args(t_token *token);
 int	handle_split_word(char **cmd_array, char *value, int *i);
+int	skip_var(char *str);
 
 
 /* Command/list helpers (implemented in parsing/command) */
