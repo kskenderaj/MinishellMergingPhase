@@ -6,7 +6,7 @@
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 19:18:19 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/23 22:18:08 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,21 +16,16 @@
 
 // static int	g_last_status_cache;
 
-int	skip_var(char *str)
+int	skip_var(char *s)
 {
 	int	i;
 
 	i = 1;
-	if (!str || str[0] != '$')
-		return (0);
-	if (str[1] == '\0')
-		return (1);
-	if (str[1] == '?')
+	if (s[1] == '?')
 		return (2);
-	if (!(ft_isalpha((unsigned char)str[1]) || str[1] == '_'))
+	if (!(ft_isalpha(s[1]) || s[1] == '_'))
 		return (1);
-	i = 2;
-	while (str[i] && (ft_isalnum((unsigned char)str[i]) || str[i] == '_'))
+	while (s[i] && (ft_isalnum(s[i]) || s[i] == '_'))
 		i++;
 	return (i);
 }
@@ -61,8 +56,8 @@ char	*expand_env(char *str, t_env_list *env_lst, t_shell_state *shell)
 	i = 1;
 	if (!str || str[0] != '$' || !env_lst)
 		return (NULL);
-	if (!(ft_isalpha((unsigned char)str[i]) || str[i] == '_'))
-		return (NULL);
+	if (!str[i] || !(ft_isalpha(str[i]) || str[i] == '_' || ft_isdigit(str[i])))
+		return (gc_strdup(shell->gc, "$"));
 	start = i;
 	while (str[i] && (ft_isalnum((unsigned char)str[i]) || str[i] == '_'))
 		i++;

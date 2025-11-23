@@ -6,7 +6,7 @@
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 00:00:00 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/23 16:34:10 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/23 22:15:09 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,17 +26,19 @@ void	process_char(char **old, t_expand_ctx *ctx, int *i,
 		len = skip_var(ctx->seg_str + *i);
 		if (len == 1)
 			new = gc_strjoin(shell->gc, *old, gc_substr(shell->gc,
-					ctx->seg_str + *i, 0, 1));
+						ctx->seg_str + *i, 0, 1));
 		else
 			new = gc_strjoin(shell->gc, *old, process_dollar(ctx->seg_str,
-					ctx->type, ctx->envlst, *i, shell));
+						ctx->type, ctx->envlst, *i, shell));
 		*old = new;
 		*i += (len - 1);
 	}
 	else
 		*old = gc_strjoin(shell->gc, *old, gc_substr(shell->gc,
-				ctx->seg_str + *i, 0, 1));
-}char	*segments_expand(t_segment_list *seglst, t_env_list *envlst,
+					ctx->seg_str + *i, 0, 1));
+}
+
+char	*segments_expand(t_segment_list *seglst, t_env_list *envlst,
 		int last_status, t_shell_state *shell)
 {
 	t_segment	*curr;

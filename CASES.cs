@@ -11,3 +11,7 @@ env
 // empty line and odd stuff
 cd--
 //go to oldpwd
+echo $"$"
+//we not handling
+
+JANNI FIX NORM PLEASE BRO WHATEVER ITS LEFT I FIXED MOST ALSO THE GLOBAL IN EXPAND ENV I REMOVED
