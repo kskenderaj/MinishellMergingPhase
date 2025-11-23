@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   cmdlst_filelst2.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 00:00:00 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/21 15:05:01 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:32:08 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include <unistd.h>
 
-t_file_node	*read_all_heredocs_in_cmd(t_cmd_node *cmd)
+t_file_node	*read_all_heredocs_in_cmd(t_cmd_node *cmd, t_shell_state *shell)
 {
 	t_file_node	*current;
 	t_file_node	*last_heredoc;
@@ -28,7 +28,7 @@ t_file_node	*read_all_heredocs_in_cmd(t_cmd_node *cmd)
 		{
 			if (isatty(STDIN_FILENO))
 			{
-				current->heredoc_content = read_heredoc_content(current->filename);
+				current->heredoc_content = read_heredoc_content(current->filename, shell);
 				if (last_heredoc)
 					last_heredoc->heredoc_content = NULL;
 			}
@@ -39,7 +39,7 @@ t_file_node	*read_all_heredocs_in_cmd(t_cmd_node *cmd)
 	return (last_heredoc);
 }
 
-void	process_all_heredocs(t_cmd_list *cmdlst)
+void	process_all_heredocs(t_cmd_list *cmdlst, t_shell_state *shell)
 {
 	t_cmd_node	*cmd;
 
@@ -48,7 +48,7 @@ void	process_all_heredocs(t_cmd_list *cmdlst)
 	cmd = cmdlst->head;
 	while (cmd)
 	{
-		read_all_heredocs_in_cmd(cmd);
+		read_all_heredocs_in_cmd(cmd, shell);
 		cmd = cmd->next;
 	}
 }

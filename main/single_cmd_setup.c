@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   single_cmd_setup.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 17:49:38 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:04:46 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@ static int	save_std_fds(int *saved_stdin, int *saved_stdout)
 	return (0);
 }
 
-int	setup_cmd_redirections(t_cmd_node *cmd, t_redir_fds *fds)
+int	setup_cmd_redirections(t_cmd_node *cmd, t_redir_fds *fds,
+		t_shell_state *shell)
 {
 	int	saved_status;
 
@@ -39,18 +40,19 @@ int	setup_cmd_redirections(t_cmd_node *cmd, t_redir_fds *fds)
 		return (0);
 	if (save_std_fds(&fds->saved_stdin, &fds->saved_stdout) == -1)
 		return (-1);
-	saved_status = g_shell.last_status;
-	fds->out_fd = setup_output_file_from_cmd(cmd);
-	if (g_shell.last_status == 1 && saved_status == 0)
+	saved_status = shell->last_status;
+	fds->out_fd = setup_output_file_from_cmd(cmd, shell);
+	if (shell->last_status == 1 && saved_status == 0)
 		return (-1);
-	fds->in_fd = setup_input_file_from_cmd(cmd);
-	if (g_shell.last_status == 1 && saved_status == 0)
+	fds->in_fd = setup_input_file_from_cmd(cmd, shell);
+	if (shell->last_status == 1 && saved_status == 0)
 		return (-1);
 	return (0);
 }
 
-void	apply_cmd_redirections(t_redir_fds *fds)
+void	apply_cmd_redirections(t_redir_fds *fds, t_shell_state *shell)
 {
+	(void)shell;
 	if (fds->in_fd >= 0 && fds->in_fd != NO_REDIRECTION)
 	{
 		dup2(fds->in_fd, STDIN_FILENO);
@@ -63,8 +65,9 @@ void	apply_cmd_redirections(t_redir_fds *fds)
 	}
 }
 
-void	restore_cmd_fds(t_redir_fds *fds)
+void	restore_cmd_fds(t_redir_fds *fds, t_shell_state *shell)
 {
+	(void)shell;
 	if (fds->saved_stdin >= 0)
 	{
 		dup2(fds->saved_stdin, STDIN_FILENO);
@@ -77,11 +80,12 @@ void	restore_cmd_fds(t_redir_fds *fds)
 	}
 }
 
-void	cleanup_cmd_redir_failure(t_redir_fds *fds, char **envp, char **merged)
+void	cleanup_cmd_redir_failure(t_redir_fds *fds, char **envp, char **merged,
+		t_shell_state *shell)
 {
 	(void)envp;
 	(void)merged;
-	restore_cmd_fds(fds);
+	restore_cmd_fds(fds, shell);
 	if (fds->in_fd >= 0)
 		close(fds->in_fd);
 	if (fds->out_fd >= 0)

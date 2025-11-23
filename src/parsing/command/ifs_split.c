@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ifs_split.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 14:50:55 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:35:17 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
+#include "executor.h"
 
 int	is_ifs_char(char c)
 {
@@ -27,7 +28,7 @@ void	process_ifs_char(char *result, int *j, int *prev_was_space)
 	}
 }
 
-char	*ifs_field_split(char *str)
+char	*ifs_field_split(char *str, t_shell_state *shell)
 {
 	char	*result;
 	int		i;
@@ -36,7 +37,7 @@ char	*ifs_field_split(char *str)
 
 	if (!str)
 		return (NULL);
-	result = gc_malloc(ft_strlen(str) + 1);
+	result = gc_malloc(shell->gc, ft_strlen(str) + 1);
 	if (!result)
 		return (NULL);
 	i = -1;

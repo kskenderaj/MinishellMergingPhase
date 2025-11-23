@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/18 19:56:33 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/23 15:59:31 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,35 +43,39 @@ typedef struct s_cmd_exec_data
 }				t_cmd_exec_data;
 
 /* main_loop.c */
-int				main_loop(t_env_list *env);
+int				main_loop(t_env_list *env, t_shell_state *shell);
 
 /* input_processing.c */
-int				process_command(t_cmd_list *cmdlst, t_env_list *envlst);
+int				process_command(t_cmd_list *cmdlst, t_env_list *envlst,
+					t_shell_state *shell);
 int				process_input_line(char *line, t_env_list *env,
-					int last_status);
+					int last_status, t_shell_state *shell);
 char			*read_line_noninteractive(void);
 
 /* env_utils.c */
-char			**env_list_to_array(t_env_list *env);
-char			***cmdlist_to_array(t_cmd_list *cmdlst);
+char			**env_list_to_array(t_env_list *env, t_shell_state *shell);
+char			***cmdlist_to_array(t_cmd_list *cmdlst, t_shell_state *shell);
 
 /* env_merge.c */
 char			**merge_env_arrays(char **base_envp, t_env_list *cmd_env);
 
 /* single_cmd_setup.c */
-int				setup_cmd_redirections(t_cmd_node *cmd, t_redir_fds *fds);
-void			apply_cmd_redirections(t_redir_fds *fds);
-void			restore_cmd_fds(t_redir_fds *fds);
+int				setup_cmd_redirections(t_cmd_node *cmd, t_redir_fds *fds,
+					t_shell_state *shell);
+void			apply_cmd_redirections(t_redir_fds *fds, t_shell_state *shell);
+void			restore_cmd_fds(t_redir_fds *fds, t_shell_state *shell);
 void			cleanup_cmd_redir_failure(t_redir_fds *fds, char **envp,
-					char **merged);
+					char **merged, t_shell_state *shell);
 
 /* single_cmd_env.c */
-int				handle_assignment_only(t_cmd_node *cmd);
+int				handle_assignment_only(t_cmd_node *cmd, t_shell_state *shell);
 
 /* single_cmd.c */
-int				handle_single_command(t_cmd_node *cmd, t_env_list *env);
+int				handle_single_command(t_cmd_node *cmd, t_env_list *env,
+					t_shell_state *shell);
 
 /* pipeline.c */
-int				handle_pipeline(t_cmd_list *cmdlst, t_env_list *env);
+int				handle_pipeline(t_cmd_list *cmdlst, t_env_list *env,
+					t_shell_state *shell);
 
 #endif

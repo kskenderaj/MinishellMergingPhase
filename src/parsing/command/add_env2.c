@@ -3,22 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   add_env2.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 00:00:00 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/21 14:46:55 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:30:16 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
+#include "executor.h"
 
-char	*get_expand(char *seg_str, int i, int last_status, t_env_list *envlst)
+char	*get_expand(char *seg_str, int i, int last_status, t_env_list *envlst, t_shell_state *shell)
 {
 	if (seg_str[i + 1] == '?')
-		return (gc_itoa(last_status));
+		return (gc_itoa(shell->gc, last_status));
 	else
-		return (expand_env(seg_str + i, envlst));
+		return (expand_env(seg_str + i, envlst, shell));
 }
 
 void	free_env_node(t_env_node *node)

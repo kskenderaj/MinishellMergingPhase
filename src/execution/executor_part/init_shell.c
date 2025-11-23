@@ -3,24 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   init_shell.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 17:27:10 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/04 17:27:49 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/23 16:27:21 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 
-void	init_shell(void)
+void	init_shell(t_shell_state *shell)
 {
-	int i;
+	int	i;
 
-	g_shell.exported_count = 0;
+	shell->exported_count = 0;
 	i = 0;
 	while (i < MAX_EXPORTED)
 	{
-		g_shell.exported_vars[i] = NULL;
+		shell->exported_vars[i] = NULL;
 		i++;
 	}
 }

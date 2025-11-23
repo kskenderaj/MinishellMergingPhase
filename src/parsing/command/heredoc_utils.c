@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 12:34:54 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:35:02 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
+#include "executor.h"
 
 int	has_quotes(char *str)
 {
@@ -27,14 +28,14 @@ int	has_quotes(char *str)
 	return (0);
 }
 
-char	*remove_quotes_heredoc(char *str)
+char	*remove_quotes_heredoc(char *str, t_shell_state *shell)
 {
 	char	*result;
 	int		i;
 	int		j;
 	char	quote;
 
-	result = gc_malloc(ft_strlen(str) + 1);
+	result = gc_malloc(shell->gc, ft_strlen(str) + 1);
 	if (!result)
 		return (NULL);
 	i = 0;
@@ -56,20 +57,21 @@ char	*remove_quotes_heredoc(char *str)
 	return (result);
 }
 
-t_heredoc_info	*process_heredoc_delimiter(char *raw_delimiter)
+t_heredoc_info	*process_heredoc_delimiter(char *raw_delimiter,
+	t_shell_state *shell)
 {
 	t_heredoc_info	*info;
 
 	if (!raw_delimiter)
 		return (NULL);
-	info = gc_malloc(sizeof(t_heredoc_info));
+	info = gc_malloc(shell->gc, sizeof(t_heredoc_info));
 	if (!info)
 		return (NULL);
 	info->quoted = has_quotes(raw_delimiter);
 	if (info->quoted)
-		info->delimiter = remove_quotes_heredoc(raw_delimiter);
+		info->delimiter = remove_quotes_heredoc(raw_delimiter, shell);
 	else
-		info->delimiter = gc_strdup(raw_delimiter);
+		info->delimiter = gc_strdup(shell->gc, raw_delimiter);
 	if (!info->delimiter)
 		return (NULL);
 	return (info);

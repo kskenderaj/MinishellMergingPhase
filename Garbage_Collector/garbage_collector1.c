@@ -3,23 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   garbage_collector1.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 16:39:30 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/21 17:53:54 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 15:54:34 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "garbage_collector.h"
 
-// Cleanup all allocated memory and close all registered fds
-void	gc_free(void *ptr)
+void	gc_free(t_gc *gc, void *ptr)
 {
 	t_gc_node	*current;
 	t_gc_node	*prev;
-	t_gc		*gc;
 
-	gc = get_gc();
 	if (!gc || !ptr)
 		return ;
 	current = gc->head;
@@ -42,13 +39,11 @@ void	gc_free(void *ptr)
 	}
 }
 
-void	gc_close(int fd)
+void	gc_close(t_gc *gc, int fd)
 {
 	t_gc_node	*current;
 	t_gc_node	*prev;
-	t_gc		*gc;
 
-	gc = get_gc();
 	if (!gc || fd < 0)
 		return ;
 	current = gc->head;
@@ -71,14 +66,11 @@ void	gc_close(int fd)
 	}
 }
 
-// Clear all memory but keep GC structure alive (for per-command cleanup)
-void	gc_clear(void)
+void	gc_clear(t_gc *gc)
 {
 	t_gc_node	*current;
 	t_gc_node	*next;
-	t_gc		*gc;
 
-	gc = get_gc();
 	if (!gc)
 		return ;
 	current = gc->head;
@@ -96,15 +88,11 @@ void	gc_clear(void)
 	gc->count = 0;
 }
 
-// Cleanup everything (for final shutdown)
-void	gc_cleanup(void)
+void	gc_cleanup(t_gc *gc)
 {
 	t_gc_node	*current;
 	t_gc_node	*next;
-	t_gc		*gc;
 
-	extern t_gc *g_gc; // Access global GC pointer
-	gc = get_gc();
 	if (!gc)
 		return ;
 	current = gc->head;
@@ -119,17 +107,13 @@ void	gc_cleanup(void)
 		current = next;
 	}
 	free(gc);
-	g_gc = NULL; // Reset global pointer after cleanup
 }
 
-// Utility functions
-void	gc_print(void)
+void	gc_print(t_gc *gc)
 {
 	t_gc_node	*current;
-	t_gc		*gc;
 	int			i;
 
-	gc = get_gc();
 	if (!gc)
 	{
 		printf("GC is NULL\n");

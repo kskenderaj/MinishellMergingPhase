@@ -1,82 +1,75 @@
-// KLEJDI HEADER
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec_args_helpers2.c                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/23 16:05:28 by kskender          #+#    #+#             */
+/*   Updated: 2025/11/23 16:06:20 by kskender         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
 #include "executor.h"
 #include "minishell.h"
 
-void	init_parse_state(t_parse_state *state, char **str, char delim)
+static char	*get_next_word(char **str, char delim, t_shell_state *shell)
 {
-	state->scan = *str;
-	state->total = 0;
-	state->first_quote = 0;
-	state->all_quoted = 1;
-	while (*(state->scan) == delim)
-		(state->scan)++;
-	state->p = state->scan;
-}
+	t_parse_state	state;
+	char			*result;
 
-void	handle_escape_seq(t_parse_state *state)
-{
-	if (state->p[1])
+	init_parse_state(&state, str, delim);
+	if (*(state.scan) == '\0')
+		return (NULL);
+	if (calculate_word_length(&state, delim) == 0)
 	{
-		state->total++;
-		state->p += 2;
+		*str = state.scan;
+		return (NULL);
 	}
-	else
-		state->p++;
-}
-
-void	handle_quoted_segment(t_parse_state *state)
-{
-	char	quote_char;
-	char	*start;
-
-	quote_char = *(state->p);
-	if (state->first_quote == 0)
-		state->first_quote = quote_char;
-	state->p++;
-	start = state->p;
-	while (*(state->p) && *(state->p) != quote_char)
-		state->p++;
-	state->total += (int)(state->p - start);
-	if (*(state->p) == quote_char)
-		state->p++;
-}
-
-int	calculate_word_length(t_parse_state *state, char delim)
-{
-	while (*(state->p) && *(state->p) != delim)
-	{
-		if (*(state->p) == '\\')
-			handle_escape_seq(state);
-		else if (*(state->p) == '\'' || *(state->p) == '"')
-			handle_quoted_segment(state);
-		else
-		{
-			state->all_quoted = 0;
-			state->total++;
-			state->p++;
-		}
-	}
-	return (state->total);
-}
-
-char	*allocate_result_buffer(t_parse_state *state)
-{
-	char	*result;
-	int		needs_marker;
-
-	needs_marker = 0;
-	if (state->all_quoted && state->first_quote != 0)
-		needs_marker = 1;
-	result = gc_malloc((size_t)state->total + needs_marker + 1);
+	result = allocate_result_buffer(&state, shell);
 	if (!result)
 		return (NULL);
-	if (needs_marker)
-	{
-		if (state->first_quote == '\'')
-			result[0] = '\x01';
-		else
-			result[0] = '\x02';
-	}
+	fill_result_buffer(&state, result, delim);
+	*str = state.p;
 	return (result);
+}
+
+/* Simple argument splitter that preserves tokens returned by the tokenizer.
+ * Previously this code removed marker-only tokens; doing so discards valid
+ * empty quoted arguments ("" and ''), so we pass tokens through verbatim.
+ */
+void	split_args(char *input, char **args, int max_args, t_shell_state *shell)
+{
+	int		i;
+	char	*ptr;
+	char	*w;
+
+	i = 0;
+	ptr = input;
+	while (i < max_args - 1)
+	{
+		w = get_next_word(&ptr, ' ', shell);
+		if (!w)
+			break ;
+		args[i++] = w;
+	}
+	args[i] = NULL;
+}
+
+void	shift_left_by(char **args, int start, int by)
+{
+	int	j;
+
+	j = start;
+	while (args[j + by])
+	{
+		args[j] = args[j + by];
+		j++;
+	}
+	while (by > 0)
+	{
+		args[j] = NULL;
+		j++;
+		by--;
+	}
 }

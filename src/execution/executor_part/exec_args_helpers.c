@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   exec_args_helpers.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 15:14:26 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 17:31:17 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:05:22 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 #include "minishell.h"
 
-static char	*get_next_word(char **str, char delim)
+static char	*get_next_word(char **str, char delim, t_shell_state *shell)
 {
 	t_parse_state	state;
 	char			*result;
@@ -26,7 +26,7 @@ static char	*get_next_word(char **str, char delim)
 		*str = state.scan;
 		return (NULL);
 	}
-	result = allocate_result_buffer(&state);
+	result = allocate_result_buffer(&state, shell);
 	if (!result)
 		return (NULL);
 	fill_result_buffer(&state, result, delim);
@@ -34,11 +34,7 @@ static char	*get_next_word(char **str, char delim)
 	return (result);
 }
 
-/* Simple argument splitter that preserves tokens returned by the tokenizer.
- * Previously this code removed marker-only tokens; doing so discards valid
- * empty quoted arguments ("" and ''), so we pass tokens through verbatim.
- */
-void	split_args(char *input, char **args, int max_args)
+void	split_args(char *input, char **args, int max_args, t_shell_state *shell)
 {
 	int		i;
 	char	*ptr;
@@ -48,7 +44,7 @@ void	split_args(char *input, char **args, int max_args)
 	ptr = input;
 	while (i < max_args - 1)
 	{
-		w = get_next_word(&ptr, ' ');
+		w = get_next_word(&ptr, ' ', shell);
 		if (!w)
 			break ;
 		args[i++] = w;

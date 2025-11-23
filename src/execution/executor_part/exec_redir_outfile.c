@@ -6,7 +6,7 @@
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 17:28:28 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/03 13:47:38 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:23:23 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,13 @@ static t_filelist	*find_last_outfile(t_commandlist *cmd, int outfile_count)
 }
 
 // Opens the last outfile/append and returns fd
-int	setup_outfile_fd(t_commandlist *cmd)
+int	setup_outfile_fd(t_commandlist *cmd, t_shell_state *shell)
 {
 	int			outfile_count;
 	t_filelist	*last_outfile;
 	int			fd;
 
+	(void)shell;
 	outfile_count = count_outfile(cmd);
 	if (outfile_count == 0)
 		return (-1);

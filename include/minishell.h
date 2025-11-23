@@ -6,7 +6,7 @@
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/23 14:22:44 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/03 15:41:13 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:46:31 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,11 @@
 # include <sys/ioctl.h>
 # include <termios.h>
 // Includes -- END
+
+# ifndef PATH_MAX
+#  define PATH_MAX 4096
+# endif
+
 // All parser types (env, cmd, file, token) are now defined in parser.h
 
 // Structs -- BEGIN
@@ -39,14 +44,15 @@ typedef enum CMD_TYPE
 
 typedef enum REDIR_TYPE
 {
-	INFILE = 4,			// TK_INFILE
-	OUTFILE = 5,		// TK_OUTFILE
-	HEREDOC = 6,		// TK_HEREDOC
-	OUTFILE_APPEND = 7,	// TK_APPEND
-	NO_REDIRECTION = -1
+	INFILE = 4,			
+	OUTFILE = 5,		
+	HEREDOC = 6,		
+	OUTFILE_APPEND = 7,	
+	NO_REDIRECTION = -42
 }								t_REDIR_TYPE;
 // Structs -- END
 
+/* Signal handling global - separate from main data structures per subject */
 extern volatile sig_atomic_t	g_sigint_status;
 
 // Functions -- BEGIN
@@ -59,18 +65,17 @@ int								*exit_code(void);
 t_env_list						*setup_env_list(void);
 t_env_list						*initialize_shell(char **env);
 char							*get_prompt(void);
-int	process_command(t_cmd_list *cmdlst, t_env_list *envlst);
 char							*get_env_value(t_env_list *env,
 									const char *key);
 // main.c -- END
 
 // signals.c -- BEGIN
 void							handle_sig_int(int signal_nb);
-void							remove_ctrlc_echo(void);
-void							handle_ctrlc_heredoc(int signal_nb);
-void							start_heredoc_signals(void);
 void							start_signals(void);
 void							reset_signals_for_child(void);
+void							set_sigint_handler(void (*handler)(int));
+void							set_sigquit_ignore(void);
+void							set_sigtstp_ignore(void);
 // signals.c -- END
 
 // Functions -- END

@@ -6,7 +6,7 @@
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/19 17:42:17 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:02:48 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,23 +49,27 @@ static t_env_list	*init_environment(char **envp)
 
 int	main(int argc, char **argv, char **envp)
 {
-	t_env_list	*env;
-	int			exit_status;
+	t_shell_state	shell;
+	t_env_list		*env;
+	int				exit_status;
 
 	(void)argc;
 	(void)argv;
-	gc_init();
-	init_shell();
+	ft_memset(&shell, 0, sizeof(t_shell_state));
+	shell.gc = gc_init();
+	if (!shell.gc)
+		return (1);
+	init_shell(&shell);
 	start_signals();
 	env = init_environment(envp);
 	if (!env)
 	{
-		gc_cleanup();
+		gc_cleanup(shell.gc);
 		return (1);
 	}
-	g_shell.env = env;
-	exit_status = main_loop(env);
+	shell.env = env;
+	exit_status = main_loop(env, &shell);
 	free_env_list(env);
-	gc_cleanup();
+	gc_cleanup(shell.gc);
 	return (exit_status);
 }

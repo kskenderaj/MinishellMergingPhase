@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 16:36:04 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/21 17:59:27 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:27:50 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,96 +19,22 @@
 #include <termios.h>
 #include <unistd.h>
 
-/* Global observed elsewhere when a SIGINT occurred */
+/* Global for signal handling - isolated from main data structures */
 volatile sig_atomic_t	g_sigint_status = 0;
-
-/* Disable terminal echoing of control characters (e.g. '^C') */
-void	remove_ctrlc_echo(void)
-{
-	struct termios	term;
-
-	if (tcgetattr(STDIN_FILENO, &term) == -1)
-		return ;
-}
 
 /* SIGINT handler for interactive prompt */
 void	handle_sig_int(int signal_nb)
 {
 	(void)signal_nb;
-	g_sigint_status = 130; // Set exit status to 130 (128 + SIGINT)
+	g_sigint_status = 130;
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
 	rl_redisplay();
 }
 
-/* SIGINT handler used while reading a heredoc */
-void	handle_ctrlc_heredoc(int signal_nb)
-{
-	(void)signal_nb;
-	g_sigint_status = 130; // Set exit status to 130 (128 + SIGINT)
-	write(STDOUT_FILENO, "\n", 1);
-}
-
-static void	set_sigint_handler(void (*handler)(int))
-{
-	struct sigaction	sa;
-
-	memset(&sa, 0, sizeof(sa));
-	sa.sa_handler = handler;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction(SIGINT, &sa, NULL);
-}
-
-static void	set_sigquit_ignore(void)
-{
-	struct sigaction	sa;
-
-	memset(&sa, 0, sizeof(sa));
-	sa.sa_handler = SIG_IGN;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction(SIGQUIT, &sa, NULL);
-}
-
-static void	set_sigtstp_ignore(void)
-{
-	struct sigaction	sa;
-
-	memset(&sa, 0, sizeof(sa));
-	sa.sa_handler = SIG_IGN;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction(SIGTSTP, &sa, NULL);
-}
-
-/* Install handlers for interactive prompt */
 void	start_signals(void)
 {
 	set_sigint_handler(handle_sig_int);
 	set_sigquit_ignore();
 	set_sigtstp_ignore();
-	remove_ctrlc_echo();
-}
-
-/* Install handlers appropriate for heredoc reading */
-void	start_heredoc_signals(void)
-{
-	set_sigint_handler(handle_ctrlc_heredoc);
-	set_sigquit_ignore();
-	set_sigtstp_ignore();
-}
-
-/* Reset signal handlers to default for child processes */
-void	reset_signals_for_child(void)
-{
-	struct sigaction	sa;
-
-	memset(&sa, 0, sizeof(sa));
-	sa.sa_handler = SIG_DFL;
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sigaction(SIGINT, &sa, NULL);
-	sigaction(SIGQUIT, &sa, NULL);
-	sigaction(SIGTSTP, &sa, NULL);
 }

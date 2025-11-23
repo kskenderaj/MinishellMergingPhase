@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_echo.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 15:22:40 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 17:35:29 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:11:21 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,6 @@ static int	is_n_option(char *arg)
 
 static void	echo_expand_and_print(char *arg)
 {
-	/* Expansion is performed earlier by expand_args_inplace().
-		The echo builtin should print the argument verbatim. */
 	if (arg)
 		ft_putstr_fd(arg, STDOUT_FILENO);
 }
@@ -51,11 +49,12 @@ static void	echo_print_range(char **args, int start_index)
 	}
 }
 
-int	ft_echo(char **args)
+int	ft_echo(char **args, t_shell_state *shell)
 {
 	int	nl_option;
 	int	start_index;
 
+	(void)shell;
 	nl_option = 0;
 	start_index = 1;
 	if (args[1])

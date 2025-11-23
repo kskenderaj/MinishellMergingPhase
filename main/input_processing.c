@@ -3,30 +3,32 @@
 /*                                                        :::      ::::::::   */
 /*   input_processing.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 17:52:00 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:01:45 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.h"
 
-int	process_command(t_cmd_list *cmdlst, t_env_list *envlst)
+int	process_command(t_cmd_list *cmdlst, t_env_list *envlst,
+		t_shell_state *shell)
 {
 	int	ret;
 
 	if (!cmdlst || !cmdlst->head)
 		return (0);
 	if (cmdlst->size == 1)
-		ret = handle_single_command(cmdlst->head, envlst);
+		ret = handle_single_command(cmdlst->head, envlst, shell);
 	else
-		ret = handle_pipeline(cmdlst, envlst);
-	g_shell.last_status = ret;
+		ret = handle_pipeline(cmdlst, envlst, shell);
+	shell->last_status = ret;
 	return (ret);
 }
 
-int	process_input_line(char *line, t_env_list *env, int last_status)
+int	process_input_line(char *line, t_env_list *env, int last_status,
+		t_shell_state *shell)
 {
 	t_token_list	toklst;
 	t_cmd_list		cmdlst;
@@ -35,12 +37,12 @@ int	process_input_line(char *line, t_env_list *env, int last_status)
 		return (last_status);
 	init_token_lst(&toklst);
 	init_cmd_lst(&cmdlst);
-	if (tokenize(&toklst, line) != 0)
+	if (tokenize(&toklst, line, shell) != 0)
 	{
 		ft_putendl_fd("minishell: syntax error", 2);
 		return (2);
 	}
-	if (token_to_cmd(&toklst, &cmdlst, env, last_status) != 0)
+	if (token_to_cmd(&toklst, &cmdlst, env, last_status, shell) != 0)
 	{
 		if (cmdlst.syntax_error)
 			ft_putendl_fd("minishell: syntax error", 2);
@@ -49,17 +51,17 @@ int	process_input_line(char *line, t_env_list *env, int last_status)
 	if (cmdlst.syntax_error)
 	{
 		ft_putendl_fd("minishell: syntax error", 2);
-		gc_clear();
+		gc_clear(shell->gc);
 		return (2);
 	}
-	process_all_heredocs(&cmdlst);
+	process_all_heredocs(&cmdlst, shell);
 	if (cmdlst.head)
 	{
-		last_status = process_command(&cmdlst, env);
-		gc_clear();
+		last_status = process_command(&cmdlst, env, shell);
+		gc_clear(shell->gc);
 		return (last_status);
 	}
-	gc_clear();
+	gc_clear(shell->gc);
 	return (0);
 }
 

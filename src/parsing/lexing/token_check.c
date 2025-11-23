@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   token_check.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/22 18:16:35 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/21 12:20:59 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:37:45 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "minishell.h"
 #include "parser.h"

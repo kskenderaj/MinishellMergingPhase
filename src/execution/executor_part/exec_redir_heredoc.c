@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_redir_heredoc.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 17:28:18 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 17:45:15 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:21:11 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,14 +51,16 @@ static t_file_node	*find_last_heredoc(t_commandlist *cmd, int heredoc_count)
 }
 
 // Opens the last heredoc
-int	setup_heredoc_fd(t_commandlist *cmd)
+int	setup_heredoc_fd(t_commandlist *cmd, t_shell_state *shell)
 {
 	int			heredoc_count;
 	t_file_node	*last_heredoc;
 	int			tmpfd;
-	char		template[] = "/tmp/minishell_heredoc_XXXXXX";
+	char		template[34];
 	size_t		len;
 
+	(void)shell;
+	ft_strlcpy(template, "/tmp/minishell_heredoc_XXXXXX", 34);
 	heredoc_count = count_heredoc(cmd);
 	if (heredoc_count == 0)
 		return (-1);

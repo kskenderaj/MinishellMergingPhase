@@ -6,7 +6,7 @@
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 16:02:10 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/19 20:16:24 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/23 15:59:09 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,43 +43,42 @@ typedef struct s_gc
 	size_t						count;
 }								t_gc;
 
-// Global GC access
-t_gc							*get_gc(void);
 // Core GC initialization and cleanup
 t_gc							*gc_init(void);
-void							gc_clear(void);
-void							gc_cleanup(void);
-int								gc_add_node(void *ptr, int fd, t_gc_type type);
+void							gc_clear(t_gc *gc);
+void							gc_cleanup(t_gc *gc);
+int								gc_add_node(t_gc *gc, void *ptr, int fd,
+									t_gc_type type);
 
 // Basic memory management
-void							*gc_malloc(size_t size);
-void							*gc_calloc(size_t count, size_t size);
+void							*gc_malloc(t_gc *gc, size_t size);
+void							*gc_calloc(t_gc *gc, size_t count, size_t size);
 
 // Basic file descriptor management
-void							gc_register_fd(int fd);
+void							gc_register_fd(t_gc *gc, int fd);
 
 // Individual cleanup
-void							gc_free(void *ptr);
-void							gc_close(int fd);
-void							gc_reset(void);
+void							gc_free(t_gc *gc, void *ptr);
+void							gc_close(t_gc *gc, int fd);
 
 // Utility functions
-void							gc_print(void);
-size_t							gc_count(void);
+void							gc_print(t_gc *gc);
+size_t							gc_count(t_gc *gc);
 
 // String utilities
-char							*gc_strdup(const char *s);
-char							*gc_strndup(const char *s, size_t n);
-char							**gc_split(const char *s, char c);
-char							*gc_substr(const char *s, unsigned int start,
-									size_t len);
-char							*gc_itoa(int n);
-char							*gc_strjoin(const char *s1, const char *s2);
+char							*gc_strdup(t_gc *gc, const char *s);
+char							*gc_strndup(t_gc *gc, const char *s, size_t n);
+char							**gc_split(t_gc *gc, const char *s, char c);
+char							*gc_substr(t_gc *gc, const char *s,
+									unsigned int start, size_t len);
+char							*gc_itoa(t_gc *gc, int n);
+char							*gc_strjoin(t_gc *gc, const char *s1,
+									const char *s2);
 
 // File descriptor utilities
-int								gc_open(const char *path, int flags, ...);
-int								gc_pipe(int pipefd[2]);
-int								gc_dup(int oldfd);
-int								gc_dup2(int oldfd, int newfd);
+int								gc_open(t_gc *gc, const char *path, int flags, ...);
+int								gc_pipe(t_gc *gc, int pipefd[2]);
+int								gc_dup(t_gc *gc, int oldfd);
+int								gc_dup2(t_gc *gc, int oldfd, int newfd);
 
 #endif

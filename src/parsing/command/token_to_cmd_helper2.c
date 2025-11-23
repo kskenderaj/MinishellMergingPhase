@@ -3,22 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   token_to_cmd_helper2.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 12:30:49 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:36:19 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
+#include "executor.h"
 
-int	handle_split_word(char **cmd_array, char *value, int *i)
+int	handle_split_word(char **cmd_array, char *value, int *i,
+		t_shell_state *shell)
 {
 	char	**words;
 	int		j;
 
-	words = split_on_spaces(value);
+	words = split_on_spaces(value, shell);
 	if (!words)
 		return (-1);
 	j = 0;
@@ -31,11 +33,11 @@ int	handle_split_word(char **cmd_array, char *value, int *i)
 	return (0);
 }
 
-int	handle_env_assignment(t_token *token, t_cmd_node *cmdnode)
+int	handle_env_assignment(t_token *token, t_cmd_node *cmdnode, t_shell_state *shell)
 {
 	t_env_node	*env_node;
 
-	env_node = gc_malloc(sizeof(t_env_node));
+	env_node = gc_malloc(shell->gc, sizeof(t_env_node));
 	if (!env_node)
 		return (-1);
 	if (!find_key(token->value, env_node))
@@ -47,14 +49,15 @@ int	handle_env_assignment(t_token *token, t_cmd_node *cmdnode)
 }
 
 int	handle_word_token(t_token *token, t_cmd_node *cmdnode, char **cmd_array,
-		int *i)
+		int *i, t_shell_state *shell)
+
 {
 	if (*i == 0 && is_valid_env_assignment(token->value))
-		return (handle_env_assignment(token, cmdnode));
+		return (handle_env_assignment(token, cmdnode, shell));
 	if (*i == 0 && token->value && token->segment_list
 		&& should_split(token->segment_list) && ft_strchr(token->value, ' '))
 	{
-		if (handle_split_word(cmd_array, token->value, i) < 0)
+		if (handle_split_word(cmd_array, token->value, i, shell) < 0)
 			return (-1);
 	}
 	else
@@ -77,7 +80,7 @@ t_token	*skip_to_next_pipe(t_token *token)
 }
 
 int	process_single_token(t_token *token, int *skip_next, t_env_list *envlst,
-		int last_status)
+		int last_status, t_shell_state *shell)
 {
 	t_segment_list	*seglst;
 
@@ -93,14 +96,15 @@ int	process_single_token(t_token *token, int *skip_next, t_env_list *envlst,
 	}
 	if (token->type == TK_WORD)
 	{
-		seglst = gc_malloc(sizeof(*seglst));
+		seglst = gc_malloc(shell->gc, sizeof(*seglst));
 		if (!seglst)
 			return (-1);
 		init_segment_lst(seglst);
-		if (find_segment(seglst, token->value))
+		if (find_segment(seglst, token->value, shell))
 		{
 			token->segment_list = seglst;
-			token->value = segments_expand(seglst, envlst, last_status);
+			token->value = segments_expand(seglst, envlst, last_status,
+					shell);
 		}
 	}
 	return (0);

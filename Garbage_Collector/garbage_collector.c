@@ -3,41 +3,33 @@
 /*                                                        :::      ::::::::   */
 /*   garbage_collector.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 16:08:39 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/21 17:54:57 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 15:54:06 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "garbage_collector.h"
 
-t_gc	*g_gc = NULL; // Global GC pointer (not static,
-
-t_gc	*get_gc(void)
-{
-	return (g_gc);
-}
-
-// initializing gc
 t_gc	*gc_init(void)
 {
-	if (g_gc)
-		return (g_gc);
-	g_gc = malloc(sizeof(t_gc));
-	if (!g_gc)
+	t_gc	*gc;
+
+	gc = malloc(sizeof(t_gc));
+	if (!gc)
 		return (NULL);
-	g_gc->head = NULL;
-	g_gc->count = 0;
-	return (g_gc);
+	gc->head = NULL;
+	gc->count = 0;
+	return (gc);
 }
 
-int	gc_add_node(void *ptr, int fd, t_gc_type type)
+int	gc_add_node(t_gc *gc, void *ptr, int fd, t_gc_type type)
 {
-	t_gc		*gc;
 	t_gc_node	*new_node;
 
-	gc = get_gc();
+	if (!gc)
+		return (0);
 	new_node = malloc(sizeof(t_gc_node));
 	if (!new_node)
 		return (0);
@@ -50,15 +42,16 @@ int	gc_add_node(void *ptr, int fd, t_gc_type type)
 	return (1);
 }
 
-// memory allocations Basics
-void	*gc_malloc(size_t size)
+void	*gc_malloc(t_gc *gc, size_t size)
 {
 	void	*ptr;
 
+	if (!gc)
+		return (NULL);
 	ptr = malloc(size);
 	if (!ptr)
 		return (NULL);
-	if (!gc_add_node(ptr, -1, GC_MEM))
+	if (!gc_add_node(gc, ptr, -1, GC_MEM))
 	{
 		free(ptr);
 		return (NULL);
@@ -66,14 +59,16 @@ void	*gc_malloc(size_t size)
 	return (ptr);
 }
 
-void	*gc_calloc(size_t count, size_t size)
+void	*gc_calloc(t_gc *gc, size_t count, size_t size)
 {
 	void	*ptr;
 
+	if (!gc)
+		return (NULL);
 	ptr = calloc(count, size);
 	if (!ptr)
 		return (NULL);
-	if (!gc_add_node(ptr, -1, GC_MEM))
+	if (!gc_add_node(gc, ptr, -1, GC_MEM))
 	{
 		free(ptr);
 		return (NULL);

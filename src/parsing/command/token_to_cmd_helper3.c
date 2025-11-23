@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_to_cmd_helper3.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 00:00:00 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/21 12:34:48 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:36:39 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,8 @@ int	process_word_result(t_token *token, int ret, int *i)
 }
 
 int	process_tokens_to_array(t_token *token, t_cmd_node *cmdnode,
-		char **cmd_array, int *i)
+		char **cmd_array, int *i, t_shell_state *shell)
+
 {
 	int	ret;
 
@@ -47,7 +48,7 @@ int	process_tokens_to_array(t_token *token, t_cmd_node *cmdnode,
 		}
 		if (token && token->type == TK_WORD)
 		{
-			ret = handle_word_token(token, cmdnode, cmd_array, i);
+			ret = handle_word_token(token, cmdnode, cmd_array, i, shell);
 			if (process_word_result(token, ret, i) == 1)
 			{
 				token = token->next;

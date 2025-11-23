@@ -3,15 +3,18 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+         #
+#    By: kskender <kskender@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/04 00:00:00 by auto              #+#    #+#              #
-#    Updated: 2025/11/21 17:31:54 by jtoumani         ###   ########.fr        #
+#    Updated: 2025/11/23 21:13:33 by kskender         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+
+.DEFAULT_GOAL := all
+
 NAME = minishell
-CC = gcc
+CC = cc
 CFLAGS = -Wall -Wextra -Werror -g
 READLINE_FLAGS = -lreadline
 
@@ -31,10 +34,6 @@ MAIN_SRCS = \
 	main/pipeline.c
 
 MAIN_OBJS = $(MAIN_SRCS:.c=.o)
-
-# Globals (single definition of g_shell)
-GLOBAL_SRC = globals.c
-GLOBAL_OBJ = $(GLOBAL_SRC:.c=.o)
 
 # Parser sources
 PARSER_SRCS = \
@@ -65,21 +64,26 @@ PARSER_OBJS = $(PARSER_SRCS:.c=.o)
 # Executor sources
 EXECUTOR_DIR = src/execution/executor_part
 EXECUTOR_SRCS = \
-	$(EXECUTOR_DIR)/exec_basics.c \
-	$(EXECUTOR_DIR)/exec_basics1.c \
 	$(EXECUTOR_DIR)/exec_builtins.c \
 	$(EXECUTOR_DIR)/exec_builtins1.c \
 	$(EXECUTOR_DIR)/exec_builtins2.c \
 	$(EXECUTOR_DIR)/exec_builtins3.c \
+	$(EXECUTOR_DIR)/exec_builtins4.c \
+	$(EXECUTOR_DIR)/exec_builtins5.c \
 	$(EXECUTOR_DIR)/exec_echo.c \
 	$(EXECUTOR_DIR)/exec_external_handler.c \
+	$(EXECUTOR_DIR)/exec_external_handler1.c \
+	$(EXECUTOR_DIR)/exec_external_handler2.c \
+	$(EXECUTOR_DIR)/exec_external_handler3.c \
 	$(EXECUTOR_DIR)/exec_external_helpers.c \
 	$(EXECUTOR_DIR)/exec_path.c \
-	$(EXECUTOR_DIR)/exec_error.c \
 	$(EXECUTOR_DIR)/exec_args_helpers.c \
 	$(EXECUTOR_DIR)/exec_args_helpers2.c \
 	$(EXECUTOR_DIR)/exec_args_helpers3.c \
 	$(EXECUTOR_DIR)/exec_pipeline_helpers.c \
+	$(EXECUTOR_DIR)/exec_pipeline_helpers1.c \
+	$(EXECUTOR_DIR)/exec_pipeline_helpers2.c \
+	$(EXECUTOR_DIR)/exec_pipeline_helpers3.c \
 	$(EXECUTOR_DIR)/exec_redir_helpers.c \
 	$(EXECUTOR_DIR)/exec_redir_attached.c \
 	$(EXECUTOR_DIR)/exec_redir_separated.c \
@@ -90,6 +94,7 @@ EXECUTOR_SRCS = \
 	$(EXECUTOR_DIR)/exec_utility_to_run.c \
 	$(EXECUTOR_DIR)/exec_redirections1.c \
 	$(EXECUTOR_DIR)/signals.c \
+	$(EXECUTOR_DIR)/signals2.c \
 	$(EXECUTOR_DIR)/init_shell.c
 
 
@@ -145,7 +150,7 @@ LIBFT_DIR = include/libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
 # All objects (executor objects and GC objects are provided by LIBEXEC)
-OBJS = $(MAIN_OBJS) $(GLOBAL_OBJ) $(PARSER_OBJS)
+OBJS = $(MAIN_OBJS) $(PARSER_OBJS)
 
 # Colors for output
 GREEN = \033[0;32m
@@ -180,8 +185,7 @@ fclean: clean
 	rm -f $(LIBEXEC)
 	$(MAKE) -C $(LIBFT_DIR) fclean
 
-re: fclean
-	$(MAKE) all
+re: fclean all
 
 # Debug target
 debug: CFLAGS += -g

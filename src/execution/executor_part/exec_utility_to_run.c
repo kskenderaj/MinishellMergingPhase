@@ -6,12 +6,11 @@
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 13:12:19 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/03 14:17:02 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:26:25 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
-#include <stdio.h>
 
 // Stub for not_error_file
 int	not_error_file(t_filelist *current, int update, t_commandlist *cmd)
@@ -43,34 +42,37 @@ int	standard_error(int update, t_commandlist *cmd)
 2.handling errors if file doesnt exist
 */
 
-int	handling_the_infile(t_commandlist *cmd, t_filelist *current, int update)
+int	handling_the_infile(t_commandlist *cmd, t_filelist *current, int update,
+	t_shell_state *shell)
 {
 	int	fd;
 
-	fd = gc_open(current->filename, O_RDONLY);
+	fd = gc_open(shell->gc, current->filename, O_RDONLY);
 	if (fd == -1)
 		return (not_error_file(current, update, cmd));
-	if (gc_dup2(fd, STDIN_FILENO) == -1)
-		return (gc_close(fd), standard_error(update, cmd));
-	return (gc_close(fd), EXIT_SUCCESS);
+	if (gc_dup2(shell->gc, fd, STDIN_FILENO) == -1)
+		return (gc_close(shell->gc, fd), standard_error(update, cmd));
+	return (gc_close(shell->gc, fd), EXIT_SUCCESS);
 }
 
 /*
 1.sets up the final input redirection by processing all input files
 2. and the heredocs then applying the last one to standard input
 */
-int	handling_the_heredoc(t_commandlist *cmd, t_filelist *current, int update)
+int	handling_the_heredoc(t_commandlist *cmd, t_filelist *current, int update,
+	t_shell_state *shell)
 {
 	int	heredoc_pipe[2];
 
-	gc_pipe(heredoc_pipe);
+	gc_pipe(shell->gc, heredoc_pipe);
 	if (current->filename != NULL && (*current->filename))
 		ft_putstr_fd(current->filename, heredoc_pipe[1]);
 	ft_putstr_fd("\n", heredoc_pipe[1]);
-	gc_close(heredoc_pipe[1]);
-	if (gc_dup2(heredoc_pipe[0], STDIN_FILENO) == -1)
-		return (gc_close(heredoc_pipe[0]), standard_error(update, cmd));
-	gc_close(heredoc_pipe[0]);
+	gc_close(shell->gc, heredoc_pipe[1]);
+	if (gc_dup2(shell->gc, heredoc_pipe[0], STDIN_FILENO) == -1)
+		return (gc_close(shell->gc, heredoc_pipe[0]), standard_error(update,
+				cmd));
+	gc_close(shell->gc, heredoc_pipe[0]);
 	return (EXIT_SUCCESS);
 }
 
@@ -78,10 +80,12 @@ int	handling_the_heredoc(t_commandlist *cmd, t_filelist *current, int update)
 1.sets up the final input redirection by processing all input files
 2.and the heredocs then applying the last one to standard input
 */
-int	setup_input(t_commandlist *cmd, int *redirect, int update)
+int	setup_input(t_commandlist *cmd, int *redirect, int update,
+	t_shell_state *shell)
 {
 	(void)cmd;
 	(void)redirect;
 	(void)update;
+	(void)shell;
 	return (0);
 }

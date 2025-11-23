@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   field_split.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 14:54:25 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:34:26 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
+#include "executor.h"
 
 int	count_words(char *str)
 {
@@ -36,7 +37,7 @@ int	count_words(char *str)
 	return (count);
 }
 
-char	*extract_word(char *str, int *pos)
+char	*extract_word(char *str, int *pos, t_shell_state *shell)
 {
 	int		start;
 	int		len;
@@ -50,11 +51,11 @@ char	*extract_word(char *str, int *pos)
 	len = *pos - start;
 	if (len == 0)
 		return (NULL);
-	word = gc_substr(str, start, len);
+	word = gc_substr(shell->gc, str, start, len);
 	return (word);
 }
 
-char	**split_on_spaces(char *str)
+char	**split_on_spaces(char *str, t_shell_state *shell)
 {
 	char	**result;
 	int		word_count;
@@ -64,14 +65,14 @@ char	**split_on_spaces(char *str)
 	if (!str)
 		return (NULL);
 	word_count = count_words(str);
-	result = gc_malloc(sizeof(char *) * (word_count + 1));
+	result = gc_malloc(shell->gc, sizeof(char *) * (word_count + 1));
 	if (!result)
 		return (NULL);
 	i = 0;
 	pos = 0;
 	while (i < word_count)
 	{
-		result[i] = extract_word(str, &pos);
+		result[i] = extract_word(str, &pos, shell);
 		if (!result[i])
 			return (NULL);
 		i++;

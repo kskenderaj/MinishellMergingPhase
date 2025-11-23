@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins1.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 00:07:02 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 17:34:29 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:08:45 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ static int	resolve_cd_target(char **args, int argc, char **target)
  * - Permission denied: error
  * - Updates OLDPWD and PWD in environment
  */
-int	ft_cd(char **args)
+int	ft_cd(char **args, t_shell_state *shell)
 {
 	char	*target;
 	char	oldpwd[PATH_MAX];
@@ -64,19 +64,19 @@ int	ft_cd(char **args)
 	while (args[argc])
 		argc++;
 	if (!getcwd(oldpwd, sizeof(oldpwd)))
-		return (perror("cd: getcwd (oldpwd)"), g_shell.last_status = 1, 1);
+		return (perror("cd: getcwd (oldpwd)"), shell->last_status = 1, 1);
 	if (resolve_cd_target(args, argc, &target))
-		return (g_shell.last_status = 1, 1);
+		return (shell->last_status = 1, 1);
 	if (chdir(target) != 0)
-		return (perror("cd"), g_shell.last_status = 1, 1);
+		return (perror("cd"), shell->last_status = 1, 1);
 	if (!getcwd(newpwd, sizeof(newpwd)))
-		return (perror("cd: getcwd (newpwd)"), g_shell.last_status = 1, 1);
+		return (perror("cd: getcwd (newpwd)"), shell->last_status = 1, 1);
 	if (args[1] && strcmp(args[1], "-") == 0)
 		printf("%s\n", newpwd);
 	setenv("OLDPWD", oldpwd, 1);
 	setenv("PWD", newpwd, 1);
-	update_shell_env("OLDPWD", oldpwd);
-	update_shell_env("PWD", newpwd);
-	g_shell.last_status = 0;
+	update_shell_env("OLDPWD", oldpwd, shell);
+	update_shell_env("PWD", newpwd, shell);
+	shell->last_status = 0;
 	return (0);
 }

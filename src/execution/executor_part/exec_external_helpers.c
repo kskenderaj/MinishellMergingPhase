@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_external_helpers.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:26:38 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 17:37:03 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:15:01 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ char	*find_command_path(char *cmd, t_env_list *env)
 	return (NULL);
 }
 
-char	**convert_env_to_array(t_env_list *env_list)
+char	**convert_env_to_array(t_env_list *env_list, t_shell_state *shell)
 {
 	extern char	**environ;
 	char		**env_array;
@@ -55,7 +55,7 @@ char	**convert_env_to_array(t_env_list *env_list)
 	i = 0;
 	while (environ[i])
 		i++;
-	env_array = gc_malloc(sizeof(char *) * (i + 1));
+	env_array = gc_malloc(shell->gc, sizeof(char *) * (i + 1));
 	if (!env_array)
 		return (NULL);
 	i = 0;

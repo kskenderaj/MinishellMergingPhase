@@ -3,32 +3,33 @@
 /*                                                        :::      ::::::::   */
 /*   cmdlst_filelst.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 14:20:41 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:31:52 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "executor.h"
 #include <unistd.h>
 
 /* forward prototype for local helper */
 
-t_cmd_node	*create_cmdnode(void)
+t_cmd_node	*create_cmdnode(t_shell_state *shell)
 {
 	t_cmd_node	*cmdnode;
 
-	cmdnode = gc_malloc(sizeof(*cmdnode));
+	cmdnode = gc_malloc(shell->gc, sizeof(*cmdnode));
 	if (!cmdnode)
 		return (NULL);
 	cmdnode->cmd_type = CMD;
 	cmdnode->cmd = NULL;
 	cmdnode->next = NULL;
-	cmdnode->files = (t_file_list *)gc_malloc(sizeof(t_file_list));
+	cmdnode->files = (t_file_list *)gc_malloc(shell->gc, sizeof(t_file_list));
 	if (!cmdnode->files)
 		return (NULL);
-	cmdnode->env = (t_env_list *)gc_malloc(sizeof(t_env_list));
+	cmdnode->env = (t_env_list *)gc_malloc(shell->gc, sizeof(t_env_list));
 	if (!cmdnode->env)
 		return (NULL);
 	init_env_lst(cmdnode->env);
@@ -38,12 +39,13 @@ t_cmd_node	*create_cmdnode(void)
 	return (cmdnode);
 }
 
-void	create_filenode(char *filename, int red_type, t_file_list *filelst)
+void	create_filenode(char *filename, int red_type, t_file_list *filelst,
+	t_shell_state *shell)
 {
 	t_file_node		*filenode;
 	t_heredoc_info	*hdoc_info;
 
-	filenode = gc_malloc(sizeof(*filenode));
+	filenode = gc_malloc(shell->gc, sizeof(*filenode));
 	if (!filenode)
 		return ;
 	filenode->redir_type = red_type;
@@ -52,7 +54,7 @@ void	create_filenode(char *filename, int red_type, t_file_list *filelst)
 	filenode->next = NULL;
 	if (red_type == 6)
 	{
-		hdoc_info = process_heredoc_delimiter(filename);
+		hdoc_info = process_heredoc_delimiter(filename, shell);
 		if (hdoc_info)
 		{
 			filenode->filename = hdoc_info->delimiter;

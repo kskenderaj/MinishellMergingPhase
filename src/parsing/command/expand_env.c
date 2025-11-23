@@ -3,17 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   expand_env.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 15:04:46 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 19:18:19 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "garbage_collector.h"
 #include "minishell.h"
+#include "executor.h"
 
-static int	g_last_status_cache = 0;
+// static int	g_last_status_cache;
 
 int	skip_var(char *str)
 {
@@ -51,7 +52,7 @@ char	*check_for_env(t_env_list *envlst, char *str, size_t len)
 	return (NULL);
 }
 
-char	*expand_env(char *str, t_env_list *env_lst)
+char	*expand_env(char *str, t_env_list *env_lst, t_shell_state *shell)
 {
 	size_t	i;
 	size_t	start;
@@ -67,39 +68,43 @@ char	*expand_env(char *str, t_env_list *env_lst)
 		i++;
 	value = check_for_env(env_lst, str + start, i - start);
 	if (value)
-		return (gc_strdup(value));
-	return (gc_strdup(""));
+		return (gc_strdup(shell->gc, value));
+	return (gc_strdup(shell->gc, ""));
 }
 
 char	*process_dollar(char *seg_str, t_seg_type seg_type, t_env_list *envlst,
-		int i)
+		int i, t_shell_state *shell)
+
 {
+	static int	g_last_status_cache;
 	char	*expand;
 
-	expand = get_expand(seg_str, i, g_last_status_cache, envlst);
+	g_last_status_cache = 0;
+	expand = get_expand(seg_str, i, g_last_status_cache, envlst, shell);
 	if (seg_type == SEG_NO && expand && ft_strchr(expand, ' '))
-		expand = ifs_field_split(expand);
+		expand = ifs_field_split(expand, shell);
 	return (expand);
 }
 
 char	*expand_or_not(char *seg_str, t_seg_type seg_type, t_env_list *envlst,
-		int last_status)
+		int last_status, t_shell_state *shell)
+
 {
 	t_expand_ctx	ctx;
 	char			*old;
 	int				i;
 
+	(void)last_status;
 	if (!seg_str)
 		return (NULL);
-	g_last_status_cache = last_status;
 	ctx.seg_str = seg_str;
 	ctx.type = seg_type;
 	ctx.envlst = envlst;
-	old = gc_strdup("");
+	old = gc_strdup(shell->gc, "");
 	i = 0;
 	while (seg_str[i])
 	{
-		process_char(&old, &ctx, &i);
+		process_char(&old, &ctx, &i, shell);
 		i++;
 	}
 	return (old);

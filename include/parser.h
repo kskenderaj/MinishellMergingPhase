@@ -3,16 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   parser.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/12 14:40:09 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/21 17:52:50 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:00:21 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PARSER_H
 # define PARSER_H
 
+// Forward declarations
+typedef struct s_shell_state	t_shell_state;
 // Includes -- BEGIN
 # include "garbage_collector.h"
 # include <aio.h>
@@ -143,19 +145,14 @@ typedef struct s_token_list
 
 // Lexing checking syntax
 // int							main(int argc, char **argv);
-bool					is_valid_red(char *str, int *i);
-bool					is_red(char *str, int *i);
-bool					is_valid_pipe(char *str, int *i);
 bool					check_tokens(char *str, int i);
 bool					is_boundary_char(char c);
-bool					we_have_token(const char *str, int *i);
 int						scan_quote(const char *str, int i);
-bool					is_valid_quote(char *str, int *i);
 int						skip_spaces(char *str, int i);
 int						add_redir_filename(t_token_list *lst, char *input,
-							int *i);
+					int *i, t_shell_state *shell);
 int						handle_quoted_redir_file(t_token_list *lst, char *input,
-							int *i);
+					int *i, t_shell_state *shell);
 
 /* helpers used in token_to_cmd */
 bool					is_redirection(t_toktype t);
@@ -166,39 +163,41 @@ void					init_env_lst(t_env_list *lst);
 void					init_segment_lst(t_segment_list *lst);
 int						validate_pipe_syntax(t_token_list *toklst);
 int						is_valid_env_assignment(char *str);
+bool					we_have_token(const char *str, int *i);
+bool					is_valid_quote(char *str, int *i);
 
 // tokenize
-t_token					*create_token(t_toktype type, char *val);
+t_token					*create_token(t_toktype type, char *val,
+							t_shell_state *shell);
 int						push_token(t_token_list *lst, t_token *token);
 int						add_token(t_token_list *lst, t_toktype type, char *str,
-							int len);
-int						handle_word(t_token_list *lst, char *input, int *i);
-int						tokenize(t_token_list *lst, char *input);
+							int len, t_shell_state *shell);
+int						handle_word(t_token_list *lst, char *input, int *i,
+							t_shell_state *shell);
+int						tokenize(t_token_list *lst, char *input,
+							t_shell_state *shell);
 int						red_len(char *input, int i);
 t_toktype				red_type(const char *str, int i);
-int						handle_quote(char *input, int *i);
 int						handle_redir(t_token_list *lst, char *input, int *i,
-							int red_len);
+							int red_len, t_shell_state *shell);
 int						word_end(char *input, int i);
 // token to command
-int						find_segment(t_segment_list *lst, char *str);
-int quote_segment(t_segment_list *lst, char *str, int *i);
-int no_quote_segment(t_segment_list *lst, char *str, int *i);
+int						find_segment(t_segment_list *lst, char *str, t_shell_state *shell);
+int quote_segment(t_segment_list *lst, char *str, int *i, t_shell_state *shell);
+int no_quote_segment(t_segment_list *lst, char *str, int *i, t_shell_state *shell);
 int						push_segment(t_segment_list *lst, t_segment *segment);
-t_segment				*create_segment(char *start, int len, t_seg_type type);
-int	handle_split_word(char **cmd_array, char *value, int *i);
+t_segment				*create_segment(char *start, int len, t_seg_type type, t_shell_state *shell);
 int	count_args(t_token *token);
-int	handle_split_word(char **cmd_array, char *value, int *i);
 int	skip_var(char *str);
 
 
 /* Command/list helpers (implemented in parsing/command) */
-t_cmd_node				*create_cmdnode(void);
+t_cmd_node				*create_cmdnode(t_shell_state *shell);
 void					push_cmd(t_cmd_list *lst, t_cmd_node *node);
-int						collect_redirs(t_token *token, t_cmd_node *cmdnode);
+int						collect_redirs(t_token *token, t_cmd_node *cmdnode, t_shell_state *shell);
 bool					is_built_in(char *str);
 void					create_filenode(char *filename, int red_type,
-							t_file_list *filelst);
+							t_file_list *filelst, t_shell_state *shell);
 void					push_file(t_file_list *lst, t_file_node *node);
 
 /* Environment functions */
@@ -218,51 +217,51 @@ void					process_ifs_char(char *result, int *j,
 
 /* Token to command conversion */
 int						token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst,
-							t_env_list *envlst, int last_status);
+							t_env_list *envlst, int last_status, t_shell_state *shell);
 void					final_token(t_token_list *toklst, t_env_list *envlst,
-							int last_status);
-int						process_tokens_to_array(t_token *token,
-							t_cmd_node *cmdnode, char **cmd_array, int *i);
-t_token					*skip_to_next_pipe(t_token *token);
+							int last_status, t_shell_state *shell);
+int							process_tokens_to_array(t_token *token, t_cmd_node *cmdnode,
+							char **cmd_array, int *i, t_shell_state *shell);
+int							process_word_result(t_token *token, int ret, int *i);
 int						process_single_token(t_token *token, int *skip_next,
-							t_env_list *envlst, int last_status);
+							t_env_list *envlst, int last_status, t_shell_state *shell);
 int						skip_redirection(t_token **token);
-int						process_word_result(t_token *token, int ret, int *i);
-int						handle_env_assignment(t_token *token,
-							t_cmd_node *cmdnode);
-int						handle_word_token(t_token *token, t_cmd_node *cmdnode,
-							char **cmd_array, int *i);
-
+int							handle_env_assignment(t_token *token,
+							t_cmd_node *cmdnode, t_shell_state *shell);
+int							handle_word_token(t_token *token, t_cmd_node *cmdnode,
+							char **cmd_array, int *i, t_shell_state *shell);
+int							process_word_result(t_token *token, int ret, int *i);
+t_token						*skip_to_next_pipe(t_token *token);
 /* Field splitting */
-char					**split_on_spaces(char *str);
+char					**split_on_spaces(char *str, t_shell_state *shell);
 int						should_split(t_segment_list *seglst);
-char					*ifs_field_split(char *str);
+char					*ifs_field_split(char *str, t_shell_state *shell);
 int						count_words(char *str);
-char					*extract_word(char *str, int *pos);
+char					*extract_word(char *str, int *pos, t_shell_state *shell);
 
 /* Heredoc utilities */
-t_heredoc_info			*process_heredoc_delimiter(char *raw_delimiter);
-char					*read_heredoc_content(char *delimiter);
-void					process_all_heredocs(t_cmd_list *cmdlst);
-char					*append_line(char *content, char *line);
+t_heredoc_info			*process_heredoc_delimiter(char *raw_delimiter, t_shell_state *shell);
+char					*read_heredoc_content(char *delimiter, t_shell_state *shell);
+void					process_all_heredocs(t_cmd_list *cmdlst, t_shell_state *shell);
+char					*append_line(char *content, char *line, t_shell_state *shell);
 int						is_delimiter(char *line, char *delimiter);
-t_file_node				*read_all_heredocs_in_cmd(t_cmd_node *cmd);
+t_file_node				*read_all_heredocs_in_cmd(t_cmd_node *cmd, t_shell_state *shell);
 int						has_quotes(char *str);
-char					*remove_quotes_heredoc(char *str);
+char					*remove_quotes_heredoc(char *str, t_shell_state *shell);
 
 
 
 /* Segment utilities used elsewhere */
 void					init_segment_lst(t_segment_list *lst);
 char					*segments_expand(t_segment_list *seglst,
-							t_env_list *envlst, int last_status);
-char					*expand_env(char *str, t_env_list *env_lst);
+							t_env_list *envlst, int last_status, t_shell_state *shell);
+char					*expand_env(char *str, t_env_list *env_lst, t_shell_state *shell);
 char					*get_expand(char *seg_str, int i, int last_status,
-							t_env_list *envlst);
+							t_env_list *envlst, t_shell_state *shell);
 char					*process_dollar(char *seg_str, t_seg_type seg_type,
-						t_env_list *envlst, int i);
-void					process_char(char **old, t_expand_ctx *ctx, int *i);
+						t_env_list *envlst, int i, t_shell_state *shell);
+void					process_char(char **old, t_expand_ctx *ctx, int *i, t_shell_state *shell);
 char					*expand_or_not(char *seg_str, t_seg_type seg_type,
-						t_env_list *envlst, int last_status);
+						t_env_list *envlst, int last_status, t_shell_state *shell);
 
 #endif

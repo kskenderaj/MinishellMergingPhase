@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_redir_attached.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 23:59:26 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/18 13:22:55 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/23 16:18:39 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ static int	handle_attached_append(char **args, int *idx, int *out_fd,
 }
 
 static int	handle_attached_heredoc(char **args, int *idx, int *in_fd,
-		char *tok)
+		char *tok, t_shell_state *shell)
 {
 	char	*delim;
 
@@ -46,7 +46,7 @@ static int	handle_attached_heredoc(char **args, int *idx, int *in_fd,
 		return (1);
 	if (*in_fd != -1)
 		close(*in_fd);
-	*in_fd = exec_heredoc(delim, 0);
+	*in_fd = exec_heredoc(delim, 0, shell);
 	if (tok[2] != '\0')
 		shift_left_by(args, *idx, 1);
 	else
@@ -95,14 +95,15 @@ static int	handle_attached_infile(char **args, int *idx, int *in_fd, char *tok)
 	return (0);
 }
 
-int	handle_attached_operators(t_redir_data *data, char *tok)
+int	handle_attached_operators(t_redir_data *data, char *tok,
+		t_shell_state *shell)
 {
 	if (strncmp(tok, ">>", 2) == 0)
 		return (handle_attached_append(data->args, data->idx, data->out_fd,
 				tok));
 	if (strncmp(tok, "<<", 2) == 0)
 		return (handle_attached_heredoc(data->args, data->idx, data->in_fd,
-				tok));
+				tok, shell));
 	if (tok[0] == '>' && tok[1] != '>')
 		return (handle_attached_outfile(data->args, data->idx, data->out_fd,
 				tok));

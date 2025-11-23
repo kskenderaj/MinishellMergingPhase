@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenize_helper.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 14:08:07 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/21 12:20:50 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:38:40 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,15 +70,16 @@ int	word_end(char *input, int i)
 	return (i);
 }
 
-int	handle_redir(t_token_list *lst, char *input, int *i, int red_len)
+int	handle_redir(t_token_list *lst, char *input, int *i, int red_len,
+		t_shell_state *shell)
 {
 	if (!red_len)
 		return (1);
-	if (add_token(lst, red_type(input, *i), input + *i, red_len) != 0)
+	if (add_token(lst, red_type(input, *i), input + *i, red_len, shell) != 0)
 		return (1);
 	*i += red_len;
 	*i = skip_spaces(input, *i);
 	if (!input[*i] || input[*i] == '|' || input[*i] == '<' || input[*i] == '>')
 		return (1);
-	return (add_redir_filename(lst, input, i));
+	return (add_redir_filename(lst, input, i, shell));
 }

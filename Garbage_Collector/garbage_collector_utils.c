@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   garbage_collector_utils.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 17:51:02 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/21 17:57:04 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:45:54 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "garbage_collector.h"
 
-char	*gc_strdup(const char *s)
+char	*gc_strdup(t_gc *gc, const char *s)
 {
 	char	*dup;
 	size_t	len;
@@ -20,7 +20,7 @@ char	*gc_strdup(const char *s)
 	if (!s)
 		return (NULL);
 	len = ft_strlen(s);
-	dup = gc_malloc(len + 1);
+	dup = gc_malloc(gc, len + 1);
 	if (!dup)
 		return (NULL);
 	ft_memcpy(dup, s, len);
@@ -28,7 +28,7 @@ char	*gc_strdup(const char *s)
 	return (dup);
 }
 
-char	*gc_strndup(const char *s, size_t n)
+char	*gc_strndup(t_gc *gc, const char *s, size_t n)
 {
 	char	*dup;
 	size_t	length;
@@ -38,7 +38,7 @@ char	*gc_strndup(const char *s, size_t n)
 	length = ft_strlen(s);
 	if (length > n)
 		length = n;
-	dup = gc_malloc(length + 1);
+	dup = gc_malloc(gc, length + 1);
 	if (!dup)
 		return (NULL);
 	ft_memcpy(dup, s, length);
@@ -67,7 +67,7 @@ static size_t	count_words(const char *s, char c)
 	return (count);
 }
 
-static char	*extract_word(const char *s, char c)
+static char	*extract_word(t_gc *gc, const char *s, char c)
 {
 	size_t	length;
 	char	*word;
@@ -75,7 +75,7 @@ static char	*extract_word(const char *s, char c)
 	length = 0;
 	while (s[length] && s[length] != c)
 		length++;
-	word = gc_malloc(length + 1);
+	word = gc_malloc(gc, length + 1);
 	if (!word)
 		return (NULL);
 	ft_memcpy(word, s, length);
@@ -83,7 +83,7 @@ static char	*extract_word(const char *s, char c)
 	return (word);
 }
 
-char	**gc_split(const char *s, char c)
+char	**gc_split(t_gc *gc, const char *s, char c)
 {
 	char	**result;
 	size_t	words;
@@ -92,7 +92,7 @@ char	**gc_split(const char *s, char c)
 	if (!s)
 		return (NULL);
 	words = count_words(s, c);
-	result = gc_calloc(words + 1, sizeof(char *));
+	result = gc_calloc(gc, words + 1, sizeof(char *));
 	if (!result)
 		return (NULL);
 	i = 0;
@@ -100,7 +100,7 @@ char	**gc_split(const char *s, char c)
 	{
 		if (*s != c)
 		{
-			result[i] = extract_word(s, c);
+			result[i] = extract_word(gc, s, c);
 			if (!result[i++])
 				return (NULL);
 			while (*s && *s != c)

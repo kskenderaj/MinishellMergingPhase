@@ -6,7 +6,7 @@
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/19 18:52:11 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:02:13 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ static void	handle_sigint(int *last_status)
 	}
 }
 
-int	main_loop(t_env_list *env)
+int	main_loop(t_env_list *env, t_shell_state *shell)
 {
 	char	*line;
 	int		last_status;
@@ -39,7 +39,7 @@ int	main_loop(t_env_list *env)
 
 	last_status = 0;
 	interactive = isatty(STDIN_FILENO);
-	g_shell.is_interactive = interactive;
+	shell->is_interactive = interactive;
 	while (1)
 	{
 		if (interactive)
@@ -52,16 +52,16 @@ int	main_loop(t_env_list *env)
 				continue ;
 			break ;
 		}
-		g_shell.current_line = line;
+		shell->current_line = line;
 		handle_sigint(&last_status);
 		if (*line)
 		{
 			if (interactive)
 				add_history(line);
-			last_status = process_input_line(line, env, last_status);
+			last_status = process_input_line(line, env, last_status, shell);
 		}
 		free(line);
-		g_shell.current_line = NULL;
+		shell->current_line = NULL;
 	}
 	if (interactive)
 	{

@@ -6,7 +6,7 @@
 /*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 17:25:42 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/03 13:47:36 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:22:21 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,13 @@ static t_filelist	*find_last_infile(t_commandlist *cmd, int infile_count)
 }
 
 // Opens the last infile and returns fd
-int	setup_infile_fd(t_commandlist *cmd)
+int	setup_infile_fd(t_commandlist *cmd, t_shell_state *shell)
 {
 	int			infile_count;
 	t_filelist	*last_infile;
 	int			fd;
 
+	(void)shell;
 	infile_count = count_infile(cmd);
 	if (infile_count == 0)
 		return (-1);

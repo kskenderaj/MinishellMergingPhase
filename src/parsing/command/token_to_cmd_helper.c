@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_to_cmd_helper.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/21 14:43:53 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:36:04 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ bool	is_built_in(char *str)
 	return (false);
 }
 
-int	collect_redirs(t_token *token, t_cmd_node *cmdnode)
+int	collect_redirs(t_token *token, t_cmd_node *cmdnode, t_shell_state *shell)
 {
 	while (token && token->type != TK_PIPE)
 	{
@@ -42,7 +42,7 @@ int	collect_redirs(t_token *token, t_cmd_node *cmdnode)
 		{
 			if (!token->next || token->next->type != TK_WORD)
 				return (-1);
-			create_filenode(token->next->value, token->type, cmdnode->files);
+			create_filenode(token->next->value, token->type, cmdnode->files, shell);
 			token = token->next;
 			if (token)
 				token = token->next;
