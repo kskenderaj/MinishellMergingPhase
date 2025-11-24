@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/24 14:37:33 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/24 15:47:08 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ char	*process_dollar(char *seg_str, t_seg_type seg_type, t_env_list *envlst,
 	char		*expand;
 
 	g_last_status_cache = 0;
-	expand = get_expand(seg_str, i, g_last_status_cache, envlst, shell);
+	expand = get_expand(seg_str, i, envlst, shell);
 	if (seg_type == SEG_NO && expand && ft_strchr(expand, ' '))
 		expand = ifs_field_split(expand, shell);
 	return (expand);

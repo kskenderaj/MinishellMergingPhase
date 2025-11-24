@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/12 14:40:09 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/23 16:00:21 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 15:43:48 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -256,7 +256,7 @@ void					init_segment_lst(t_segment_list *lst);
 char					*segments_expand(t_segment_list *seglst,
 							t_env_list *envlst, int last_status, t_shell_state *shell);
 char					*expand_env(char *str, t_env_list *env_lst, t_shell_state *shell);
-char					*get_expand(char *seg_str, int i, int last_status,
+char					*get_expand(char *seg_str, int last_status,
 							t_env_list *envlst, t_shell_state *shell);
 char					*process_dollar(char *seg_str, t_seg_type seg_type,
 						t_env_list *envlst, int i, t_shell_state *shell);

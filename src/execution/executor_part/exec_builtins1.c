@@ -82,7 +82,8 @@ int	ft_cd(char **args, t_shell_state *shell)
 	if (args[1] && strcmp(args[1], "-") == 0)
 		printf("%s\n", newpwd);
 	/* Handle the case where we used -- and the next arg was - */
-	else if (argc > 2 && strcmp(args[1], "--") == 0 && strcmp(args[2], "-") == 0)
+	else if (argc > 2 && strcmp(args[1], "--") == 0 && strcmp(args[2],
+			"-") == 0)
 		printf("%s\n", newpwd);
 	setenv("OLDPWD", oldpwd, 1);
 	setenv("PWD", newpwd, 1);

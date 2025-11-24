@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 00:00:00 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/24 15:37:34 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/24 15:45:38 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 #include "minishell.h"
 #include "parser.h"
 
-char	*get_expand_status(char *seg_str, int i, t_shell_state *shell)
+char	*get_expand_status(t_shell_state *shell)
 {
 	return (gc_itoa(shell->gc, shell->last_status));
 }
@@ -23,7 +23,7 @@ char	*get_expand(char *seg_str, int i, t_env_list *envlst,
 		t_shell_state *shell)
 {
 	if (seg_str[i + 1] == '?')
-		return (get_expand_status(seg_str, i, shell));
+		return (get_expand_status(shell));
 	else
 		return (expand_env(seg_str + i, envlst, shell));
 }
