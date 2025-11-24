@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:35:02 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:37:50 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "executor.h"
 #include "minishell.h"
 #include "parser.h"
-#include "executor.h"
 
 int	has_quotes(char *str)
 {
@@ -58,7 +58,7 @@ char	*remove_quotes_heredoc(char *str, t_shell_state *shell)
 }
 
 t_heredoc_info	*process_heredoc_delimiter(char *raw_delimiter,
-	t_shell_state *shell)
+		t_shell_state *shell)
 {
 	t_heredoc_info	*info;
 

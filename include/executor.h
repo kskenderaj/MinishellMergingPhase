@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/24 13:20:10 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/23 15:58:41 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:28:00 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ int							check_redirection(t_commandlist *cmd, int control,
 								int *reset, t_shell_state *shell);
 /* Redirectories -- END */
 /* Export utility functions -- BEGIN */
-int							is_valid_identifier(const char *name);
+int						is_valid_identifier(const char *name);
 /* Builtins */
 int							ft_cd(char **args, t_shell_state *shell);
 int							ft_echo(char **args, t_shell_state *shell);

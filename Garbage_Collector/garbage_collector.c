@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   garbage_collector.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 16:08:39 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/23 15:54:06 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:28:00 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,23 @@ void	*gc_malloc(t_gc *gc, size_t size)
 	if (!ptr)
 		return (NULL);
 	if (!gc_add_node(gc, ptr, -1, GC_MEM))
+	{
+		free(ptr);
+		return (NULL);
+	}
+	return (ptr);
+}
+
+void	*gc_malloc_persistent(t_gc *gc, size_t size)
+{
+	void	*ptr;
+
+	if (!gc)
+		return (NULL);
+	ptr = malloc(size);
+	if (!ptr)
+		return (NULL);
+	if (!gc_add_node(gc, ptr, -1, GC_PERSISTENT))
 	{
 		free(ptr);
 		return (NULL);

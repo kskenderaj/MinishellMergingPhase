@@ -46,8 +46,7 @@ static void	process_newline(char **result, char *content, int *start, int i,
 	*start = i + 1;
 }
 
-char	*expand_heredoc_content(char *content, int quoted,
-		t_shell_state *shell)
+char	*expand_heredoc_content(char *content, int quoted, t_shell_state *shell)
 {
 	char	*result;
 	int		i;
@@ -66,14 +65,13 @@ char	*expand_heredoc_content(char *content, int quoted,
 	}
 	if (start < i)
 	{
-		result = gc_strjoin(shell->gc, result,
-				process_line(content, start, i, shell));
+		result = gc_strjoin(shell->gc, result, process_line(content, start, i,
+					shell));
 	}
 	return (result);
 }
 
-int	exec_heredoc_from_content(char *content, int quoted,
-		t_shell_state *shell)
+int	exec_heredoc_from_content(char *content, int quoted, t_shell_state *shell)
 {
 	int		pipefd[2];
 	char	*expanded;

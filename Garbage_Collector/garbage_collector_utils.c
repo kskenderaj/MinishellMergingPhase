@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   garbage_collector_utils.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 17:51:02 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/23 16:45:54 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:28:00 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,22 @@ char	*gc_strdup(t_gc *gc, const char *s)
 		return (NULL);
 	len = ft_strlen(s);
 	dup = gc_malloc(gc, len + 1);
+	if (!dup)
+		return (NULL);
+	ft_memcpy(dup, s, len);
+	dup[len] = '\0';
+	return (dup);
+}
+
+char	*gc_strdup_persistent(t_gc *gc, const char *s)
+{
+	char	*dup;
+	size_t	len;
+
+	if (!s)
+		return (NULL);
+	len = ft_strlen(s);
+	dup = gc_malloc_persistent(gc, len + 1);
 	if (!dup)
 		return (NULL);
 	ft_memcpy(dup, s, len);

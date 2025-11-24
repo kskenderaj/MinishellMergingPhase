@@ -75,4 +75,3 @@ int	exec_pipeline(t_cmd_list *cmdlst, char **envp, t_shell_state *shell)
 	ret = wait_children(ctx.pids, ctx.ncmds, shell);
 	return (ret);
 }
-

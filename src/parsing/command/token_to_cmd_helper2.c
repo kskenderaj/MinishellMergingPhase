@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   token_to_cmd_helper2.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:36:19 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:38:12 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "executor.h"
 #include "minishell.h"
 #include "parser.h"
-#include "executor.h"
 
 int	handle_split_word(char **cmd_array, char *value, int *i,
 		t_shell_state *shell)
@@ -33,7 +33,8 @@ int	handle_split_word(char **cmd_array, char *value, int *i,
 	return (0);
 }
 
-int	handle_env_assignment(t_token *token, t_cmd_node *cmdnode, t_shell_state *shell)
+int	handle_env_assignment(t_token *token, t_cmd_node *cmdnode,
+		t_shell_state *shell)
 {
 	t_env_node	*env_node;
 
@@ -103,8 +104,7 @@ int	process_single_token(t_token *token, int *skip_next, t_env_list *envlst,
 		if (find_segment(seglst, token->value, shell))
 		{
 			token->segment_list = seglst;
-			token->value = segments_expand(seglst, envlst, last_status,
-					shell);
+			token->value = segments_expand(seglst, envlst, last_status, shell);
 		}
 	}
 	return (0);

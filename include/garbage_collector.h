@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   garbage_collector.h                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 16:02:10 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/23 15:59:09 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:28:00 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ typedef struct s_gc_collector	t_gc_collector;
 typedef enum e_gc_type
 {
 	GC_MEM,
-	GC_FD
+	GC_FD,
+	GC_PERSISTENT
 }								t_gc_type;
 
 typedef struct s_gc_node
@@ -51,8 +52,9 @@ int								gc_add_node(t_gc *gc, void *ptr, int fd,
 									t_gc_type type);
 
 // Basic memory management
-void							*gc_malloc(t_gc *gc, size_t size);
-void							*gc_calloc(t_gc *gc, size_t count, size_t size);
+void						*gc_malloc(t_gc *gc, size_t size);
+void						*gc_malloc_persistent(t_gc *gc, size_t size);
+void						*gc_calloc(t_gc *gc, size_t count, size_t size);
 
 // Basic file descriptor management
 void							gc_register_fd(t_gc *gc, int fd);
@@ -66,8 +68,9 @@ void							gc_print(t_gc *gc);
 size_t							gc_count(t_gc *gc);
 
 // String utilities
-char							*gc_strdup(t_gc *gc, const char *s);
-char							*gc_strndup(t_gc *gc, const char *s, size_t n);
+char						*gc_strdup(t_gc *gc, const char *s);
+char						*gc_strdup_persistent(t_gc *gc, const char *s);
+char						*gc_strndup(t_gc *gc, const char *s, size_t n);
 char							**gc_split(t_gc *gc, const char *s, char c);
 char							*gc_substr(t_gc *gc, const char *s,
 									unsigned int start, size_t len);

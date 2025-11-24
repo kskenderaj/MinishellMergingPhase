@@ -16,9 +16,8 @@
 
 static int	check_syntax_error(char *tok, char **args, int i)
 {
-	if ((strcmp(tok, ">") == 0 || strcmp(tok, ">>") == 0
-			|| strcmp(tok, "<") == 0 || strcmp(tok, "<<") == 0)
-		&& args[i + 1] == NULL)
+	if ((strcmp(tok, ">") == 0 || strcmp(tok, ">>") == 0 || strcmp(tok,
+				"<") == 0 || strcmp(tok, "<<") == 0) && args[i + 1] == NULL)
 	{
 		ft_putstr_fd("minishell: syntax error near token `newline`\n",
 			STDERR_FILENO);
@@ -27,21 +26,20 @@ static int	check_syntax_error(char *tok, char **args, int i)
 	return (0);
 }
 
-static int	process_operators(t_redir_data *data, char *tok,
-	char **args, int *i, t_shell_state *shell)
+static int	process_operators(t_redir_data *data, char *tok, char **args,
+		int *i, t_shell_state *shell)
 {
 	int	res;
 
 	res = handle_attached_operators(data, tok, shell);
 	if (res != 2)
 		return (res);
-	res = handle_separated_operators(args, i, data->in_fd, data->out_fd,
-			shell);
+	res = handle_separated_operators(args, i, data->in_fd, data->out_fd, shell);
 	return (res);
 }
 
-static void	init_redir_data(t_redir_data *data, char **args,
-	int *in_fd, int *out_fd)
+static void	init_redir_data(t_redir_data *data, char **args, int *in_fd,
+		int *out_fd)
 {
 	data->args = args;
 	data->in_fd = in_fd;

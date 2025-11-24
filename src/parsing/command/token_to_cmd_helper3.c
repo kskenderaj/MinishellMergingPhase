@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_to_cmd_helper3.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 00:00:00 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/23 16:36:39 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:38:18 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ int	process_tokens_to_array(t_token *token, t_cmd_node *cmdnode,
 		char **cmd_array, int *i, t_shell_state *shell)
 
 {
-	int	ret;
+	int ret;
 
 	while (token && token->type != TK_PIPE)
 	{

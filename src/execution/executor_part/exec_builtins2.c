@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins2.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 17:31:20 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:08:19 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:47:27 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,12 +50,15 @@ static int	export_no_value(char *arg, t_shell_state *shell)
 			return (0);
 		i++;
 	}
-	if (shell->exported_count < MAX_EXPORTED)
+	if (shell->exported_count < MAX_EXPORTED - 1)
 	{
-		shell->exported_vars[shell->exported_count] = gc_strdup(shell->gc,
+		shell->exported_vars[shell->exported_count] = gc_strdup_persistent(shell->gc,
 				arg);
 		if (shell->exported_vars[shell->exported_count])
+		{
 			shell->exported_count++;
+			shell->exported_vars[shell->exported_count] = NULL;
+		}
 	}
 	return (0);
 }

@@ -43,7 +43,7 @@ int	standard_error(int update, t_commandlist *cmd)
 */
 
 int	handling_the_infile(t_commandlist *cmd, t_filelist *current, int update,
-	t_shell_state *shell)
+		t_shell_state *shell)
 {
 	int	fd;
 
@@ -60,7 +60,7 @@ int	handling_the_infile(t_commandlist *cmd, t_filelist *current, int update,
 2. and the heredocs then applying the last one to standard input
 */
 int	handling_the_heredoc(t_commandlist *cmd, t_filelist *current, int update,
-	t_shell_state *shell)
+		t_shell_state *shell)
 {
 	int	heredoc_pipe[2];
 
@@ -81,7 +81,7 @@ int	handling_the_heredoc(t_commandlist *cmd, t_filelist *current, int update,
 2.and the heredocs then applying the last one to standard input
 */
 int	setup_input(t_commandlist *cmd, int *redirect, int update,
-	t_shell_state *shell)
+		t_shell_state *shell)
 {
 	(void)cmd;
 	(void)redirect;

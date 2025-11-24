@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins3.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:06:11 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 21:09:38 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 13:57:12 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,8 @@ static void	cleanup_and_exit(int exit_code, t_shell_state *shell)
 
 static void	exit_print_error(char *arg)
 {
-	int		i;
-	int		is_printable;
+	int	i;
+	int	is_printable;
 
 	ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
 	if (arg)
@@ -91,4 +91,3 @@ int	ft_exit(char **args, t_shell_state *shell)
 	cleanup_and_exit(exit_code, shell);
 	return (0);
 }
-

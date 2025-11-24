@@ -27,8 +27,8 @@ void	apply_env_vars(char **envp, t_shell_state *shell)
 		eq = ft_strchr(envp[ei], '=');
 		if (eq)
 		{
-			key = gc_substr(shell->gc, envp[ei], 0,
-					(unsigned int)(eq - envp[ei]));
+			key = gc_substr(shell->gc, envp[ei], 0, (unsigned int)(eq
+						- envp[ei]));
 			val = eq + 1;
 			if (key)
 				setenv(key, val, 1);

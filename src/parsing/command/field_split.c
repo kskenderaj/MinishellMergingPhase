@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   field_split.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:34:26 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:37:42 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "executor.h"
 #include "minishell.h"
 #include "parser.h"
-#include "executor.h"
 
 int	count_words(char *str)
 {

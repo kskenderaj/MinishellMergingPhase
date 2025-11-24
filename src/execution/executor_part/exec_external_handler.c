@@ -13,8 +13,7 @@
 #include "executor.h"
 #include "minishell.h"
 
-static void	exec_error_and_exit(char *exec_path, int code,
-		t_shell_state *shell)
+static void	exec_error_and_exit(char *exec_path, int code, t_shell_state *shell)
 {
 	if (code == 127)
 		ft_putstr_fd(": command not found\n", STDERR_FILENO);
@@ -66,8 +65,8 @@ void	exec_external(char **args, char **envp, t_shell_state *shell)
 
 int	exec_heredoc(const char *delimiter, int quoted, t_shell_state *shell)
 {
-	int		pipefd[2];
-	int		is_tty;
+	int	pipefd[2];
+	int	is_tty;
 
 	if (pipe(pipefd) == -1)
 		return (-1);

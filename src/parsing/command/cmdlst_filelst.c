@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   cmdlst_filelst.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:31:52 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:37:21 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
 #include "executor.h"
+#include "minishell.h"
 #include <unistd.h>
 
 /* forward prototype for local helper */
@@ -40,7 +40,7 @@ t_cmd_node	*create_cmdnode(t_shell_state *shell)
 }
 
 void	create_filenode(char *filename, int red_type, t_file_list *filelst,
-	t_shell_state *shell)
+		t_shell_state *shell)
 {
 	t_file_node		*filenode;
 	t_heredoc_info	*hdoc_info;

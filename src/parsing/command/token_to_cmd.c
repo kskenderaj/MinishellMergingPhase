@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   token_to_cmd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:36:54 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:38:22 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "executor.h"
 #include "minishell.h"
 #include "parser.h"
-#include "executor.h"
 
 int	count_args(t_token *token)
 {
@@ -35,12 +35,12 @@ int	count_args(t_token *token)
 }
 
 char	**create_array(t_token *token, t_cmd_node *cmdnode, int i,
-	t_shell_state *shell)
+		t_shell_state *shell)
 {
 	char	**cmd_array;
 
 	cmd_array = gc_malloc(shell->gc, sizeof(char *) * ((size_t)count_args(token)
-			+ 1));
+				+ 1));
 	if (!cmd_array)
 		return (NULL);
 	if (process_tokens_to_array(token, cmdnode, cmd_array, &i, shell) < 0)
@@ -50,7 +50,7 @@ char	**create_array(t_token *token, t_cmd_node *cmdnode, int i,
 }
 
 char	*look_for_cmd(t_token *token, t_token_list *toklst, t_cmd_list *cmdlst,
-	t_shell_state *shell)
+		t_shell_state *shell)
 {
 	t_cmd_node	*cmdnode;
 
@@ -90,10 +90,10 @@ int	token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst, t_env_list *envlst,
 }
 
 void	final_token(t_token_list *toklst, t_env_list *envlst, int last_status,
-	t_shell_state *shell)
+		t_shell_state *shell)
 {
-	t_token	*token;
-	int		skip_next;
+	t_token *token;
+	int skip_next;
 
 	if (!toklst)
 		return ;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_redir_separated.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 13:50:15 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/23 16:23:45 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:41:50 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ int	handle_output_redirection(char **args, int *i, int *out_fd)
 }
 
 int	handle_input_redirection(char **args, int *i, int *in_fd,
-	t_shell_state *shell)
+		t_shell_state *shell)
 {
 	int	fd;
 
@@ -51,10 +51,7 @@ int	handle_input_redirection(char **args, int *i, int *in_fd,
 			close(*in_fd);
 		fd = open(args[*i + 1], O_RDONLY);
 		if (fd < 0)
-		{
-			perror(args[*i + 1]);
-			return (1);
-		}
+			return (perror(args[*i + 1]), 1);
 		*in_fd = fd;
 	}
 	else if (strcmp(args[*i], "<<") == 0 && args[*i + 1])
@@ -74,7 +71,7 @@ int	handle_input_redirection(char **args, int *i, int *in_fd,
 }
 
 int	handle_separated_operators(char **args, int *i, int *in_fd, int *out_fd,
-	t_shell_state *shell)
+		t_shell_state *shell)
 {
 	if (handle_output_redirection(args, i, out_fd) == 0)
 		return (0);

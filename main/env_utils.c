@@ -65,9 +65,9 @@ char	**env_list_to_array(t_env_list *env, t_shell_state *shell)
 
 char	***cmdlist_to_array(t_cmd_list *cmdlst, t_shell_state *shell)
 {
-	char		***cmds;
-	t_cmd_node	*node;
-	int			i;
+	char ***cmds;
+	t_cmd_node *node;
+	int i;
 
 	cmds = gc_malloc(shell->gc, sizeof(char **) * (cmdlst->size + 1));
 	if (!cmds)

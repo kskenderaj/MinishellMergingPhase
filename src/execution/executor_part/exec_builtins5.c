@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins5.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 16:10:37 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/23 16:10:56 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:42:58 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,8 +22,8 @@ int	is_in_exported(const char *name, t_shell_state *shell)
 	i = 0;
 	while (i < shell->exported_count)
 	{
-		if (shell->exported_vars[i]
-			&& ft_strcmp(shell->exported_vars[i], name) == 0)
+		if (shell->exported_vars[i] && ft_strcmp(shell->exported_vars[i],
+				name) == 0)
 			return (1);
 		i++;
 	}
@@ -57,7 +57,7 @@ void	set_export_value(char *name, char *value, t_shell_state *shell)
 	}
 	if (!is_in_exported(name, shell) && shell->exported_count < MAX_EXPORTED)
 	{
-		shell->exported_vars[shell->exported_count] = gc_strdup(shell->gc,
+		shell->exported_vars[shell->exported_count] = gc_strdup_persistent(shell->gc,
 				name);
 		if (shell->exported_vars[shell->exported_count])
 			shell->exported_count++;
@@ -72,15 +72,17 @@ static void	remove_from_exported(const char *name, t_shell_state *shell)
 	i = 0;
 	while (i < shell->exported_count)
 	{
-		if (shell->exported_vars[i]
-			&& ft_strcmp(shell->exported_vars[i], name) == 0)
+		if (shell->exported_vars[i] && ft_strcmp(shell->exported_vars[i],
+				name) == 0)
 		{
+			gc_free(shell->gc, shell->exported_vars[i]);
 			j = i;
 			while (j < shell->exported_count - 1)
 			{
 				shell->exported_vars[j] = shell->exported_vars[j + 1];
 				j++;
 			}
+			shell->exported_vars[shell->exported_count - 1] = NULL;
 			shell->exported_count--;
 			return ;
 		}

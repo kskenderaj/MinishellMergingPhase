@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_redir_attached.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 23:59:26 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:18:39 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:42:11 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,8 +102,8 @@ int	handle_attached_operators(t_redir_data *data, char *tok,
 		return (handle_attached_append(data->args, data->idx, data->out_fd,
 				tok));
 	if (strncmp(tok, "<<", 2) == 0)
-		return (handle_attached_heredoc(data->args, data->idx, data->in_fd,
-				tok, shell));
+		return (handle_attached_heredoc(data->args, data->idx, data->in_fd, tok,
+				shell));
 	if (tok[0] == '>' && tok[1] != '>')
 		return (handle_attached_outfile(data->args, data->idx, data->out_fd,
 				tok));

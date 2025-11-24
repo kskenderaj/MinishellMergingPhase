@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   tokenize.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/23 13:37:54 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/23 16:39:11 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:38:53 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "executor.h"
 #include "garbage_collector.h"
 #include "parser.h"
-#include "executor.h"
 
 t_token	*create_token(t_toktype type, char *val, t_shell_state *shell)
 {
@@ -46,7 +46,7 @@ int	push_token(t_token_list *lst, t_token *token)
 }
 
 int	add_token(t_token_list *lst, t_toktype type, char *str, int len,
-	t_shell_state *shell)
+		t_shell_state *shell)
 {
 	char	*copy;
 	t_token	*tok;

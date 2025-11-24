@@ -21,8 +21,8 @@ char	*read_heredoc_buffer(int is_tty, t_shell_state *shell)
 		return (read_line_from_stdin(shell));
 }
 
-int	check_delimiter(char *buffer, const char *delimiter,
-	size_t delim_len, int is_tty)
+int	check_delimiter(char *buffer, const char *delimiter, size_t delim_len,
+		int is_tty)
 {
 	if (ft_strncmp(buffer, delimiter, delim_len) == 0
 		&& buffer[delim_len] == '\0')
@@ -34,8 +34,7 @@ int	check_delimiter(char *buffer, const char *delimiter,
 	return (0);
 }
 
-int	handle_heredoc_interrupt(char *buffer, int pipefd[2],
-		t_shell_state *shell)
+int	handle_heredoc_interrupt(char *buffer, int pipefd[2], t_shell_state *shell)
 {
 	(void)shell;
 	if (buffer)
@@ -55,8 +54,8 @@ int	handle_heredoc_eof(int is_tty, int pipefd[2], t_shell_state *shell)
 	return (pipefd[0]);
 }
 
-void	process_heredoc_line(char *buffer, int quoted,
-		int pipefd[2], int is_tty, t_shell_state *shell)
+void	process_heredoc_line(char *buffer, int quoted, int pipefd[2],
+		int is_tty, t_shell_state *shell)
 {
 	char	*expanded;
 

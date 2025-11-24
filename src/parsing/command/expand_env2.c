@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   expand_env2.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 00:00:00 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/23 22:15:09 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:37:38 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "executor.h"
 #include "garbage_collector.h"
 #include "minishell.h"
-#include "executor.h"
 
 void	process_char(char **old, t_expand_ctx *ctx, int *i,
-	t_shell_state *shell)
+		t_shell_state *shell)
 {
 	char	*new;
 	int		len;
@@ -25,8 +25,8 @@ void	process_char(char **old, t_expand_ctx *ctx, int *i,
 	{
 		len = skip_var(ctx->seg_str + *i);
 		if (len == 1)
-			new = gc_strjoin(shell->gc, *old, gc_substr(shell->gc,
-						ctx->seg_str + *i, 0, 1));
+			new = gc_strjoin(shell->gc, *old, gc_substr(shell->gc, ctx->seg_str
+						+ *i, 0, 1));
 		else
 			new = gc_strjoin(shell->gc, *old, process_dollar(ctx->seg_str,
 						ctx->type, ctx->envlst, *i, shell));
@@ -34,8 +34,8 @@ void	process_char(char **old, t_expand_ctx *ctx, int *i,
 		*i += (len - 1);
 	}
 	else
-		*old = gc_strjoin(shell->gc, *old, gc_substr(shell->gc,
-					ctx->seg_str + *i, 0, 1));
+		*old = gc_strjoin(shell->gc, *old, gc_substr(shell->gc, ctx->seg_str
+					+ *i, 0, 1));
 }
 
 char	*segments_expand(t_segment_list *seglst, t_env_list *envlst,
@@ -62,4 +62,3 @@ char	*segments_expand(t_segment_list *seglst, t_env_list *envlst,
 	}
 	return (tmp);
 }
-

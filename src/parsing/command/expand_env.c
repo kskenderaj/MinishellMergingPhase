@@ -3,18 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   expand_env.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 22:18:08 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:37:33 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "executor.h"
 #include "garbage_collector.h"
 #include "minishell.h"
-#include "executor.h"
-
-// static int	g_last_status_cache;
 
 int	skip_var(char *s)
 {
@@ -69,10 +67,9 @@ char	*expand_env(char *str, t_env_list *env_lst, t_shell_state *shell)
 
 char	*process_dollar(char *seg_str, t_seg_type seg_type, t_env_list *envlst,
 		int i, t_shell_state *shell)
-
 {
 	static int	g_last_status_cache;
-	char	*expand;
+	char		*expand;
 
 	g_last_status_cache = 0;
 	expand = get_expand(seg_str, i, g_last_status_cache, envlst, shell);
@@ -83,7 +80,6 @@ char	*process_dollar(char *seg_str, t_seg_type seg_type, t_env_list *envlst,
 
 char	*expand_or_not(char *seg_str, t_seg_type seg_type, t_env_list *envlst,
 		int last_status, t_shell_state *shell)
-
 {
 	t_expand_ctx	ctx;
 	char			*old;

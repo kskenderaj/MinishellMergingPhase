@@ -69,8 +69,8 @@ static int	validate_all_redirections(t_pipeline_ctx *ctx, t_shell_state *shell)
 			gc_close(shell->gc, in_fd);
 		if (out_fd >= 0)
 			gc_close(shell->gc, out_fd);
-		if ((in_fd < 0 && in_fd != NO_REDIRECTION)
-			|| (out_fd < 0 && out_fd != NO_REDIRECTION))
+		if ((in_fd < 0 && in_fd != NO_REDIRECTION) || (out_fd < 0
+				&& out_fd != NO_REDIRECTION))
 		{
 			shell->last_status = 1;
 			return (1);
@@ -81,8 +81,8 @@ static int	validate_all_redirections(t_pipeline_ctx *ctx, t_shell_state *shell)
 	return (0);
 }
 
-static int	setup_and_fork_child(t_pipeline_ctx *ctx, int i,
-	t_child_ctx *child, t_cmd_node *node, t_shell_state *shell)
+static int	setup_and_fork_child(t_pipeline_ctx *ctx, int i, t_child_ctx *child,
+		t_cmd_node *node, t_shell_state *shell)
 {
 	int				fds[2];
 	t_child_init	init;

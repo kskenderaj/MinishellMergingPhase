@@ -26,15 +26,15 @@ char	*process_line(char *content, int start, int i, t_shell_state *shell)
 	return (result);
 }
 
-void	heredoc_read_loop(const char *delimiter, int quoted,
-		int pipefd[2], int is_tty, t_shell_state *shell)
+void	heredoc_read_loop(const char *delimiter, int quoted, int pipefd[2],
+		int is_tty, t_shell_state *shell)
 {
 	char	*buffer;
 	size_t	delim_len;
 
 	delim_len = ft_strlen(delimiter);
 	if (delim_len == 0)
-		delim_len = (size_t) - 1;
+		delim_len = (size_t)-1;
 	while (1)
 	{
 		buffer = read_heredoc_buffer(is_tty, shell);

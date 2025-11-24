@@ -3,17 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins4.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 16:10:09 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/23 16:10:25 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:28:00 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 #include "minishell.h"
 
-void	update_shell_env(const char *name, const char *value, t_shell_state *shell)
+void	update_shell_env(const char *name, const char *value,
+		t_shell_state *shell)
 {
 	t_env_node	*existing;
 	t_env_node	*new_node;
@@ -93,7 +94,8 @@ void	print_exported_env(t_shell_state *shell)
 	i = 0;
 	while (i < shell->exported_count && i < MAX_EXPORTED)
 	{
-		if (shell->exported_vars[i]
+		if (shell->exported_vars[i] && shell->exported_vars[i][0] != '\0'
+			&& is_valid_identifier(shell->exported_vars[i])
 			&& !get_env_value(shell->env, shell->exported_vars[i]))
 		{
 			ft_putstr_fd("declare -x ", STDOUT_FILENO);

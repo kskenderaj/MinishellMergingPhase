@@ -3,17 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   find_token.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:34:43 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/24 15:37:37 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "parser.h"
 #include "executor.h"
+#include "parser.h"
 
-int	no_quote_segment(t_segment_list *lst, char *str, int *i, t_shell_state *shell)
+int	no_quote_segment(t_segment_list *lst, char *str, int *i,
+		t_shell_state *shell)
 {
 	int			start;
 	t_segment	*segment;
@@ -23,9 +24,13 @@ int	no_quote_segment(t_segment_list *lst, char *str, int *i, t_shell_state *shel
 		(*i)++;
 	if (*i > start)
 	{
-		segment = create_segment(str + start, (*i - start), SEG_NO, shell);
-		if (!segment || !push_segment(lst, segment))
-			return (0);
+		if (!(((*i - start) == 1) && (str[start] == '$') && (str[*i] == '"'
+					|| str[*i] == '\'')))
+		{
+			segment = create_segment(str + start, (*i - start), SEG_NO, shell);
+			if (!segment || !push_segment(lst, segment))
+				return (0);
+		}
 	}
 	return (1);
 }
@@ -76,7 +81,8 @@ int	find_segment(t_segment_list *lst, char *str, t_shell_state *shell)
 	return (1);
 }
 
-t_segment	*create_segment(char *start, int len, t_seg_type type, t_shell_state *shell)
+t_segment	*create_segment(char *start, int len, t_seg_type type,
+		t_shell_state *shell)
 {
 	t_segment	*segment;
 
