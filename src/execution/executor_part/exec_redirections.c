@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   exec_redirections.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/26 17:00:04 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/23 16:24:42 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 16:09:48 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 
-static t_file_node	*find_last_input(t_commandlist *cmd, int input_count)
+static t_file_node *find_last_input(t_commandlist *cmd, int input_count)
 {
-	int			current_count;
-	t_file_node	*current;
+	int current_count;
+	t_file_node *current;
 
 	current_count = 0;
 	current = (t_file_node *)cmd->files;
@@ -32,10 +32,10 @@ static t_file_node	*find_last_input(t_commandlist *cmd, int input_count)
 	return (NULL);
 }
 
-static int	check_all_input_files(t_commandlist *cmd, t_shell_state *shell)
+static int check_all_input_files(t_commandlist *cmd, t_shell_state *shell)
 {
-	t_file_node	*current;
-	int			fd;
+	t_file_node *current;
+	int fd;
 
 	current = (t_file_node *)cmd->files;
 	while (current != NULL)
@@ -56,11 +56,11 @@ static int	check_all_input_files(t_commandlist *cmd, t_shell_state *shell)
 	return (0);
 }
 
-int	setup_input_file(t_commandlist *cmd, t_shell_state *shell)
+int setup_input_file(t_commandlist *cmd, t_shell_state *shell)
 {
-	int			input_count;
-	t_file_node	*last_input;
-	int			fd;
+	int input_count;
+	t_file_node *last_input;
+	int fd;
 
 	input_count = count_input(cmd);
 	if (input_count == 0)
@@ -73,7 +73,7 @@ int	setup_input_file(t_commandlist *cmd, t_shell_state *shell)
 	if (last_input->redir_type == HEREDOC)
 	{
 		return (exec_heredoc_from_content(last_input->heredoc_content,
-				last_input->heredoc_quoted, shell));
+										  last_input->heredoc_quoted, shell));
 	}
 	fd = gc_open(shell->gc, last_input->filename, O_RDONLY, 0);
 	if (fd < 0)
@@ -84,17 +84,16 @@ int	setup_input_file(t_commandlist *cmd, t_shell_state *shell)
 	return (fd);
 }
 
-static t_file_node	*find_last_output(t_commandlist *cmd, int output_count)
+static t_file_node *find_last_output(t_commandlist *cmd, int output_count)
 {
-	int			current_count;
-	t_file_node	*current;
+	int current_count;
+	t_file_node *current;
 
 	current_count = 0;
 	current = (t_file_node *)cmd->files;
 	while (current != NULL)
 	{
-		if (current->redir_type == OUTFILE
-			|| current->redir_type == OUTFILE_APPEND)
+		if (current->redir_type == OUTFILE || current->redir_type == OUTFILE_APPEND)
 		{
 			current_count++;
 			if (current_count == output_count)
@@ -105,24 +104,26 @@ static t_file_node	*find_last_output(t_commandlist *cmd, int output_count)
 	return (NULL);
 }
 
-int	setup_output_file(t_commandlist *cmd, t_shell_state *shell)
+int setup_output_file(t_commandlist *cmd, t_shell_state *shell)
 {
-	int			output_count;
-	t_file_node	*last_output;
-	int			fd;
+	int output_count;
+	t_file_node *last_output;
+	int fd;
 
 	output_count = count_output(cmd);
 	if (output_count == 0)
 		return (NO_REDIRECTION);
+	if (open_all_output_files(cmd, shell) == -1)
+		return (-1);
 	last_output = find_last_output(cmd, output_count);
 	if (last_output == NULL)
 		return (NO_REDIRECTION);
 	if (last_output->redir_type == OUTFILE)
 		fd = gc_open(shell->gc, last_output->filename,
-				O_WRONLY | O_CREAT | O_TRUNC, 0644);
+					 O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	else
 		fd = gc_open(shell->gc, last_output->filename,
-				O_WRONLY | O_CREAT | O_APPEND, 0644);
+					 O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd < 0)
 	{
 		perror(last_output->filename);

@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   input_processing.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:01:45 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:49:34 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.h"
 
-int	process_command(t_cmd_list *cmdlst, t_env_list *envlst,
-		t_shell_state *shell)
+int process_command(t_cmd_list *cmdlst, t_env_list *envlst,
+					t_shell_state *shell)
 {
-	int	ret;
+	int ret;
 
 	if (!cmdlst || !cmdlst->head)
 		return (0);
@@ -27,33 +27,30 @@ int	process_command(t_cmd_list *cmdlst, t_env_list *envlst,
 	return (ret);
 }
 
-int	process_input_line(char *line, t_env_list *env, int last_status,
-		t_shell_state *shell)
+static int handle_syntax_error(t_cmd_list *cmdlst, t_shell_state *shell)
 {
-	t_token_list	toklst;
-	t_cmd_list		cmdlst;
+	if (cmdlst->syntax_error)
+		ft_putendl_fd("minishell: syntax error", 2);
+	gc_clear(shell->gc);
+	return (2);
+}
+
+int process_input_line(char *line, t_env_list *env, int last_status,
+					   t_shell_state *shell)
+{
+	t_token_list toklst;
+	t_cmd_list cmdlst;
 
 	if (!line || !*line)
 		return (last_status);
 	init_token_lst(&toklst);
 	init_cmd_lst(&cmdlst);
 	if (tokenize(&toklst, line, shell) != 0)
-	{
-		ft_putendl_fd("minishell: syntax error", 2);
-		return (2);
-	}
-	if (token_to_cmd(&toklst, &cmdlst, env, last_status, shell) != 0)
-	{
-		if (cmdlst.syntax_error)
-			ft_putendl_fd("minishell: syntax error", 2);
-		return (2);
-	}
+		return (handle_syntax_error(&cmdlst, shell));
+	if (token_to_cmd(&toklst, &cmdlst, shell) != 0)
+		return (handle_syntax_error(&cmdlst, shell));
 	if (cmdlst.syntax_error)
-	{
-		ft_putendl_fd("minishell: syntax error", 2);
-		gc_clear(shell->gc);
-		return (2);
-	}
+		return (handle_syntax_error(&cmdlst, shell));
 	process_all_heredocs(&cmdlst, shell);
 	if (cmdlst.head)
 	{
@@ -65,13 +62,33 @@ int	process_input_line(char *line, t_env_list *env, int last_status,
 	return (0);
 }
 
-char	*read_line_noninteractive(void)
+static int append_char(char **line, char c, int *len, int *capacity)
 {
-	char	*line;
-	char	c;
-	int		len;
-	int		capacity;
-	ssize_t	ret;
+	char *tmp;
+
+	if (*len >= *capacity)
+	{
+		if (*capacity == 0)
+			*capacity = 64;
+		else
+			*capacity *= 2;
+		tmp = ft_realloc(*line, *len, *capacity);
+		if (!tmp)
+			return (0);
+		*line = tmp;
+	}
+	(*line)[*len] = c;
+	(*len)++;
+	return (1);
+}
+
+char *read_line_noninteractive(void)
+{
+	char *line;
+	char c;
+	int len;
+	int capacity;
+	ssize_t ret;
 
 	line = NULL;
 	len = 0;
@@ -80,17 +97,11 @@ char	*read_line_noninteractive(void)
 	{
 		ret = read(STDIN_FILENO, &c, 1);
 		if (ret <= 0)
-			return (line);
+			break;
 		if (c == '\n')
-			break ;
-		if (len >= capacity)
-		{
-			capacity = (capacity == 0) * 64 + (capacity != 0) * (capacity * 2);
-			line = ft_realloc(line, len, capacity);
-			if (!line)
-				return (NULL);
-		}
-		line[len++] = c;
+			break;
+		if (!append_char(&line, c, &len, &capacity))
+			return (NULL);
 	}
 	if (len == 0 && ret <= 0)
 		return (NULL);

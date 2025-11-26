@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   single_cmd_setup.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:04:46 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:51:39 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.h"
 
-static int	save_std_fds(int *saved_stdin, int *saved_stdout)
+static int save_std_fds(int *saved_stdin, int *saved_stdout)
 {
 	*saved_stdin = dup(STDIN_FILENO);
 	*saved_stdout = dup(STDOUT_FILENO);
@@ -27,10 +27,10 @@ static int	save_std_fds(int *saved_stdin, int *saved_stdout)
 	return (0);
 }
 
-int	setup_cmd_redirections(t_cmd_node *cmd, t_redir_fds *fds,
-		t_shell_state *shell)
+int setup_cmd_redirections(t_cmd_node *cmd, t_redir_fds *fds,
+						   t_shell_state *shell)
 {
-	int	saved_status;
+	int saved_status;
 
 	fds->saved_stdin = -1;
 	fds->saved_stdout = -1;
@@ -50,7 +50,7 @@ int	setup_cmd_redirections(t_cmd_node *cmd, t_redir_fds *fds,
 	return (0);
 }
 
-void	apply_cmd_redirections(t_redir_fds *fds, t_shell_state *shell)
+void apply_cmd_redirections(t_redir_fds *fds, t_shell_state *shell)
 {
 	(void)shell;
 	if (fds->in_fd >= 0 && fds->in_fd != NO_REDIRECTION)
@@ -65,7 +65,7 @@ void	apply_cmd_redirections(t_redir_fds *fds, t_shell_state *shell)
 	}
 }
 
-void	restore_cmd_fds(t_redir_fds *fds, t_shell_state *shell)
+void restore_cmd_fds(t_redir_fds *fds, t_shell_state *shell)
 {
 	(void)shell;
 	if (fds->saved_stdin >= 0)
@@ -80,8 +80,8 @@ void	restore_cmd_fds(t_redir_fds *fds, t_shell_state *shell)
 	}
 }
 
-void	cleanup_cmd_redir_failure(t_redir_fds *fds, char **envp, char **merged,
-		t_shell_state *shell)
+void cleanup_cmd_redir_failure(t_redir_fds *fds, char **envp, char **merged,
+							   t_shell_state *shell)
 {
 	(void)envp;
 	(void)merged;

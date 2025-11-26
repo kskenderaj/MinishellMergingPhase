@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins5.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 16:10:37 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/24 14:42:58 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/26 14:00:12 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 #include "minishell.h"
 
-int	is_in_exported(const char *name, t_shell_state *shell)
+int is_in_exported(const char *name, t_shell_state *shell)
 {
-	int	i;
+	int i;
 
 	if (!name)
 		return (0);
@@ -23,14 +23,14 @@ int	is_in_exported(const char *name, t_shell_state *shell)
 	while (i < shell->exported_count)
 	{
 		if (shell->exported_vars[i] && ft_strcmp(shell->exported_vars[i],
-				name) == 0)
+												 name) == 0)
 			return (1);
 		i++;
 	}
 	return (0);
 }
 
-int	export_invalid_error(char *name, t_shell_state *shell)
+int export_invalid_error(char *name, t_shell_state *shell)
 {
 	(void)shell;
 	ft_putstr_fd("export: not a valid identifier: ", STDERR_FILENO);
@@ -39,9 +39,9 @@ int	export_invalid_error(char *name, t_shell_state *shell)
 	return (1);
 }
 
-void	set_export_value(char *name, char *value, t_shell_state *shell)
+void set_export_value(char *name, char *value, t_shell_state *shell)
 {
-	char	*stripped;
+	char *stripped;
 
 	stripped = strip_quotes(value, shell);
 	if (stripped)
@@ -57,23 +57,22 @@ void	set_export_value(char *name, char *value, t_shell_state *shell)
 	}
 	if (!is_in_exported(name, shell) && shell->exported_count < MAX_EXPORTED)
 	{
-		shell->exported_vars[shell->exported_count] = gc_strdup_persistent(shell->gc,
-				name);
+		shell->exported_vars[shell->exported_count] = gc_strdup_persistent(shell->gc, name);
 		if (shell->exported_vars[shell->exported_count])
 			shell->exported_count++;
 	}
 }
 
-static void	remove_from_exported(const char *name, t_shell_state *shell)
+static void remove_from_exported(const char *name, t_shell_state *shell)
 {
-	int	i;
-	int	j;
+	int i;
+	int j;
 
 	i = 0;
 	while (i < shell->exported_count)
 	{
 		if (shell->exported_vars[i] && ft_strcmp(shell->exported_vars[i],
-				name) == 0)
+												 name) == 0)
 		{
 			gc_free(shell->gc, shell->exported_vars[i]);
 			j = i;
@@ -84,16 +83,16 @@ static void	remove_from_exported(const char *name, t_shell_state *shell)
 			}
 			shell->exported_vars[shell->exported_count - 1] = NULL;
 			shell->exported_count--;
-			return ;
+			return;
 		}
 		i++;
 	}
 }
 
-int	ft_unset(char **args, t_shell_state *shell)
+int ft_unset(char **args, t_shell_state *shell)
 {
-	int	i;
-	int	has_error;
+	int i;
+	int has_error;
 
 	i = 1;
 	has_error = 0;
@@ -106,7 +105,7 @@ int	ft_unset(char **args, t_shell_state *shell)
 			ft_putchar_fd('\n', STDERR_FILENO);
 			has_error = 1;
 			i++;
-			continue ;
+			continue;
 		}
 		unsetenv(args[i]);
 		remove_from_env_list(shell->env, args[i]);

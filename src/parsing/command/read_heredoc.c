@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   read_heredoc.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/24 14:38:03 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/26 16:18:36 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,10 +16,20 @@
 #include <readline/readline.h>
 #include <unistd.h>
 
-char	*append_line(char *content, char *line, t_shell_state *shell)
+static int check_heredoc_interrupt(void)
 {
-	char	*new_content;
-	char	*with_newline;
+	if (g_signal_status == 130)
+	{
+		rl_done = 1;
+		return (0);
+	}
+	return (0);
+}
+
+char *append_line(char *content, char *line, t_shell_state *shell)
+{
+	char *new_content;
+	char *with_newline;
 
 	if (!line)
 		return (content);
@@ -34,29 +44,9 @@ char	*append_line(char *content, char *line, t_shell_state *shell)
 	return (new_content);
 }
 
-int	is_delimiter(char *line, char *delimiter)
+int handle_heredoc_line(char **content, char *line, char *delimiter,
+						t_shell_state *shell)
 {
-	size_t	len;
-
-	if (!line || !delimiter)
-		return (0);
-	len = ft_strlen(delimiter);
-	if (len == 0)
-		return (0);
-	if (ft_strncmp(line, delimiter, len) == 0 && line[len] == '\0')
-		return (1);
-	return (0);
-}
-
-int	handle_heredoc_line(char **content, char *line, char *delimiter,
-		t_shell_state *shell)
-{
-	if (g_sigint_status == 130)
-	{
-		if (line)
-			free(line);
-		return (-1);
-	}
 	if (!line)
 	{
 		write(2, "warning: here-document delimited by end-of-file\n", 49);
@@ -72,25 +62,47 @@ int	handle_heredoc_line(char **content, char *line, char *delimiter,
 	return (0);
 }
 
-char	*read_heredoc_content(char *delimiter, t_shell_state *shell)
+static int check_signal_and_read(char **line)
 {
-	char	*content;
-	char	*line;
-	int		ret;
+	if (g_signal_status == 130)
+	{
+		rl_event_hook = NULL;
+		return (1);
+	}
+	*line = readline("> ");
+	if (g_signal_status == 130)
+	{
+		if (*line)
+			free(*line);
+		rl_event_hook = NULL;
+		return (1);
+	}
+	return (0);
+}
+
+char *read_heredoc_content(char *delimiter, t_shell_state *shell)
+{
+	char *content;
+	char *line;
+	int ret;
 
 	if (!delimiter || !isatty(STDIN_FILENO))
 		return (NULL);
 	content = NULL;
+	rl_event_hook = check_heredoc_interrupt;
 	while (1)
 	{
-		line = readline("> ");
+		if (check_signal_and_read(&line))
+			return (NULL);
 		ret = handle_heredoc_line(&content, line, delimiter, shell);
-		if (ret == -1)
+		if (ret == 1 || ret == 2)
+			break;
+		if (!line)
 		{
+			rl_event_hook = NULL;
 			return (NULL);
 		}
-		if (ret == 1 || ret == 2)
-			break ;
 	}
+	rl_event_hook = NULL;
 	return (content);
 }

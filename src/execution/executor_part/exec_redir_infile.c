@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   exec_redir_infile.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 17:25:42 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:22:21 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 16:08:33 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 
 // Counts infile/heredoc redirections
-int	count_infile(t_commandlist *cmd)
+int count_infile(t_commandlist *cmd)
 {
-	int			count;
-	t_filelist	*cur;
+	int count;
+	t_filelist *cur;
 
 	count = 0;
 	cur = cmd->files;
@@ -30,10 +30,10 @@ int	count_infile(t_commandlist *cmd)
 }
 
 // Finds the last infile/heredoc
-static t_filelist	*find_last_infile(t_commandlist *cmd, int infile_count)
+static t_filelist *find_last_infile(t_commandlist *cmd, int infile_count)
 {
-	int			cur_count;
-	t_filelist	*cur;
+	int cur_count;
+	t_filelist *cur;
 
 	cur_count = 0;
 	cur = cmd->files;
@@ -51,11 +51,11 @@ static t_filelist	*find_last_infile(t_commandlist *cmd, int infile_count)
 }
 
 // Opens the last infile and returns fd
-int	setup_infile_fd(t_commandlist *cmd, t_shell_state *shell)
+int setup_infile_fd(t_commandlist *cmd, t_shell_state *shell)
 {
-	int			infile_count;
-	t_filelist	*last_infile;
-	int			fd;
+	int infile_count;
+	t_filelist *last_infile;
+	int fd;
 
 	(void)shell;
 	infile_count = count_infile(cmd);

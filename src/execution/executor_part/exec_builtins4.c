@@ -3,24 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins4.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 16:10:09 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/24 14:28:00 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:57:12 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 #include "minishell.h"
 
-void	update_shell_env(const char *name, const char *value,
-		t_shell_state *shell)
+void update_shell_env(const char *name, const char *value,
+					  t_shell_state *shell)
 {
-	t_env_node	*existing;
-	t_env_node	*new_node;
+	t_env_node *existing;
+	t_env_node *new_node;
 
 	if (!shell->env || !name)
-		return ;
+		return;
 	existing = shell->env->head;
 	while (existing)
 	{
@@ -29,7 +29,7 @@ void	update_shell_env(const char *name, const char *value,
 			if (existing->value)
 				free(existing->value);
 			existing->value = ft_strdup(value);
-			return ;
+			return;
 		}
 		existing = existing->next;
 	}
@@ -42,14 +42,13 @@ void	update_shell_env(const char *name, const char *value,
 	}
 }
 
-char	*strip_quotes(const char *value, t_shell_state *shell)
+char *strip_quotes(const char *value, t_shell_state *shell)
 {
-	int		len;
-	char	*stripped;
+	int len;
+	char *stripped;
 
 	len = ft_strlen(value);
-	if (len >= 2 && ((value[0] == '"' && value[len - 1] == '"')
-			|| (value[0] == '\'' && value[len - 1] == '\'')))
+	if (len >= 2 && ((value[0] == '"' && value[len - 1] == '"') || (value[0] == '\'' && value[len - 1] == '\'')))
 	{
 		stripped = (char *)gc_malloc(shell->gc, (size_t)len - 1);
 		if (stripped)
@@ -62,41 +61,14 @@ char	*strip_quotes(const char *value, t_shell_state *shell)
 	return (NULL);
 }
 
-void	print_exported_env(t_shell_state *shell)
+static void print_exported_vars(t_shell_state *shell)
 {
-	t_env_node	*node;
-	int			i;
+	int i;
 
-	node = shell->env->head;
-	while (node)
-	{
-		if (!node->key)
-		{
-			node = node->next;
-			continue ;
-		}
-		if (node->value && node->value[0])
-		{
-			ft_putstr_fd("declare -x ", STDOUT_FILENO);
-			ft_putstr_fd(node->key, STDOUT_FILENO);
-			ft_putstr_fd("=\"", STDOUT_FILENO);
-			ft_putstr_fd(node->value, STDOUT_FILENO);
-			ft_putstr_fd("\"\n", STDOUT_FILENO);
-		}
-		else
-		{
-			ft_putstr_fd("declare -x ", STDOUT_FILENO);
-			ft_putstr_fd(node->key, STDOUT_FILENO);
-			ft_putchar_fd('\n', STDOUT_FILENO);
-		}
-		node = node->next;
-	}
 	i = 0;
 	while (i < shell->exported_count && i < MAX_EXPORTED)
 	{
-		if (shell->exported_vars[i] && shell->exported_vars[i][0] != '\0'
-			&& is_valid_identifier(shell->exported_vars[i])
-			&& !get_env_value(shell->env, shell->exported_vars[i]))
+		if (shell->exported_vars[i] && shell->exported_vars[i][0] != '\0' && is_valid_identifier(shell->exported_vars[i]) && !get_env_value(shell->env, shell->exported_vars[i]))
 		{
 			ft_putstr_fd("declare -x ", STDOUT_FILENO);
 			ft_putstr_fd(shell->exported_vars[i], STDOUT_FILENO);
@@ -106,10 +78,36 @@ void	print_exported_env(t_shell_state *shell)
 	}
 }
 
-int	ft_env(char **args, t_shell_state *shell)
+void print_exported_env(t_shell_state *shell)
 {
-	extern char	**environ;
-	int			i;
+	t_env_node *node;
+
+	node = shell->env->head;
+	while (node)
+	{
+		if (!node->key)
+		{
+			node = node->next;
+			continue;
+		}
+		ft_putstr_fd("declare -x ", STDOUT_FILENO);
+		ft_putstr_fd(node->key, STDOUT_FILENO);
+		if (node->value && node->value[0])
+		{
+			ft_putstr_fd("=\"", STDOUT_FILENO);
+			ft_putstr_fd(node->value, STDOUT_FILENO);
+			ft_putstr_fd("\"", STDOUT_FILENO);
+		}
+		ft_putchar_fd('\n', STDOUT_FILENO);
+		node = node->next;
+	}
+	print_exported_vars(shell);
+}
+
+int ft_env(char **args, t_shell_state *shell)
+{
+	extern char **environ;
+	int i;
 
 	i = 0;
 	(void)args;

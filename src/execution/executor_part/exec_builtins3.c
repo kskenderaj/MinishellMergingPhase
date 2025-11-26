@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins3.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 18:06:11 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/24 13:57:12 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:56:33 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 #include "minishell.h"
 
-static int	is_numeric(const char *str)
+static int is_numeric(const char *str)
 {
-	int	i;
+	int i;
 
 	if (!str || !*str)
 		return (0);
@@ -33,7 +33,7 @@ static int	is_numeric(const char *str)
 	return (1);
 }
 
-static void	cleanup_and_exit(int exit_code, t_shell_state *shell)
+static void cleanup_and_exit(int exit_code, t_shell_state *shell)
 {
 	if (shell->current_line)
 		free(shell->current_line);
@@ -43,10 +43,10 @@ static void	cleanup_and_exit(int exit_code, t_shell_state *shell)
 	exit(exit_code);
 }
 
-static void	exit_print_error(char *arg)
+static void exit_print_error(char *arg)
 {
-	int	i;
-	int	is_printable;
+	int i;
+	int is_printable;
 
 	ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
 	if (arg)
@@ -58,7 +58,7 @@ static void	exit_print_error(char *arg)
 			if (arg[i] < 32 || arg[i] > 126)
 			{
 				is_printable = 0;
-				break ;
+				break;
 			}
 			i++;
 		}
@@ -68,9 +68,9 @@ static void	exit_print_error(char *arg)
 	ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
 }
 
-int	ft_exit(char **args, t_shell_state *shell)
+int ft_exit(char **args, t_shell_state *shell)
 {
-	long	exit_code;
+	long exit_code;
 
 	if (shell->is_interactive)
 		ft_putstr_fd("exit\n", STDOUT_FILENO);

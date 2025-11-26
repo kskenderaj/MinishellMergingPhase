@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   exec_external_handler.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 17:34:28 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:12:14 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 14:50:36 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 #include "minishell.h"
 
-static void	exec_error_and_exit(char *exec_path, int code, t_shell_state *shell)
+static void exec_error_and_exit(char *exec_path, int code, t_shell_state *shell)
 {
 	if (code == 127)
 		ft_putstr_fd(": command not found\n", STDERR_FILENO);
@@ -25,8 +25,8 @@ static void	exec_error_and_exit(char *exec_path, int code, t_shell_state *shell)
 	exit(code);
 }
 
-static int	check_exec_errors(char **args, char *exec_path,
-		t_shell_state *shell)
+static int check_exec_errors(char **args, char *exec_path,
+							 t_shell_state *shell)
 {
 	if (!exec_path)
 	{
@@ -48,13 +48,13 @@ static int	check_exec_errors(char **args, char *exec_path,
 	return (0);
 }
 
-void	exec_external(char **args, char **envp, t_shell_state *shell)
+void exec_external(char **args, char **envp, t_shell_state *shell)
 {
-	char	*exec_path;
+	char *exec_path;
 
 	if (!args || !args[0])
-		return ;
-	reset_signals_for_child();
+		return;
+	set_signals_child();
 	exec_path = find_in_path(args[0], shell);
 	check_exec_errors(args, exec_path, shell);
 	execve(exec_path, args, envp);
@@ -63,15 +63,21 @@ void	exec_external(char **args, char **envp, t_shell_state *shell)
 	exit(126);
 }
 
-int	exec_heredoc(const char *delimiter, int quoted, t_shell_state *shell)
+int exec_heredoc(const char *delimiter, int quoted, t_shell_state *shell)
 {
-	int	pipefd[2];
-	int	is_tty;
+	int pipefd[2];
+	int is_tty;
+	t_heredoc_ctx ctx;
 
 	if (pipe(pipefd) == -1)
 		return (-1);
 	is_tty = isatty(STDIN_FILENO);
-	heredoc_read_loop(delimiter, quoted, pipefd, is_tty, shell);
+	ctx.shell = shell;
+	ctx.delimiter = delimiter;
+	ctx.quoted = quoted;
+	ctx.pipefd = pipefd;
+	ctx.is_tty = is_tty;
+	heredoc_read_loop(&ctx);
 	close(pipefd[1]);
 	return (pipefd[0]);
 }

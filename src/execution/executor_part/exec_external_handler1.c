@@ -3,21 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   exec_external_handler1.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 16:13:19 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/23 16:14:51 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 14:51:36 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 #include "minishell.h"
 
-char	*expand_heredoc_line(char *line, int should_expand,
-		t_shell_state *shell)
+char *expand_heredoc_line(char *line, int should_expand,
+						  t_shell_state *shell)
 {
-	t_segment_list	*seglst;
-	char			*expanded;
+	t_segment_list *seglst;
+	char *expanded;
 
 	if (!should_expand || !line)
 		return (line);
@@ -33,48 +33,51 @@ char	*expand_heredoc_line(char *line, int should_expand,
 	return (expanded);
 }
 
-static void	process_newline(char **result, char *content, int *start, int i,
-		t_shell_state *shell)
+static void process_newline(t_heredoc_ctx *ctx)
 {
-	char	*line;
-	char	*expanded;
+	char *line;
+	char *expanded;
 
-	line = gc_substr(shell->gc, content, *start, i - *start);
-	expanded = expand_heredoc_line(line, 1, shell);
-	*result = gc_strjoin(shell->gc, *result, expanded);
-	*result = gc_strjoin(shell->gc, *result, "\n");
-	*start = i + 1;
+	line = gc_substr(ctx->shell->gc, ctx->content, *ctx->start,
+					 ctx->i - *ctx->start);
+	expanded = expand_heredoc_line(line, 1, ctx->shell);
+	*ctx->result = gc_strjoin(ctx->shell->gc, *ctx->result, expanded);
+	*ctx->result = gc_strjoin(ctx->shell->gc, *ctx->result, "\n");
+	*ctx->start = ctx->i + 1;
 }
 
-char	*expand_heredoc_content(char *content, int quoted, t_shell_state *shell)
+char *expand_heredoc_content(char *content, int quoted, t_shell_state *shell)
 {
-	char	*result;
-	int		i;
-	int		start;
+	char *result;
+	t_heredoc_ctx ctx;
+	int start;
 
 	if (!content || quoted)
 		return (content);
 	result = gc_strdup(shell->gc, "");
-	i = 0;
 	start = 0;
-	while (content[i])
+	ctx.result = &result;
+	ctx.content = content;
+	ctx.start = &start;
+	ctx.shell = shell;
+	ctx.i = 0;
+	while (content[ctx.i])
 	{
-		if (content[i] == '\n')
-			process_newline(&result, content, &start, i, shell);
-		i++;
+		if (content[ctx.i] == '\n')
+			process_newline(&ctx);
+		ctx.i++;
 	}
-	if (start < i)
+	if (start < ctx.i)
 	{
-		result = gc_strjoin(shell->gc, result, process_line(content, start, i,
-					shell));
+		result = gc_strjoin(shell->gc, result, process_line(content, start, ctx.i, shell));
 	}
 	return (result);
 }
 
-int	exec_heredoc_from_content(char *content, int quoted, t_shell_state *shell)
+int exec_heredoc_from_content(char *content, int quoted, t_shell_state *shell)
 {
-	int		pipefd[2];
-	char	*expanded;
+	int pipefd[2];
+	char *expanded;
 
 	if (pipe(pipefd) == -1)
 		return (-1);
@@ -89,12 +92,12 @@ int	exec_heredoc_from_content(char *content, int quoted, t_shell_state *shell)
 	return (pipefd[0]);
 }
 
-char	*read_line_from_stdin(t_shell_state *shell)
+char *read_line_from_stdin(t_shell_state *shell)
 {
-	char	buffer[2];
-	char	*line;
-	char	*tmp;
-	ssize_t	bytes;
+	char buffer[2];
+	char *line;
+	char *tmp;
+	ssize_t bytes;
 
 	line = gc_strdup(shell->gc, "");
 	buffer[1] = '\0';

@@ -3,65 +3,62 @@
 /*                                                        :::      ::::::::   */
 /*   main_loop.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:02:13 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:49:58 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.h"
 
-static int	handle_eof(int interactive)
+static char *get_input_line(int interactive)
 {
-	if (interactive && g_sigint_status == 130)
-	{
-		g_sigint_status = 0;
-		return (1);
-	}
-	return (0);
+	if (interactive)
+		return (readline(PROMPT));
+	return (read_line_noninteractive());
 }
 
-static void	handle_sigint(int *last_status)
+static int handle_single_line(char *line, t_env_list *env,
+							  t_shell_state *shell, int last_status)
 {
-	if (g_sigint_status == 130)
+	if (*line)
 	{
-		*last_status = 130;
-		g_sigint_status = 0;
+		if (shell->is_interactive)
+			add_history(line);
+		within_command();
+		last_status = process_input_line(line, env, last_status, shell);
+		out_command();
 	}
+	return (last_status);
 }
 
-int	main_loop(t_env_list *env, t_shell_state *shell)
+static int process_line_cleanup(char *line, t_env_list *env,
+								t_shell_state *shell, int last_status)
 {
-	char	*line;
-	int		last_status;
-	int		interactive;
+	last_status = handle_single_line(line, env, shell, last_status);
+	free(line);
+	shell->current_line = NULL;
+	return (last_status);
+}
+
+int main_loop(t_env_list *env, t_shell_state *shell)
+{
+	char *line;
+	int last_status;
+	int interactive;
 
 	last_status = 0;
 	interactive = isatty(STDIN_FILENO);
 	shell->is_interactive = interactive;
 	while (1)
 	{
-		if (interactive)
-			line = readline(PROMPT);
-		else
-			line = read_line_noninteractive();
+		out_command();
+		line = get_input_line(interactive);
 		if (!line)
-		{
-			if (handle_eof(interactive))
-				continue ;
-			break ;
-		}
+			break;
 		shell->current_line = line;
-		handle_sigint(&last_status);
-		if (*line)
-		{
-			if (interactive)
-				add_history(line);
-			last_status = process_input_line(line, env, last_status, shell);
-		}
-		free(line);
-		shell->current_line = NULL;
+		last_status = process_line_cleanup(line, env, shell, last_status);
 	}
 	if (interactive)
 	{

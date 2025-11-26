@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   exec_redir_separated.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 13:50:15 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/24 14:41:50 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/26 16:09:15 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 
-int	handle_output_redirection(char **args, int *i, int *out_fd)
+int handle_output_redirection(char **args, int *i, int *out_fd)
 {
-	int	flags;
-	int	fd;
+	int flags;
+	int fd;
 
 	if (strcmp(args[*i], ">") == 0)
 		flags = O_WRONLY | O_CREAT | O_TRUNC;
@@ -40,10 +40,10 @@ int	handle_output_redirection(char **args, int *i, int *out_fd)
 	return (0);
 }
 
-int	handle_input_redirection(char **args, int *i, int *in_fd,
-		t_shell_state *shell)
+int handle_input_redirection(char **args, int *i, int *in_fd,
+							 t_shell_state *shell)
 {
-	int	fd;
+	int fd;
 
 	if (strcmp(args[*i], "<") == 0 && args[*i + 1])
 	{
@@ -70,12 +70,12 @@ int	handle_input_redirection(char **args, int *i, int *in_fd,
 	return (0);
 }
 
-int	handle_separated_operators(char **args, int *i, int *in_fd, int *out_fd,
-		t_shell_state *shell)
+int handle_separated_operators(t_redir_data *data, t_shell_state *shell)
 {
-	if (handle_output_redirection(args, i, out_fd) == 0)
+	if (handle_output_redirection(data->args, data->idx, data->out_fd) == 0)
 		return (0);
-	if (handle_input_redirection(args, i, in_fd, shell) == 0)
+	if (handle_input_redirection(data->args, data->idx, data->in_fd,
+								 shell) == 0)
 		return (0);
 	return (2);
 }

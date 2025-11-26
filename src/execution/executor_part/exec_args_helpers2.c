@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   exec_args_helpers2.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 16:05:28 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/23 16:06:20 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:53:23 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 #include "minishell.h"
 
-static char	*get_next_word(char **str, char delim, t_shell_state *shell)
+static char *get_next_word(char **str, char delim, t_shell_state *shell)
 {
-	t_parse_state	state;
-	char			*result;
+	t_parse_state state;
+	char *result;
 
 	init_parse_state(&state, str, delim);
 	if (*(state.scan) == '\0')
@@ -38,11 +38,11 @@ static char	*get_next_word(char **str, char delim, t_shell_state *shell)
  * Previously this code removed marker-only tokens; doing so discards valid
  * empty quoted arguments ("" and ''), so we pass tokens through verbatim.
  */
-void	split_args(char *input, char **args, int max_args, t_shell_state *shell)
+void split_args(char *input, char **args, int max_args, t_shell_state *shell)
 {
-	int		i;
-	char	*ptr;
-	char	*w;
+	int i;
+	char *ptr;
+	char *w;
 
 	i = 0;
 	ptr = input;
@@ -50,15 +50,15 @@ void	split_args(char *input, char **args, int max_args, t_shell_state *shell)
 	{
 		w = get_next_word(&ptr, ' ', shell);
 		if (!w)
-			break ;
+			break;
 		args[i++] = w;
 	}
 	args[i] = NULL;
 }
 
-void	shift_left_by(char **args, int start, int by)
+void shift_left_by(char **args, int start, int by)
 {
-	int	j;
+	int j;
 
 	j = start;
 	while (args[j + by])

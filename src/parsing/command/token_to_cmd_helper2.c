@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token_to_cmd_helper2.c                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/24 14:38:12 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/26 16:19:25 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,11 @@
 #include "minishell.h"
 #include "parser.h"
 
-int	handle_split_word(char **cmd_array, char *value, int *i,
-		t_shell_state *shell)
+int handle_split_word(char **cmd_array, char *value, int *i,
+					  t_shell_state *shell)
 {
-	char	**words;
-	int		j;
+	char **words;
+	int j;
 
 	words = split_on_spaces(value, shell);
 	if (!words)
@@ -33,10 +33,10 @@ int	handle_split_word(char **cmd_array, char *value, int *i,
 	return (0);
 }
 
-int	handle_env_assignment(t_token *token, t_cmd_node *cmdnode,
-		t_shell_state *shell)
+int handle_env_assignment(t_token *token, t_cmd_node *cmdnode,
+						  t_shell_state *shell)
 {
-	t_env_node	*env_node;
+	t_env_node *env_node;
 
 	env_node = gc_malloc(shell->gc, sizeof(t_env_node));
 	if (!env_node)
@@ -49,42 +49,46 @@ int	handle_env_assignment(t_token *token, t_cmd_node *cmdnode,
 	return (0);
 }
 
-int	handle_word_token(t_token *token, t_cmd_node *cmdnode, char **cmd_array,
-		int *i, t_shell_state *shell)
-
+int handle_word_token(t_token_process_ctx *ctx)
 {
-	if (*i == 0 && is_valid_env_assignment(token->value))
-		return (handle_env_assignment(token, cmdnode, shell));
-	if (*i == 0 && token->value && token->segment_list
-		&& should_split(token->segment_list) && ft_strchr(token->value, ' '))
+	if (*ctx->i == 0 && is_valid_env_assignment(ctx->token->value))
+		return (handle_env_assignment(ctx->token, ctx->cmdnode, ctx->shell));
+	if (*ctx->i == 0 && ctx->token->value && ctx->token->segment_list && should_split(ctx->token->segment_list) && ft_strchr(ctx->token->value, ' '))
 	{
-		if (handle_split_word(cmd_array, token->value, i, shell) < 0)
+		if (handle_split_word(ctx->cmd_array, ctx->token->value, ctx->i,
+							  ctx->shell) < 0)
 			return (-1);
 	}
 	else
 	{
-		cmd_array[*i] = token->value;
-		(*i)++;
+		ctx->cmd_array[*ctx->i] = ctx->token->value;
+		(*ctx->i)++;
 	}
-	if (*i > 0 && cmd_array[0] && is_built_in(cmd_array[0]))
-		cmdnode->cmd_type = BUILTIN;
+	if (*ctx->i > 0 && ctx->cmd_array[0] && is_built_in(ctx->cmd_array[0]))
+		ctx->cmdnode->cmd_type = BUILTIN;
 	return (0);
 }
 
-t_token	*skip_to_next_pipe(t_token *token)
+static int expand_word_token(t_token *token, t_shell_state *shell)
 {
-	while (token && token->type != TK_PIPE)
-		token = token->next;
-	if (token && token->type == TK_PIPE)
-		token = token->next;
-	return (token);
+	t_segment_list *seglst;
+
+	seglst = gc_malloc(shell->gc, sizeof(*seglst));
+	if (!seglst)
+		return (-1);
+	init_segment_lst(seglst);
+	if (find_segment(seglst, token->value, shell))
+	{
+		token->segment_list = seglst;
+		token->value = segments_expand(seglst, shell->env,
+									   shell->last_status, shell);
+	}
+	return (0);
 }
 
-int	process_single_token(t_token *token, int *skip_next, t_env_list *envlst,
-		int last_status, t_shell_state *shell)
+int process_single_token(t_token *token, int *skip_next,
+						 t_shell_state *shell)
 {
-	t_segment_list	*seglst;
-
 	if (*skip_next)
 	{
 		*skip_next = 0;
@@ -96,16 +100,6 @@ int	process_single_token(t_token *token, int *skip_next, t_env_list *envlst,
 		return (0);
 	}
 	if (token->type == TK_WORD)
-	{
-		seglst = gc_malloc(shell->gc, sizeof(*seglst));
-		if (!seglst)
-			return (-1);
-		init_segment_lst(seglst);
-		if (find_segment(seglst, token->value, shell))
-		{
-			token->segment_list = seglst;
-			token->value = segments_expand(seglst, envlst, last_status, shell);
-		}
-	}
+		return (expand_word_token(token, shell));
 	return (0);
 }

@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 00:32:23 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:07:44 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:55:14 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 #include "minishell.h"
 
-int	table_of_builtins(t_cmd_node *cmd, char **envp, int flag,
-		t_shell_state *shell)
+int table_of_builtins(t_cmd_node *cmd, char **envp, int flag,
+					  t_shell_state *shell)
 {
 	if (!cmd || !cmd->cmd || !cmd->cmd[0])
 		return (128);
@@ -37,9 +37,9 @@ int	table_of_builtins(t_cmd_node *cmd, char **envp, int flag,
 	return (128);
 }
 
-int	ft_pwd(char **args, t_shell_state *shell)
+int ft_pwd(char **args, t_shell_state *shell)
 {
-	char	cwd[4096];
+	char cwd[4096];
 
 	(void)args;
 	(void)shell;
@@ -56,11 +56,11 @@ int	ft_pwd(char **args, t_shell_state *shell)
 ** Quick compatibility shim for builtins: construct envp from the process
 ** environ so that calls to setenv()/unsetenv() are immediately visible.
 */
-char	**generate_env(t_env_list *env, t_shell_state *shell)
+char **generate_env(t_env_list *env, t_shell_state *shell)
 {
-	extern char	**environ;
-	char		**envp;
-	int			i;
+	extern char **environ;
+	char **envp;
+	int i;
 
 	(void)env;
 	if (!environ)

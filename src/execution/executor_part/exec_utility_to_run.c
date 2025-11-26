@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utility_to_run.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 13:12:19 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/23 16:26:25 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 16:10:25 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 
 // Stub for not_error_file
-int	not_error_file(t_filelist *current, int update, t_commandlist *cmd)
+int not_error_file(t_filelist *current, int update, t_commandlist *cmd)
 {
 	(void)cmd;
 	if (current && current->filename)
@@ -28,7 +28,7 @@ int	not_error_file(t_filelist *current, int update, t_commandlist *cmd)
 }
 
 // Stub for standard_error
-int	standard_error(int update, t_commandlist *cmd)
+int standard_error(int update, t_commandlist *cmd)
 {
 	(void)cmd;
 	if (update)
@@ -42,10 +42,10 @@ int	standard_error(int update, t_commandlist *cmd)
 2.handling errors if file doesnt exist
 */
 
-int	handling_the_infile(t_commandlist *cmd, t_filelist *current, int update,
-		t_shell_state *shell)
+int handling_the_infile(t_commandlist *cmd, t_filelist *current, int update,
+						t_shell_state *shell)
 {
-	int	fd;
+	int fd;
 
 	fd = gc_open(shell->gc, current->filename, O_RDONLY);
 	if (fd == -1)
@@ -59,10 +59,10 @@ int	handling_the_infile(t_commandlist *cmd, t_filelist *current, int update,
 1.sets up the final input redirection by processing all input files
 2. and the heredocs then applying the last one to standard input
 */
-int	handling_the_heredoc(t_commandlist *cmd, t_filelist *current, int update,
-		t_shell_state *shell)
+int handling_the_heredoc(t_commandlist *cmd, t_filelist *current, int update,
+						 t_shell_state *shell)
 {
-	int	heredoc_pipe[2];
+	int heredoc_pipe[2];
 
 	gc_pipe(shell->gc, heredoc_pipe);
 	if (current->filename != NULL && (*current->filename))
@@ -71,21 +71,7 @@ int	handling_the_heredoc(t_commandlist *cmd, t_filelist *current, int update,
 	gc_close(shell->gc, heredoc_pipe[1]);
 	if (gc_dup2(shell->gc, heredoc_pipe[0], STDIN_FILENO) == -1)
 		return (gc_close(shell->gc, heredoc_pipe[0]), standard_error(update,
-				cmd));
+																	 cmd));
 	gc_close(shell->gc, heredoc_pipe[0]);
 	return (EXIT_SUCCESS);
-}
-
-/*
-1.sets up the final input redirection by processing all input files
-2.and the heredocs then applying the last one to standard input
-*/
-int	setup_input(t_commandlist *cmd, int *redirect, int update,
-		t_shell_state *shell)
-{
-	(void)cmd;
-	(void)redirect;
-	(void)update;
-	(void)shell;
-	return (0);
 }

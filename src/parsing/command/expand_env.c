@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expand_env.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/24 15:47:08 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/26 16:14:07 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 #include "garbage_collector.h"
 #include "minishell.h"
 
-int	skip_var(char *s)
+int skip_var(char *s)
 {
-	int	i;
+	int i;
 
 	i = 1;
 	if (s[1] == '?')
@@ -28,28 +28,27 @@ int	skip_var(char *s)
 	return (i);
 }
 
-char	*check_for_env(t_env_list *envlst, char *str, size_t len)
+char *check_for_env(t_env_list *envlst, char *str, size_t len)
 {
-	t_env_node	*node;
+	t_env_node *node;
 
 	if (!envlst || !str)
 		return (NULL);
 	node = envlst->head;
 	while (node)
 	{
-		if (node->key && ft_strlen(node->key) == len && ft_strncmp(node->key,
-				str, len) == 0)
+		if (node->key && ft_strlen(node->key) == len && ft_strncmp(node->key, str, len) == 0)
 			return (node->value);
 		node = node->next;
 	}
 	return (NULL);
 }
 
-char	*expand_env(char *str, t_env_list *env_lst, t_shell_state *shell)
+char *expand_env(char *str, t_env_list *env_lst, t_shell_state *shell)
 {
-	size_t	i;
-	size_t	start;
-	char	*value;
+	size_t i;
+	size_t start;
+	char *value;
 
 	i = 1;
 	if (!str || str[0] != '$' || !env_lst)
@@ -65,37 +64,31 @@ char	*expand_env(char *str, t_env_list *env_lst, t_shell_state *shell)
 	return (gc_strdup(shell->gc, ""));
 }
 
-char	*process_dollar(char *seg_str, t_seg_type seg_type, t_env_list *envlst,
-		int i, t_shell_state *shell)
+char *process_dollar(t_expand_ctx *ctx, int i, t_shell_state *shell)
 {
-	static int	g_last_status_cache;
-	char		*expand;
+	static int g_last_status_cache;
+	char *expand;
 
 	g_last_status_cache = 0;
-	expand = get_expand(seg_str, i, envlst, shell);
-	if (seg_type == SEG_NO && expand && ft_strchr(expand, ' '))
+	expand = get_expand(ctx->seg_str, i, ctx->envlst, shell);
+	if (ctx->type == SEG_NO && expand && ft_strchr(expand, ' '))
 		expand = ifs_field_split(expand, shell);
 	return (expand);
 }
 
-char	*expand_or_not(char *seg_str, t_seg_type seg_type, t_env_list *envlst,
-		int last_status, t_shell_state *shell)
+char *expand_or_not(t_expand_ctx *ctx, int last_status, t_shell_state *shell)
 {
-	t_expand_ctx	ctx;
-	char			*old;
-	int				i;
+	char *old;
+	int i;
 
 	(void)last_status;
-	if (!seg_str)
+	if (!ctx->seg_str)
 		return (NULL);
-	ctx.seg_str = seg_str;
-	ctx.type = seg_type;
-	ctx.envlst = envlst;
 	old = gc_strdup(shell->gc, "");
 	i = 0;
-	while (seg_str[i])
+	while (ctx->seg_str[i])
 	{
-		process_char(&old, &ctx, &i, shell);
+		process_char(&old, ctx, &i, shell);
 		i++;
 	}
 	return (old);

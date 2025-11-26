@@ -3,33 +3,38 @@
 /*                                                        :::      ::::::::   */
 /*   exec_builtins1.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/15 00:07:02 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/24 14:48:06 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:55:36 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 #include "minishell.h"
 
-/* resolve_cd_target: set *target based on args and argc
-   returns 0 on success, 1 on error (and prints an error message) */
-static int	resolve_cd_target(char **args, int argc, char **target)
+static int cd_prepare_and_validate(char **args, int *argc, int *start_index)
 {
-	int	start_index;
-
-	start_index = 1;
-	if (argc > 1 && strcmp(args[1], "--") == 0)
+	*start_index = 1;
+	if (*argc > 1 && strcmp(args[1], "--") == 0)
 	{
-		start_index = 2;
-		argc--;
+		*start_index = 2;
+		(*argc)--;
 	}
-	if (argc > 2)
+	if (*argc > 2)
 	{
 		ft_putstr_fd("cd: too many arguments\n", STDERR_FILENO);
 		return (1);
 	}
+	return (0);
+}
+
+static int resolve_cd_target(char **args, int argc, char **target)
+{
+	int start_index;
+
+	if (cd_prepare_and_validate(args, &argc, &start_index))
+		return (1);
 	if (argc == 1 || (args[start_index] && args[start_index][0] == '\0'))
 	{
 		*target = getenv("HOME");
@@ -51,22 +56,24 @@ static int	resolve_cd_target(char **args, int argc, char **target)
 	return (0);
 }
 
-/*
- * ft_cd - Change the current working directory.
- * Handles all edge cases:
- * - No argument: change to HOME
- * - "-": change to OLDPWD and print new dir
- * - Too many arguments: error
- * - Nonexistent directory: error
- * - Permission denied: error
- * - Updates OLDPWD and PWD in environment
- */
-int	ft_cd(char **args, t_shell_state *shell)
+static int cd_print_and_update(char **args, int argc, char *oldpwd,
+							   char *newpwd)
 {
-	char	*target;
-	char	oldpwd[PATH_MAX];
-	char	newpwd[PATH_MAX];
-	int		argc;
+	if (args[1] && strcmp(args[1], "-") == 0)
+		printf("%s\n", newpwd);
+	else if (argc > 2 && strcmp(args[1], "--") == 0 && strcmp(args[2], "-") == 0)
+		printf("%s\n", newpwd);
+	setenv("OLDPWD", oldpwd, 1);
+	setenv("PWD", newpwd, 1);
+	return (0);
+}
+
+int ft_cd(char **args, t_shell_state *shell)
+{
+	char *target;
+	char oldpwd[PATH_MAX];
+	char newpwd[PATH_MAX];
+	int argc;
 
 	argc = 0;
 	while (args[argc])
@@ -79,14 +86,7 @@ int	ft_cd(char **args, t_shell_state *shell)
 		return (perror("cd"), shell->last_status = 1, 1);
 	if (!getcwd(newpwd, sizeof(newpwd)))
 		return (perror("cd: getcwd (newpwd)"), shell->last_status = 1, 1);
-	if (args[1] && strcmp(args[1], "-") == 0)
-		printf("%s\n", newpwd);
-	/* Handle the case where we used -- and the next arg was - */
-	else if (argc > 2 && strcmp(args[1], "--") == 0 && strcmp(args[2],
-			"-") == 0)
-		printf("%s\n", newpwd);
-	setenv("OLDPWD", oldpwd, 1);
-	setenv("PWD", newpwd, 1);
+	cd_print_and_update(args, argc, oldpwd, newpwd);
 	update_shell_env("OLDPWD", oldpwd, shell);
 	update_shell_env("PWD", newpwd, shell);
 	shell->last_status = 0;

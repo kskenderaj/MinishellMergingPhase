@@ -3,21 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   exec_external_handler3.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 16:13:54 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/23 16:14:49 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 15:11:37 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 #include "minishell.h"
 
-char	*process_line(char *content, int start, int i, t_shell_state *shell)
+char *process_line(char *content, int start, int i, t_shell_state *shell)
 {
-	char	*line;
-	char	*expanded;
-	char	*result;
+	char *line;
+	char *expanded;
+	char *result;
 
 	result = gc_strdup(shell->gc, "");
 	line = gc_substr(shell->gc, content, start, i - start);
@@ -26,25 +26,31 @@ char	*process_line(char *content, int start, int i, t_shell_state *shell)
 	return (result);
 }
 
-void	heredoc_read_loop(const char *delimiter, int quoted, int pipefd[2],
-		int is_tty, t_shell_state *shell)
+void heredoc_read_loop(t_heredoc_ctx *ctx)
 {
-	char	*buffer;
-	size_t	delim_len;
+	char *buffer;
+	size_t delim_len;
 
-	delim_len = ft_strlen(delimiter);
+	delim_len = ft_strlen(ctx->delimiter);
 	if (delim_len == 0)
 		delim_len = (size_t)-1;
 	while (1)
 	{
-		buffer = read_heredoc_buffer(is_tty, shell);
+		if (g_signal_status == 130)
+		{
+			g_signal_status = 0;
+			close(ctx->pipefd[1]);
+			return;
+		}
+		buffer = read_heredoc_buffer(ctx->is_tty, ctx->shell);
 		if (!buffer)
 		{
-			handle_heredoc_eof(is_tty, pipefd, shell);
-			return ;
+			handle_heredoc_eof(ctx->is_tty, ctx->pipefd, ctx->shell);
+			return;
 		}
-		if (check_delimiter(buffer, delimiter, delim_len, is_tty))
-			break ;
-		process_heredoc_line(buffer, quoted, pipefd, is_tty, shell);
+		if (check_delimiter(buffer, ctx->delimiter, delim_len, ctx->is_tty))
+			break;
+		ctx->result = &buffer;
+		process_heredoc_line(ctx);
 	}
 }

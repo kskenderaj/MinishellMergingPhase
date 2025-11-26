@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   env_merge.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:00:56 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:48:04 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.h"
 
-static char	**allocate_merged_array(char **base_envp, t_env_list *cmd_env)
+static char **allocate_merged_array(char **base_envp, t_env_list *cmd_env)
 {
-	char	**merged;
-	int		i;
+	char **merged;
+	int i;
 
 	i = 0;
 	while (base_envp[i])
@@ -24,9 +24,9 @@ static char	**allocate_merged_array(char **base_envp, t_env_list *cmd_env)
 	return (merged);
 }
 
-static int	copy_base_env(char **merged, char **base_envp)
+static int copy_base_env(char **merged, char **base_envp)
 {
-	int	i;
+	int i;
 
 	i = 0;
 	while (base_envp[i])
@@ -44,10 +44,10 @@ static int	copy_base_env(char **merged, char **base_envp)
 	return (i);
 }
 
-static int	add_cmd_env(char **merged, int j, t_env_list *cmd_env)
+static int add_cmd_env(char **merged, int j, t_env_list *cmd_env)
 {
-	t_env_node	*node;
-	char		*temp;
+	t_env_node *node;
+	char *temp;
 
 	node = cmd_env->head;
 	while (node)
@@ -65,11 +65,11 @@ static int	add_cmd_env(char **merged, int j, t_env_list *cmd_env)
 	return (j);
 }
 
-char	**merge_env_arrays(char **base_envp, t_env_list *cmd_env)
+char **merge_env_arrays(char **base_envp, t_env_list *cmd_env)
 {
-	char	**merged;
-	int		i;
-	int		j;
+	char **merged;
+	int i;
+	int j;
 
 	if (!cmd_env || cmd_env->size == 0)
 		return (base_envp);

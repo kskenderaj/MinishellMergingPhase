@@ -3,22 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   token_check.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/22 18:16:35 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/24 14:38:35 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/26 16:22:40 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
 
-bool	is_boundary_char(char c)
+bool is_boundary_char(char c)
 {
 	return (c == ' ' || c == '\t' || c == '|' || c == '<' || c == '>');
 }
 
-bool	is_valid_red(char *str, int *i)
+bool is_valid_red(char *str, int *i)
 {
 	*i = skip_spaces(str, *i);
 	if (str[*i] == '\0')
@@ -28,7 +28,7 @@ bool	is_valid_red(char *str, int *i)
 	return (true);
 }
 
-bool	is_red(char *str, int *i)
+bool is_red(char *str, int *i)
 {
 	if (str[*i] == '<' && str[*i + 1] == '<')
 	{
@@ -53,7 +53,7 @@ bool	is_red(char *str, int *i)
 	return (false);
 }
 
-bool	is_valid_pipe(char *str, int *i)
+bool is_valid_pipe(char *str, int *i)
 {
 	(*i)++;
 	*i = skip_spaces(str, *i);
@@ -62,7 +62,7 @@ bool	is_valid_pipe(char *str, int *i)
 	return (true);
 }
 
-bool	check_tokens(char *str, int i)
+bool check_tokens(char *str, int i)
 {
 	if (!str)
 		return (false);
@@ -70,7 +70,7 @@ bool	check_tokens(char *str, int i)
 	{
 		i = skip_spaces(str, i);
 		if (str[i] == '\0')
-			break ;
+			break;
 		if (str[i] == '|')
 		{
 			if (!is_valid_pipe(str, &i))

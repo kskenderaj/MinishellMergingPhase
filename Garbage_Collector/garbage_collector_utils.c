@@ -3,35 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   garbage_collector_utils.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 17:51:02 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/24 14:28:00 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:41:07 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "garbage_collector.h"
 
-char	*gc_strdup(t_gc *gc, const char *s)
+char *gc_strdup_persistent(t_gc *gc, const char *s)
 {
-	char	*dup;
-	size_t	len;
-
-	if (!s)
-		return (NULL);
-	len = ft_strlen(s);
-	dup = gc_malloc(gc, len + 1);
-	if (!dup)
-		return (NULL);
-	ft_memcpy(dup, s, len);
-	dup[len] = '\0';
-	return (dup);
-}
-
-char	*gc_strdup_persistent(t_gc *gc, const char *s)
-{
-	char	*dup;
-	size_t	len;
+	char *dup;
+	size_t len;
 
 	if (!s)
 		return (NULL);
@@ -44,10 +28,10 @@ char	*gc_strdup_persistent(t_gc *gc, const char *s)
 	return (dup);
 }
 
-char	*gc_strndup(t_gc *gc, const char *s, size_t n)
+char *gc_strndup(t_gc *gc, const char *s, size_t n)
 {
-	char	*dup;
-	size_t	length;
+	char *dup;
+	size_t length;
 
 	if (!s)
 		return (NULL);
@@ -62,10 +46,10 @@ char	*gc_strndup(t_gc *gc, const char *s, size_t n)
 	return (dup);
 }
 
-static size_t	count_words(const char *s, char c)
+static size_t count_words(const char *s, char c)
 {
-	size_t	count;
-	int		in_word;
+	size_t count;
+	int in_word;
 
 	count = 0;
 	in_word = 0;
@@ -83,10 +67,10 @@ static size_t	count_words(const char *s, char c)
 	return (count);
 }
 
-static char	*extract_word(t_gc *gc, const char *s, char c)
+static char *extract_word(t_gc *gc, const char *s, char c)
 {
-	size_t	length;
-	char	*word;
+	size_t length;
+	char *word;
 
 	length = 0;
 	while (s[length] && s[length] != c)
@@ -99,11 +83,11 @@ static char	*extract_word(t_gc *gc, const char *s, char c)
 	return (word);
 }
 
-char	**gc_split(t_gc *gc, const char *s, char c)
+char **gc_split(t_gc *gc, const char *s, char c)
 {
-	char	**result;
-	size_t	words;
-	size_t	i;
+	char **result;
+	size_t words;
+	size_t i;
 
 	if (!s)
 		return (NULL);

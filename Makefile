@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: kskender <kskender@student.42.fr>          +#+  +:+       +#+         #
+#    By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/04 00:00:00 by auto              #+#    #+#              #
-#    Updated: 2025/11/23 21:13:33 by kskender         ###   ########.fr        #
+#    Updated: 2025/11/26 17:54:00 by jtoumani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,6 +42,7 @@ PARSER_SRCS = \
 	src/parsing/lexing/tokenize.c \
 	src/parsing/lexing/tokenize_helper.c \
 	src/parsing/lexing/tokenize_helper2.c \
+	src/parsing/lexing/tokenize_helper3.c \
 	src/parsing/lexing/init.c \
 	src/parsing/command/token_to_cmd.c \
 	src/parsing/command/find_token.c \
@@ -50,6 +51,7 @@ PARSER_SRCS = \
 	src/parsing/command/token_to_cmd_helper.c \
 	src/parsing/command/token_to_cmd_helper2.c \
 	src/parsing/command/token_to_cmd_helper3.c \
+	src/parsing/command/token_to_cmd_helper4.c \
 	src/parsing/command/expand_env.c \
 	src/parsing/command/expand_env2.c \
 	src/parsing/command/cmdlst_filelst.c \
@@ -57,7 +59,8 @@ PARSER_SRCS = \
 	src/parsing/command/field_split.c \
 	src/parsing/command/ifs_split.c \
 	src/parsing/command/heredoc_utils.c \
-	src/parsing/command/read_heredoc.c 
+	src/parsing/command/read_heredoc.c \
+	src/parsing/command/read_heredoc_utils.c 
 	
 PARSER_OBJS = $(PARSER_SRCS:.c=.o)
 

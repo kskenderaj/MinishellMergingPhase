@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   garbage_collector_utils1.c                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 21:03:21 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/23 16:45:51 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:41:36 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "garbage_collector.h"
 
-int	gc_open(t_gc *gc, const char *pathname, int flags, ...)
+int gc_open(t_gc *gc, const char *pathname, int flags, ...)
 {
-	int		fd;
-	mode_t	mode;
-	va_list	args;
+	int fd;
+	mode_t mode;
+	va_list args;
 
 	if (flags & O_CREAT)
 	{
@@ -33,7 +33,7 @@ int	gc_open(t_gc *gc, const char *pathname, int flags, ...)
 	return (fd);
 }
 
-int	gc_pipe(t_gc *gc, int pipefd[2])
+int gc_pipe(t_gc *gc, int pipefd[2])
 {
 	if (pipe(pipefd) == -1)
 		return (-1);
@@ -42,9 +42,9 @@ int	gc_pipe(t_gc *gc, int pipefd[2])
 	return (0);
 }
 
-int	gc_dup(t_gc *gc, int oldfd)
+int gc_dup(t_gc *gc, int oldfd)
 {
-	int	newfd;
+	int newfd;
 
 	newfd = dup(oldfd);
 	if (newfd < 0)
@@ -53,9 +53,9 @@ int	gc_dup(t_gc *gc, int oldfd)
 	return (newfd);
 }
 
-int	gc_dup2(t_gc *gc, int oldfd, int newfd)
+int gc_dup2(t_gc *gc, int oldfd, int newfd)
 {
-	int	result;
+	int result;
 
 	result = dup2(oldfd, newfd);
 	if (result < 0)
@@ -65,9 +65,9 @@ int	gc_dup2(t_gc *gc, int oldfd, int newfd)
 	return (result);
 }
 
-void	gc_register_fd(t_gc *gc, int fd)
+void gc_register_fd(t_gc *gc, int fd)
 {
 	if (fd < 0)
-		return ;
+		return;
 	gc_add_node(gc, NULL, fd, GC_FD);
 }

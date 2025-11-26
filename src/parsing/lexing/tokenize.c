@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenize.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/23 13:37:54 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/24 14:38:53 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/26 16:25:15 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,9 @@
 #include "garbage_collector.h"
 #include "parser.h"
 
-t_token	*create_token(t_toktype type, char *val, t_shell_state *shell)
+t_token *create_token(t_toktype type, char *val, t_shell_state *shell)
 {
-	t_token	*t;
+	t_token *t;
 
 	t = gc_malloc(shell->gc, sizeof(*t));
 	if (!t)
@@ -27,7 +27,7 @@ t_token	*create_token(t_toktype type, char *val, t_shell_state *shell)
 	return (t);
 }
 
-int	push_token(t_token_list *lst, t_token *token)
+int push_token(t_token_list *lst, t_token *token)
 {
 	if (!lst || !token)
 		return (1);
@@ -45,32 +45,30 @@ int	push_token(t_token_list *lst, t_token *token)
 	return (0);
 }
 
-int	add_token(t_token_list *lst, t_toktype type, char *str, int len,
-		t_shell_state *shell)
+int add_token(t_tokenize_ctx *ctx, t_toktype type, int len)
 {
-	char	*copy;
-	t_token	*tok;
+	char *copy;
+	t_token *tok;
 
-	if (!lst || !str || len <= 0)
+	if (!ctx->lst || !ctx->input || len <= 0)
 		return (1);
-	copy = gc_substr(shell->gc, str, 0, len);
+	copy = gc_substr(ctx->shell->gc, ctx->input, 0, len);
 	if (!copy)
 		return (1);
-	tok = create_token(type, copy, shell);
+	tok = create_token(type, copy, ctx->shell);
 	if (!tok)
 		return (1);
-	return (push_token(lst, tok));
+	return (push_token(ctx->lst, tok));
 }
 
-int	handle_word(t_token_list *lst, char *input, int *i, t_shell_state *shell)
+int handle_word(t_token_list *lst, char *input, int *i, t_shell_state *shell)
 {
-	int	next;
-	int	start;
+	int next;
+	int start;
+	t_tokenize_ctx ctx;
 
 	start = *i;
-	while (input[*i] && input[*i] != ' ' && input[*i] != '\t'
-		&& input[*i] != '|' && input[*i] != '<' && input[*i] != '>'
-		&& input[*i] != '|')
+	while (input[*i] && input[*i] != ' ' && input[*i] != '\t' && input[*i] != '|' && input[*i] != '<' && input[*i] != '>')
 	{
 		if (input[*i] == '\'' || input[*i] == '\"')
 		{
@@ -84,32 +82,14 @@ int	handle_word(t_token_list *lst, char *input, int *i, t_shell_state *shell)
 	}
 	if (*i == start)
 		return (1);
-	return (add_token(lst, TK_WORD, input + start, *i - start, shell));
+	ctx.lst = lst;
+	ctx.input = input + start;
+	ctx.i = i;
+	ctx.shell = shell;
+	return (add_token(&ctx, TK_WORD, *i - start));
 }
 
-int	tokenize(t_token_list *lst, char *input, t_shell_state *shell)
+int tokenize(t_token_list *lst, char *input, t_shell_state *shell)
 {
-	int	i;
-
-	i = 0;
-	while (input[i])
-	{
-		i = skip_spaces(input, i);
-		if (!input[i])
-			break ;
-		if (input[i] == '|')
-		{
-			if (add_token(lst, TK_PIPE, input + i, 1, shell) != 0)
-				return (1);
-			i++;
-		}
-		else if (red_len(input, i))
-		{
-			if (handle_redir(lst, input, &i, red_len(input, i), shell) != 0)
-				return (1);
-		}
-		else if (handle_word(lst, input, &i, shell) != 0)
-			return (1);
-	}
-	return (0);
+	return (tokenize_main(lst, input, shell));
 }

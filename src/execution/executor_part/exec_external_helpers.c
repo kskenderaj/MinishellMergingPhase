@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_external_helpers.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:26:38 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/23 16:15:01 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 15:37:10 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 #include "minishell.h"
 
 // Searches $PATH for executable
-char	*find_command_path(char *cmd, t_env_list *env)
+char *find_command_path(char *cmd, t_env_list *env)
 {
-	char	*path_env;
-	char	**dirs;
-	char	full_path[1024];
-	int		i;
+	char *path_env;
+	char **dirs;
+	char full_path[1024];
+	int i;
 
 	if (ft_strchr(cmd, '/'))
 		return (ft_strdup(cmd));
@@ -43,11 +43,11 @@ char	*find_command_path(char *cmd, t_env_list *env)
 	return (NULL);
 }
 
-char	**convert_env_to_array(t_env_list *env_list, t_shell_state *shell)
+char **convert_env_to_array(t_env_list *env_list, t_shell_state *shell)
 {
-	extern char	**environ;
-	char		**env_array;
-	int			i;
+	extern char **environ;
+	char **env_array;
+	int i;
 
 	(void)env_list;
 	if (!environ)

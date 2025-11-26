@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   exec_args_helpers3.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 17:30:00 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/23 16:06:47 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:54:18 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
 #include "minishell.h"
 
-void	copy_escape_char(char **p, char *out, int *idx, int marker)
+void copy_escape_char(char **p, char *out, int *idx, int marker)
 {
 	if ((*p)[1])
 	{
@@ -25,9 +25,9 @@ void	copy_escape_char(char **p, char *out, int *idx, int marker)
 		(*p)++;
 }
 
-void	copy_quoted_content(char **p, char *out, int *idx, int marker)
+void copy_quoted_content(char **p, char *out, int *idx, int marker)
 {
-	char	quote_char;
+	char quote_char;
 
 	quote_char = **p;
 	(*p)++;
@@ -41,10 +41,10 @@ void	copy_quoted_content(char **p, char *out, int *idx, int marker)
 		(*p)++;
 }
 
-void	fill_result_buffer(t_parse_state *state, char *result, char delim)
+void fill_result_buffer(t_parse_state *state, char *result, char delim)
 {
-	int	idx;
-	int	marker;
+	int idx;
+	int marker;
 
 	marker = 0;
 	if (state->all_quoted && state->first_quote != 0)

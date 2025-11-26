@@ -1,34 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipeline.c                                         :+:      :+:    :+:   */
+/*   read_heredoc_utils.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/26 13:50:49 by klejdi           ###   ########.fr       */
+/*   Created: 2025/11/26 16:17:52 by klejdi            #+#    #+#             */
+/*   Updated: 2025/11/26 16:18:41 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "main.h"
+#include "executor.h"
+#include "minishell.h"
+#include "parser.h"
 
-int handle_pipeline(t_cmd_list *cmdlst, t_env_list *env, t_shell_state *shell)
+int is_delimiter(char *line, char *delimiter)
 {
-	char **envp;
-	int ret;
+    size_t len;
 
-	envp = env_list_to_array(env, shell);
-	if (!envp)
-		return (1);
-	ret = exec_pipeline(cmdlst, envp, shell);
-	return (ret);
-}
-
-int is_empty_command(t_cmd_node *cmd)
-{
-	if (!cmd->cmd || !cmd->cmd[0])
-		return (1);
-	if (cmd->cmd[0] && !cmd->cmd[0][0])
-		return (1);
-	return (0);
+    if (!line || !delimiter)
+        return (0);
+    len = ft_strlen(delimiter);
+    if (len == 0)
+        return (0);
+    if (ft_strncmp(line, delimiter, len) == 0 && line[len] == '\0')
+        return (1);
+    return (0);
 }

@@ -3,28 +3,27 @@
 /*                                                        :::      ::::::::   */
 /*   garbage_collector1.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/30 16:39:30 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/24 14:28:00 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:42:54 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "garbage_collector.h"
 
-void	gc_free(t_gc *gc, void *ptr)
+void gc_free(t_gc *gc, void *ptr)
 {
-	t_gc_node	*current;
-	t_gc_node	*prev;
+	t_gc_node *current;
+	t_gc_node *prev;
 
 	if (!gc || !ptr)
-		return ;
+		return;
 	current = gc->head;
 	prev = NULL;
 	while (current)
 	{
-		if ((current->type == GC_MEM || current->type == GC_PERSISTENT)
-			&& current->ptr == ptr)
+		if ((current->type == GC_MEM || current->type == GC_PERSISTENT) && current->ptr == ptr)
 		{
 			if (prev)
 				prev->next = current->next;
@@ -33,20 +32,20 @@ void	gc_free(t_gc *gc, void *ptr)
 			free(current->ptr);
 			free(current);
 			gc->count--;
-			return ;
+			return;
 		}
 		prev = current;
 		current = current->next;
 	}
 }
 
-void	gc_close(t_gc *gc, int fd)
+void gc_close(t_gc *gc, int fd)
 {
-	t_gc_node	*current;
-	t_gc_node	*prev;
+	t_gc_node *current;
+	t_gc_node *prev;
 
 	if (!gc || fd < 0)
-		return ;
+		return;
 	current = gc->head;
 	prev = NULL;
 	while (current)
@@ -60,55 +59,59 @@ void	gc_close(t_gc *gc, int fd)
 			close(current->fd);
 			free(current);
 			gc->count--;
-			return ;
+			return;
 		}
 		prev = current;
 		current = current->next;
 	}
 }
 
-void	gc_clear(t_gc *gc)
+static void free_node_and_advance(t_gc_node **current, t_gc_node **prev,
+								  t_gc_node *next, t_gc *gc)
 {
-	t_gc_node	*current;
-	t_gc_node	*next;
-	t_gc_node	*prev;
+	if (*prev)
+		(*prev)->next = next;
+	else
+		gc->head = next;
+	if ((*current)->type == GC_MEM)
+		free((*current)->ptr);
+	else if ((*current)->type == GC_FD)
+		close((*current)->fd);
+	free(*current);
+	gc->count--;
+	*current = next;
+}
+
+void gc_clear(t_gc *gc)
+{
+	t_gc_node *current;
+	t_gc_node *next;
+	t_gc_node *prev;
 
 	if (!gc)
-		return ;
+		return;
 	current = gc->head;
 	prev = NULL;
 	while (current)
 	{
 		next = current->next;
-		/* Skip persistent allocations */
 		if (current->type == GC_PERSISTENT)
 		{
 			prev = current;
 			current = next;
-			continue ;
+			continue;
 		}
-		/* Remove non-persistent allocations */
-		if (prev)
-			prev->next = next;
-		else
-			gc->head = next;
-		if (current->type == GC_MEM)
-			free(current->ptr);
-		else if (current->type == GC_FD)
-			close(current->fd);
-		free(current);
-		gc->count--;
-		current = next;
+		free_node_and_advance(&current, &prev, next, gc);
 	}
 }
 
-void	gc_cleanup(t_gc *gc)
+void gc_cleanup(t_gc *gc)
 {
-	t_gc_node	*current;
-	t_gc_node	*next;
+	t_gc_node *current;
+	t_gc_node *next;
 
 	if (!gc)
-		return ;
+		return;
 	current = gc->head;
 	while (current)
 	{
@@ -121,30 +124,4 @@ void	gc_cleanup(t_gc *gc)
 		current = next;
 	}
 	free(gc);
-}
-
-void	gc_print(t_gc *gc)
-{
-	t_gc_node	*current;
-	int			i;
-
-	if (!gc)
-	{
-		printf("GC is NULL\n");
-		return ;
-	}
-	printf("GC has %zu items:\n", gc->count);
-	current = gc->head;
-	i = 0;
-	while (current)
-	{
-		if (current->type == GC_MEM)
-			printf(" [%d] MEM: %p\n", i, current->ptr);
-		else if (current->type == GC_FD)
-			printf(" [%d] FD: %d\n", i, current->fd);
-		else if (current->type == GC_PERSISTENT)
-			printf(" [%d] PERSISTENT: %p\n", i, current->ptr);
-		current = current->next;
-		i++;
-	}
 }

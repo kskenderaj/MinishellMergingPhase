@@ -3,20 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/24 13:57:12 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/26 13:50:31 by klejdi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.h"
 
-static void	increment_shlvl(void)
+static void increment_shlvl(void)
 {
-	char	*shlvl_str;
-	int		shlvl;
-	char	new_shlvl[32];
+	char *shlvl_str;
+	int shlvl;
+	char new_shlvl[32];
 
 	shlvl_str = getenv("SHLVL");
 	if (!shlvl_str)
@@ -28,10 +28,10 @@ static void	increment_shlvl(void)
 	setenv("SHLVL", new_shlvl, 1);
 }
 
-static t_env_list	*init_environment(char **envp)
+static t_env_list *init_environment(char **envp)
 {
-	t_env_list	*env;
-	extern char	**environ;
+	t_env_list *env;
+	extern char **environ;
 
 	(void)envp;
 	increment_shlvl();
@@ -47,11 +47,11 @@ static t_env_list	*init_environment(char **envp)
 	return (env);
 }
 
-int	main(int argc, char **argv, char **envp)
+int main(int argc, char **argv, char **envp)
 {
-	t_shell_state	shell;
-	t_env_list		*env;
-	int				exit_status;
+	t_shell_state shell;
+	t_env_list *env;
+	int exit_status;
 
 	(void)argc;
 	(void)argv;
@@ -60,7 +60,7 @@ int	main(int argc, char **argv, char **envp)
 	if (!shell.gc)
 		return (1);
 	init_shell(&shell);
-	start_signals();
+	set_signals_parent();
 	env = init_environment(envp);
 	if (!env)
 	{
