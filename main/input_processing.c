@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   input_processing.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/26 13:49:34 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/27 17:55:56 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,13 @@ int process_input_line(char *line, t_env_list *env, int last_status,
 	if (cmdlst.syntax_error)
 		return (handle_syntax_error(&cmdlst, shell));
 	process_all_heredocs(&cmdlst, shell);
+	if(g_signal_status == 130)
+	{
+		gc_clear(shell->gc);
+		shell->last_status = 130;
+		g_signal_status = 0;
+		return (130);
+	}
 	if (cmdlst.head)
 	{
 		last_status = process_command(&cmdlst, env, shell);

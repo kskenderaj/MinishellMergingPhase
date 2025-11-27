@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_external_handler.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/16 17:34:28 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/26 14:50:36 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/27 17:24:44 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,9 @@ int exec_heredoc(const char *delimiter, int quoted, t_shell_state *shell)
 	ctx.quoted = quoted;
 	ctx.pipefd = pipefd;
 	ctx.is_tty = is_tty;
+	set_signals_heredoc();
 	heredoc_read_loop(&ctx);
+	set_signals_parent();
 	close(pipefd[1]);
 	return (pipefd[0]);
 }

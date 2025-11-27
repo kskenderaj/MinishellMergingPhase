@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_external_handler1.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 16:13:19 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/26 14:51:36 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/27 17:27:59 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,8 @@ char *read_line_from_stdin(t_shell_state *shell)
 	while (1)
 	{
 		bytes = read(STDIN_FILENO, buffer, 1);
+		if (g_signal_status == 130)
+			return (NULL);
 		if (bytes <= 0)
 			return (NULL);
 		if (buffer[0] == '\n')

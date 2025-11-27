@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   read_heredoc.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/26 18:18:52 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/27 18:19:43 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,23 +86,25 @@ char *read_heredoc_content(char *delimiter, t_shell_state *shell)
 	char *line;
 	int ret;
 
+	set_signals_heredoc();
 	if (!delimiter || !isatty(STDIN_FILENO))
 		return (NULL);
-	content = NULL;
 	rl_event_hook = check_heredoc_interrupt;
+	content = NULL;
 	while (1)
 	{
 		if (check_signal_and_read(&line))
-			return (NULL);
+			return (set_signals_parent(), NULL);
 		ret = handle_heredoc_line(&content, line, delimiter, shell);
 		if (ret == 1 || ret == 2)
 			break;
 		if (!line)
 		{
 			rl_event_hook = NULL;
+			set_signals_parent();
 			return (NULL);
 		}
 	}
 	rl_event_hook = NULL;
-	return (content);
+	return (set_signals_parent(), content);
 }

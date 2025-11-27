@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipeline_helpers.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 16:04:59 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/26 16:27:23 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/27 17:53:04 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,5 +87,6 @@ int exec_pipeline(t_cmd_list *cmdlst, char **envp, t_shell_state *shell)
 	}
 	close_all_pipes(ctx.pipes, ctx.ncmds, shell);
 	ret = wait_children(ctx.pids, ctx.ncmds, shell);
+	set_signals_parent();
 	return (ret);
 }

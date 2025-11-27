@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 16:36:04 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/26 17:54:20 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/27 17:29:10 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ void heredoc_sigint_handler(int sig)
 {
 	(void)sig;
 	g_signal_status = 130;
+	rl_done = 1;
 }
 
 void within_command(void)

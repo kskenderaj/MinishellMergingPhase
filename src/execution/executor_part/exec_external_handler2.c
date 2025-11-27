@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_external_handler2.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 16:13:51 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/26 14:51:57 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/27 17:27:17 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,15 @@
 
 char *read_heredoc_buffer(int is_tty, t_shell_state *shell)
 {
+	char *buffer;
+
 	if (is_tty)
-		return (readline("> "));
+	{
+		buffer = readline("> ");
+		if (g_signal_status == 130)
+			return (NULL);
+		return (buffer);
+	}
 	else
 		return (read_line_from_stdin(shell));
 }

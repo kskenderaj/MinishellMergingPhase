@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipeline_helpers1.c                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/23 16:16:20 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/26 16:04:10 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/27 18:18:21 by kskender         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,9 +33,6 @@ int wait_children(pid_t *pids, int ncmds, t_shell_state *shell)
 
 	(void)shell;
 	status = 0;
-	signal(SIGINT, SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGTSTP, SIG_IGN);
 	i = 0;
 	while (i < ncmds)
 	{
