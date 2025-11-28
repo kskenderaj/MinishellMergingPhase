@@ -6,17 +6,16 @@
 #    By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/11/04 00:00:00 by auto              #+#    #+#              #
-#    Updated: 2025/11/26 17:54:00 by jtoumani         ###   ########.fr        #
+#    Updated: 2025/11/28 15:44:30 by jtoumani         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
-
 
 .DEFAULT_GOAL := all
 
 NAME = minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -g
-READLINE_FLAGS = -lreadline
+READLINE_FLAGS = -lreadline -lncurses
 
 # Include directories
 INCLUDES = -Iinclude -Iinclude/libft -Isrc/execution/executor_part -IGarbage_Collector -Imain
@@ -100,42 +99,7 @@ EXECUTOR_SRCS = \
 	$(EXECUTOR_DIR)/signals2.c \
 	$(EXECUTOR_DIR)/init_shell.c
 
-
 EXECUTOR_OBJS = $(EXECUTOR_SRCS:.c=.o)
-
-# Execution archive produced by executor part
-LIBEXEC = $(EXECUTOR_DIR)/libexec.a
-
-# Executor archive rule: build all executor and GC objs and archive them
-
-$(LIBEXEC): $(EXECUTOR_OBJS) $(GC_OBJS)
-	@echo "$(YELLOW)Building executor archive...$(RESET)"
-	# Compile any missing Garbage_Collector object files
-	@for src in $(GC_SRCS); do \
-		obj=$${src%.c}.o; \
-		if [ ! -f $$obj ]; then \
-			echo "$(YELLOW)Compiling $$src...$(RESET)"; \
-			$(CC) $(CFLAGS) $(INCLUDES) -c $$src -o $$obj || exit 1; \
-		fi; \
-	done
-	# Compile any missing executor object files
-	@for src in $(EXECUTOR_SRCS); do \
-		obj=$${src%.c}.o; \
-		if [ ! -f $$obj ]; then \
-			echo "$(YELLOW)Compiling $$src...$(RESET)"; \
-			$(CC) $(CFLAGS) $(INCLUDES) -c $$src -o $$obj || exit 1; \
-		fi; \
-	done
-	ar rcs $(LIBEXEC) $(EXECUTOR_OBJS) $(GC_OBJS)
-
-# Pattern rules to compile executor and GC sources to object files
-$(EXECUTOR_DIR)/%.o: $(EXECUTOR_DIR)/%.c
-	@echo "$(YELLOW)Compiling $<...$(RESET)"
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-Garbage_Collector/%.o: Garbage_Collector/%.c
-	@echo "$(YELLOW)Compiling $<...$(RESET)"
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
 # Garbage Collector sources
 GC_DIR = Garbage_Collector
@@ -148,18 +112,26 @@ GC_SRCS = \
 
 GC_OBJS = $(GC_SRCS:.c=.o)
 
-# Libft (adjust path as needed)
+# Execution archive
+LIBEXEC = $(EXECUTOR_DIR)/libexec.a
+
+# Libft
 LIBFT_DIR = include/libft
 LIBFT = $(LIBFT_DIR)/libft.a
 
-# All objects (executor objects and GC objects are provided by LIBEXEC)
+# All objects
 OBJS = $(MAIN_OBJS) $(PARSER_OBJS)
 
-# Colors for output
+# Colors
 GREEN = \033[0;32m
 RED = \033[0;31m
 YELLOW = \033[0;33m
 RESET = \033[0m
+
+# Silent mode if not verbose
+ifndef VERBOSE
+.SILENT:
+endif
 
 all: $(NAME)
 
@@ -167,6 +139,10 @@ $(NAME): $(LIBFT) $(LIBEXEC) $(OBJS)
 	@echo "$(YELLOW)Linking $(NAME)...$(RESET)"
 	$(CC) $(CFLAGS) $(OBJS) $(LIBEXEC) $(LIBFT) $(READLINE_FLAGS) -o $(NAME)
 	@echo "$(GREEN)✓ $(NAME) created successfully!$(RESET)"
+
+$(LIBEXEC): $(EXECUTOR_OBJS) $(GC_OBJS)
+	@echo "$(YELLOW)Building executor archive...$(RESET)"
+	ar rcs $(LIBEXEC) $(EXECUTOR_OBJS) $(GC_OBJS)
 
 $(LIBFT):
 	@echo "$(YELLOW)Building libft...$(RESET)"
@@ -190,11 +166,9 @@ fclean: clean
 
 re: fclean all
 
-# Debug target
 debug: CFLAGS += -g
 debug: re
 
-# Sanitize target
 sanitize: CFLAGS += -fsanitize=address -g
 sanitize: re
 
