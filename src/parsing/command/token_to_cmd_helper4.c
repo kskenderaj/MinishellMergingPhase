@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 16:20:52 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/28 13:24:29 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/28 15:29:13 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,4 +47,11 @@ t_token	*skip_to_next_pipe(t_token *token)
 	if (token && token->type == TK_PIPE)
 		token = token->next;
 	return (token);
+}
+
+int	is_export_command(t_cmd_node *cmdnode)
+{
+	if (!cmdnode || !cmdnode->cmd || !cmdnode->cmd[0])
+		return (0);
+	return (ft_strcmp(cmdnode->cmd[0], "export") == 0);
 }

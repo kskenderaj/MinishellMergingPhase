@@ -45,8 +45,8 @@ int	process_input_line(char *line, t_env_list *env, int last_status,
 		return (last_status);
 	init_token_lst(&toklst);
 	init_cmd_lst(&cmdlst);
-	if (tokenize(&toklst, line, shell) != 0
-		|| token_to_cmd(&toklst, &cmdlst, shell) != 0 || cmdlst.syntax_error)
+	if (tokenize(&toklst, line, shell) != 0 || token_to_cmd(&toklst, &cmdlst,
+			shell) != 0 || cmdlst.syntax_error)
 		return (handle_syntax_error(&cmdlst, shell));
 	process_all_heredocs(&cmdlst, shell);
 	if (g_signal_status == 130)

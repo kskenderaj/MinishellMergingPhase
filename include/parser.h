@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/12 14:40:09 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/28 13:52:12 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/28 15:30:31 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,6 +206,7 @@ int								handle_redir_token(t_token_list *lst,
 									char *input, int *i, t_shell_state *shell);
 int								tokenize_main(t_token_list *lst, char *input,
 									t_shell_state *shell);
+int								is_export_command(t_cmd_node *cmdnode);
 // token to command
 int								find_segment(t_segment_list *lst, char *str,
 									t_shell_state *shell);

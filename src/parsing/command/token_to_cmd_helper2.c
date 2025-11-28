@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/26 18:19:00 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/28 14:45:36 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@ int	handle_env_assignment(t_token *token, t_cmd_node *cmdnode,
 {
 	t_env_node	*env_node;
 
+	if (!is_export_command(cmdnode))
+		return (0);
 	env_node = gc_malloc(shell->gc, sizeof(t_env_node));
 	if (!env_node)
 		return (-1);
