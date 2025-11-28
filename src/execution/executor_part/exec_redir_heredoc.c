@@ -13,10 +13,10 @@
 #include "executor.h"
 
 // Counts heredoc redirections
-int count_heredoc(t_commandlist *cmd)
+int	count_heredoc(t_commandlist *cmd)
 {
-	int count;
-	t_file_node *cur;
+	int			count;
+	t_file_node	*cur;
 
 	count = 0;
 	cur = (t_file_node *)cmd->files;
@@ -30,10 +30,10 @@ int count_heredoc(t_commandlist *cmd)
 }
 
 // Finds the last heredoc
-static t_file_node *find_last_heredoc(t_commandlist *cmd, int heredoc_count)
+static t_file_node	*find_last_heredoc(t_commandlist *cmd, int heredoc_count)
 {
-	int cur_count;
-	t_file_node *cur;
+	int			cur_count;
+	t_file_node	*cur;
 
 	cur_count = 0;
 	cur = (t_file_node *)cmd->files;
@@ -51,13 +51,13 @@ static t_file_node *find_last_heredoc(t_commandlist *cmd, int heredoc_count)
 }
 
 // Opens the last heredoc
-int setup_heredoc_fd(t_commandlist *cmd, t_shell_state *shell)
+int	setup_heredoc_fd(t_commandlist *cmd, t_shell_state *shell)
 {
-	int heredoc_count;
-	t_file_node *last_heredoc;
-	int tmpfd;
-	char template[34];
-	size_t len;
+	int			heredoc_count;
+	t_file_node	*last_heredoc;
+	int			tmpfd;
+	char		template[34];
+	size_t		len;
 
 	(void)shell;
 	ft_strlcpy(template, "/tmp/minishell_heredoc_XXXXXX", 34);

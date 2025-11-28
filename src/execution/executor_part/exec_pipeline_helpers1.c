@@ -12,9 +12,9 @@
 
 #include "executor.h"
 
-void close_all_pipes(int **pipes, int ncmds, t_shell_state *shell)
+void	close_all_pipes(int **pipes, int ncmds, t_shell_state *shell)
 {
-	int i;
+	int	i;
 
 	(void)shell;
 	i = 0;
@@ -26,10 +26,10 @@ void close_all_pipes(int **pipes, int ncmds, t_shell_state *shell)
 	}
 }
 
-int wait_children(pid_t *pids, int ncmds, t_shell_state *shell)
+int	wait_children(pid_t *pids, int ncmds, t_shell_state *shell)
 {
-	int i;
-	int status;
+	int	i;
+	int	status;
 
 	(void)shell;
 	status = 0;
@@ -46,10 +46,10 @@ int wait_children(pid_t *pids, int ncmds, t_shell_state *shell)
 	return (128);
 }
 
-int create_pipes(int **pipes, int ncmds, t_shell_state *shell)
+int	create_pipes(int **pipes, int ncmds, t_shell_state *shell)
 {
-	int i;
-	int j;
+	int	i;
+	int	j;
 
 	(void)shell;
 	i = 0;
@@ -71,7 +71,7 @@ int create_pipes(int **pipes, int ncmds, t_shell_state *shell)
 	return (0);
 }
 
-void init_child_ctx(t_child_init *init)
+void	init_child_ctx(t_child_init *init)
 {
 	init->child->idx = init->i;
 	init->child->ncmds = init->ctx->ncmds;

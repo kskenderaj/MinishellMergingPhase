@@ -14,9 +14,9 @@
 #include "garbage_collector.h"
 #include "parser.h"
 
-t_token *create_token(t_toktype type, char *val, t_shell_state *shell)
+t_token	*create_token(t_toktype type, char *val, t_shell_state *shell)
 {
-	t_token *t;
+	t_token	*t;
 
 	t = gc_malloc(shell->gc, sizeof(*t));
 	if (!t)
@@ -27,7 +27,7 @@ t_token *create_token(t_toktype type, char *val, t_shell_state *shell)
 	return (t);
 }
 
-int push_token(t_token_list *lst, t_token *token)
+int	push_token(t_token_list *lst, t_token *token)
 {
 	if (!lst || !token)
 		return (1);
@@ -45,10 +45,10 @@ int push_token(t_token_list *lst, t_token *token)
 	return (0);
 }
 
-int add_token(t_tokenize_ctx *ctx, t_toktype type, int len)
+int	add_token(t_tokenize_ctx *ctx, t_toktype type, int len)
 {
-	char *copy;
-	t_token *tok;
+	char	*copy;
+	t_token	*tok;
 
 	if (!ctx->lst || !ctx->input || len <= 0)
 		return (1);
@@ -61,14 +61,15 @@ int add_token(t_tokenize_ctx *ctx, t_toktype type, int len)
 	return (push_token(ctx->lst, tok));
 }
 
-int handle_word(t_token_list *lst, char *input, int *i, t_shell_state *shell)
+int	handle_word(t_token_list *lst, char *input, int *i, t_shell_state *shell)
 {
-	int next;
-	int start;
-	t_tokenize_ctx ctx;
+	int				next;
+	int				start;
+	t_tokenize_ctx	ctx;
 
 	start = *i;
-	while (input[*i] && input[*i] != ' ' && input[*i] != '\t' && input[*i] != '|' && input[*i] != '<' && input[*i] != '>')
+	while (input[*i] && input[*i] != ' ' && input[*i] != '\t'
+		&& input[*i] != '|' && input[*i] != '<' && input[*i] != '>')
 	{
 		if (input[*i] == '\'' || input[*i] == '\"')
 		{
@@ -89,7 +90,7 @@ int handle_word(t_token_list *lst, char *input, int *i, t_shell_state *shell)
 	return (add_token(&ctx, TK_WORD, *i - start));
 }
 
-int tokenize(t_token_list *lst, char *input, t_shell_state *shell)
+int	tokenize(t_token_list *lst, char *input, t_shell_state *shell)
 {
 	return (tokenize_main(lst, input, shell));
 }

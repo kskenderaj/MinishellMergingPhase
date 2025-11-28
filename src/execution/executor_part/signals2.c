@@ -15,9 +15,9 @@
 #include <string.h>
 #include <sys/types.h>
 
-void reset_signals_default(void)
+void	reset_signals_default(void)
 {
-	struct sigaction sa;
+	struct sigaction	sa;
 
 	memset(&sa, 0, sizeof(sa));
 	sa.sa_handler = SIG_DFL;
@@ -28,9 +28,9 @@ void reset_signals_default(void)
 	sigaction(SIGTSTP, &sa, NULL);
 }
 
-void set_signals_child(void)
+void	set_signals_child(void)
 {
-	struct sigaction sa;
+	struct sigaction	sa;
 
 	sa.sa_handler = sigint_exit;
 	sigemptyset(&sa.sa_mask);
@@ -42,9 +42,9 @@ void set_signals_child(void)
 	sigaction(SIGTSTP, &sa, NULL);
 }
 
-void set_signals_heredoc(void)
+void	set_signals_heredoc(void)
 {
-	struct sigaction sa;
+	struct sigaction	sa;
 
 	g_signal_status = 0;
 	sa.sa_handler = heredoc_sigint_handler;
@@ -58,9 +58,9 @@ void set_signals_heredoc(void)
 	sigaction(SIGTSTP, &sa, NULL);
 }
 
-void set_signals_parent(void)
+void	set_signals_parent(void)
 {
-	struct sigaction sa;
+	struct sigaction	sa;
 
 	sa.sa_handler = parent_sigint_handler;
 	sigemptyset(&sa.sa_mask);

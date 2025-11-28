@@ -12,9 +12,9 @@
 
 #include "main.h"
 
-char *get_env_value(t_env_list *env, const char *key)
+char	*get_env_value(t_env_list *env, const char *key)
 {
-	t_env_node *node;
+	t_env_node	*node;
 
 	if (!env || !key)
 		return (NULL);
@@ -28,10 +28,10 @@ char *get_env_value(t_env_list *env, const char *key)
 	return (NULL);
 }
 
-static char *create_env_string(t_env_node *node, t_shell_state *shell)
+static char	*create_env_string(t_env_node *node, t_shell_state *shell)
 {
-	char *temp;
-	char *result;
+	char	*temp;
+	char	*result;
 
 	temp = gc_strjoin(shell->gc, node->key, "=");
 	if (!temp)
@@ -40,11 +40,11 @@ static char *create_env_string(t_env_node *node, t_shell_state *shell)
 	return (result);
 }
 
-char **env_list_to_array(t_env_list *env, t_shell_state *shell)
+char	**env_list_to_array(t_env_list *env, t_shell_state *shell)
 {
-	t_env_node *node;
-	char **envp;
-	int i;
+	t_env_node	*node;
+	char		**envp;
+	int			i;
 
 	envp = gc_malloc(shell->gc, sizeof(char *) * (env->size + 1));
 	if (!envp)
@@ -63,11 +63,11 @@ char **env_list_to_array(t_env_list *env, t_shell_state *shell)
 	return (envp);
 }
 
-char ***cmdlist_to_array(t_cmd_list *cmdlst, t_shell_state *shell)
+char	***cmdlist_to_array(t_cmd_list *cmdlst, t_shell_state *shell)
 {
-	char ***cmds;
-	t_cmd_node *node;
-	int i;
+	char		***cmds;
+	t_cmd_node	*node;
+	int			i;
 
 	cmds = gc_malloc(shell->gc, sizeof(char **) * (cmdlst->size + 1));
 	if (!cmds)

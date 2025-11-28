@@ -14,12 +14,12 @@
 #include "minishell.h"
 
 // Searches $PATH for executable
-char *find_command_path(char *cmd, t_env_list *env)
+char	*find_command_path(char *cmd, t_env_list *env)
 {
-	char *path_env;
-	char **dirs;
-	char full_path[1024];
-	int i;
+	char	*path_env;
+	char	**dirs;
+	char	full_path[1024];
+	int		i;
 
 	if (ft_strchr(cmd, '/'))
 		return (ft_strdup(cmd));
@@ -43,11 +43,11 @@ char *find_command_path(char *cmd, t_env_list *env)
 	return (NULL);
 }
 
-char **convert_env_to_array(t_env_list *env_list, t_shell_state *shell)
+char	**convert_env_to_array(t_env_list *env_list, t_shell_state *shell)
 {
-	extern char **environ;
-	char **env_array;
-	int i;
+	extern char	**environ;
+	char		**env_array;
+	int			i;
 
 	(void)env_list;
 	if (!environ)

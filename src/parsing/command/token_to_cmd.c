@@ -6,7 +6,7 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/26 18:19:13 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/28 13:52:12 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,14 @@
 #include "minishell.h"
 #include "parser.h"
 
-char **create_array(t_token *token, t_cmd_node *cmdnode, int i,
-					t_shell_state *shell)
+char	**create_array(t_token *token, t_cmd_node *cmdnode, int i,
+		t_shell_state *shell)
 {
-	char **cmd_array;
-	t_token_process_ctx ctx;
+	char				**cmd_array;
+	t_token_process_ctx	ctx;
 
-	cmd_array = gc_malloc(shell->gc, sizeof(char *) * ((size_t)count_args(token) + 1));
+	cmd_array = gc_malloc(shell->gc, sizeof(char *) * ((size_t)count_args(token)
+				+ 1));
 	if (!cmd_array)
 		return (NULL);
 	ctx.token = token;
@@ -28,16 +29,16 @@ char **create_array(t_token *token, t_cmd_node *cmdnode, int i,
 	ctx.cmd_array = cmd_array;
 	ctx.i = &i;
 	ctx.shell = shell;
-	if (process_tokens_to_array(&ctx) < 0)
+	if (process_tok_to_array(&ctx) < 0)
 		return (NULL);
 	cmd_array[i] = NULL;
 	return (cmd_array);
 }
 
-char *look_for_cmd(t_token *token, t_token_list *toklst, t_cmd_list *cmdlst,
-				   t_shell_state *shell)
+char	*look_for_cmd(t_token *token, t_token_list *toklst, t_cmd_list *cmdlst,
+		t_shell_state *shell)
 {
-	t_cmd_node *cmdnode;
+	t_cmd_node	*cmdnode;
 
 	token = toklst->head;
 	while (token)
@@ -57,8 +58,8 @@ char *look_for_cmd(t_token *token, t_token_list *toklst, t_cmd_list *cmdlst,
 	return (NULL);
 }
 
-static int process_cmdlst(t_token_list *toklst, t_cmd_list *cmdlst,
-						  t_shell_state *shell)
+static int	process_cmdlst(t_token_list *toklst, t_cmd_list *cmdlst,
+		t_shell_state *shell)
 {
 	final_token(toklst, shell);
 	look_for_cmd(toklst->head, toklst, cmdlst, shell);
@@ -67,8 +68,7 @@ static int process_cmdlst(t_token_list *toklst, t_cmd_list *cmdlst,
 	return (0);
 }
 
-int token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst,
-				 t_shell_state *shell)
+int	token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst, t_shell_state *shell)
 {
 	if (!toklst || !cmdlst || !shell->env)
 		return (1);
@@ -80,19 +80,19 @@ int token_to_cmd(t_token_list *toklst, t_cmd_list *cmdlst,
 	return (process_cmdlst(toklst, cmdlst, shell));
 }
 
-void final_token(t_token_list *toklst, t_shell_state *shell)
+void	final_token(t_token_list *toklst, t_shell_state *shell)
 {
-	t_token *token;
-	int skip_next;
+	t_token	*token;
+	int		skip_next;
 
 	if (!toklst)
-		return;
+		return ;
 	token = toklst->head;
 	skip_next = 0;
 	while (token)
 	{
 		if (process_single_token(token, &skip_next, shell) < 0)
-			return;
+			return ;
 		token = token->next;
 	}
 }

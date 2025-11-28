@@ -19,33 +19,33 @@
 #include <termios.h>
 #include <unistd.h>
 
-volatile sig_atomic_t g_signal_status = 0;
+volatile sig_atomic_t	g_signal_status = 0;
 
-void sigint_exit(int sig)
+void	sigint_exit(int sig)
 {
 	(void)sig;
 	ft_putendl_fd("", 1);
 	exit(130);
 }
 
-void heredoc_sigint_handler(int sig)
+void	heredoc_sigint_handler(int sig)
 {
 	(void)sig;
 	g_signal_status = 130;
 	rl_done = 1;
 }
 
-void within_command(void)
+void	within_command(void)
 {
 	g_signal_status = 1;
 }
 
-void out_command(void)
+void	out_command(void)
 {
 	g_signal_status = 0;
 }
 
-void parent_sigint_handler(int signo)
+void	parent_sigint_handler(int signo)
 {
 	(void)signo;
 	if (g_signal_status == 0)

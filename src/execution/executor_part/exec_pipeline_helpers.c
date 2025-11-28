@@ -13,10 +13,10 @@
 #include "executor.h"
 #include "main.h"
 
-static int **allocate_pipes(int ncmds, t_shell_state *shell)
+static int	**allocate_pipes(int ncmds, t_shell_state *shell)
 {
-	int **pipes;
-	int i;
+	int	**pipes;
+	int	i;
 
 	pipes = gc_malloc(shell->gc, sizeof(int *) * (ncmds - 1));
 	if (!pipes)
@@ -32,8 +32,8 @@ static int **allocate_pipes(int ncmds, t_shell_state *shell)
 	return (pipes);
 }
 
-static int init_pipeline_ctx(t_pipeline_ctx *ctx, t_cmd_list *cmdlst,
-							 char **envp, t_shell_state *shell)
+static int	init_pipeline_ctx(t_pipeline_ctx *ctx, t_cmd_list *cmdlst,
+		char **envp, t_shell_state *shell)
 {
 	ctx->pipes = allocate_pipes((int)cmdlst->size, shell);
 	if (!ctx->pipes)
@@ -50,10 +50,10 @@ static int init_pipeline_ctx(t_pipeline_ctx *ctx, t_cmd_list *cmdlst,
 	return (0);
 }
 
-static void setup_per_cmd_envs(t_pipeline_ctx *ctx, char **envp)
+static void	setup_per_cmd_envs(t_pipeline_ctx *ctx, char **envp)
 {
-	t_cmd_node *node;
-	int i;
+	t_cmd_node	*node;
+	int			i;
 
 	i = 0;
 	node = ctx->cmdlst->head;
@@ -68,10 +68,10 @@ static void setup_per_cmd_envs(t_pipeline_ctx *ctx, char **envp)
 	}
 }
 
-int exec_pipeline(t_cmd_list *cmdlst, char **envp, t_shell_state *shell)
+int	exec_pipeline(t_cmd_list *cmdlst, char **envp, t_shell_state *shell)
 {
-	t_pipeline_ctx ctx;
-	int ret;
+	t_pipeline_ctx	ctx;
+	int				ret;
 
 	if (!cmdlst || cmdlst->size <= 0)
 		return (1);

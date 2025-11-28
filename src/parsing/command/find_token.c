@@ -13,18 +13,19 @@
 #include "executor.h"
 #include "parser.h"
 
-int no_quote_segment(t_segment_list *lst, char *str, int *i,
-					 t_shell_state *shell)
+int	no_quote_segment(t_segment_list *lst, char *str, int *i,
+		t_shell_state *shell)
 {
-	int start;
-	t_segment *segment;
+	int			start;
+	t_segment	*segment;
 
 	start = *i;
 	while (str[*i] && str[*i] != '\'' && str[*i] != '\"')
 		(*i)++;
 	if (*i > start)
 	{
-		if (!(((*i - start) == 1) && (str[start] == '$') && (str[*i] == '"' || str[*i] == '\'')))
+		if (!(((*i - start) == 1) && (str[start] == '$') && (str[*i] == '"'
+					|| str[*i] == '\'')))
 		{
 			segment = create_segment(str + start, (*i - start), SEG_NO, shell);
 			if (!segment || !push_segment(lst, segment))
@@ -34,12 +35,12 @@ int no_quote_segment(t_segment_list *lst, char *str, int *i,
 	return (1);
 }
 
-int quote_segment(t_segment_list *lst, char *str, int *i, t_shell_state *shell)
+int	quote_segment(t_segment_list *lst, char *str, int *i, t_shell_state *shell)
 {
-	char q;
-	int start;
-	t_segment *segment;
-	t_seg_type type;
+	char		q;
+	int			start;
+	t_segment	*segment;
+	t_seg_type	type;
 
 	if (!str[*i] || (str[*i] != '\'' && str[*i] != '\"'))
 		return (1);
@@ -61,9 +62,9 @@ int quote_segment(t_segment_list *lst, char *str, int *i, t_shell_state *shell)
 	return (1);
 }
 
-int find_segment(t_segment_list *lst, char *str, t_shell_state *shell)
+int	find_segment(t_segment_list *lst, char *str, t_shell_state *shell)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	if (!str || !lst)
@@ -73,17 +74,17 @@ int find_segment(t_segment_list *lst, char *str, t_shell_state *shell)
 		if (!no_quote_segment(lst, str, &i, shell))
 			return (0);
 		if (!str[i])
-			break;
+			break ;
 		if (!quote_segment(lst, str, &i, shell))
 			return (0);
 	}
 	return (1);
 }
 
-t_segment *create_segment(char *start, int len, t_seg_type type,
-						  t_shell_state *shell)
+t_segment	*create_segment(char *start, int len, t_seg_type type,
+		t_shell_state *shell)
 {
-	t_segment *segment;
+	t_segment	*segment;
 
 	segment = gc_malloc(shell->gc, sizeof(*segment));
 	if (!segment)
@@ -96,7 +97,7 @@ t_segment *create_segment(char *start, int len, t_seg_type type,
 	return (segment);
 }
 
-int push_segment(t_segment_list *lst, t_segment *segment)
+int	push_segment(t_segment_list *lst, t_segment *segment)
 {
 	if (!lst || !segment)
 		return (0);

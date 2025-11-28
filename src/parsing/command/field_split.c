@@ -14,11 +14,11 @@
 #include "minishell.h"
 #include "parser.h"
 
-int count_words(char *str)
+int	count_words(char *str)
 {
-	int count;
-	int in_word;
-	int i;
+	int	count;
+	int	in_word;
+	int	i;
 
 	count = 0;
 	in_word = 0;
@@ -37,11 +37,11 @@ int count_words(char *str)
 	return (count);
 }
 
-char *extract_word(char *str, int *pos, t_shell_state *shell)
+char	*extract_word(char *str, int *pos, t_shell_state *shell)
 {
-	int start;
-	int len;
-	char *word;
+	int		start;
+	int		len;
+	char	*word;
 
 	while (str[*pos] && (str[*pos] == ' ' || str[*pos] == '\t'))
 		(*pos)++;
@@ -55,12 +55,12 @@ char *extract_word(char *str, int *pos, t_shell_state *shell)
 	return (word);
 }
 
-char **split_on_spaces(char *str, t_shell_state *shell)
+char	**split_on_spaces(char *str, t_shell_state *shell)
 {
-	char **result;
-	int word_count;
-	int i;
-	int pos;
+	char	**result;
+	int		word_count;
+	int		i;
+	int		pos;
 
 	if (!str)
 		return (NULL);
@@ -81,10 +81,10 @@ char **split_on_spaces(char *str, t_shell_state *shell)
 	return (result);
 }
 
-int should_split(t_segment_list *seglst)
+int	should_split(t_segment_list *seglst)
 {
-	t_segment *seg;
-	int has_unquoted;
+	t_segment	*seg;
+	int			has_unquoted;
 
 	if (!seglst || seglst->size == 0)
 		return (0);
@@ -95,7 +95,7 @@ int should_split(t_segment_list *seglst)
 		if (seg->type == SEG_NO)
 		{
 			has_unquoted = 1;
-			break;
+			break ;
 		}
 		seg = seg->next;
 	}

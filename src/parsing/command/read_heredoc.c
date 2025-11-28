@@ -16,7 +16,7 @@
 #include <readline/readline.h>
 #include <unistd.h>
 
-static int check_heredoc_interrupt(void)
+static int	check_heredoc_interrupt(void)
 {
 	if (g_signal_status == 130)
 	{
@@ -26,10 +26,10 @@ static int check_heredoc_interrupt(void)
 	return (0);
 }
 
-char *append_line(char *content, char *line, t_shell_state *shell)
+char	*append_line(char *content, char *line, t_shell_state *shell)
 {
-	char *new_content;
-	char *with_newline;
+	char	*new_content;
+	char	*with_newline;
 
 	if (!line)
 		return (content);
@@ -44,8 +44,8 @@ char *append_line(char *content, char *line, t_shell_state *shell)
 	return (new_content);
 }
 
-int handle_heredoc_line(char **content, char *line, char *delimiter,
-						t_shell_state *shell)
+int	handle_heredoc_line(char **content, char *line, char *delimiter,
+		t_shell_state *shell)
 {
 	if (!line)
 	{
@@ -62,7 +62,7 @@ int handle_heredoc_line(char **content, char *line, char *delimiter,
 	return (0);
 }
 
-static int check_signal_and_read(char **line)
+static int	check_signal_and_read(char **line)
 {
 	if (g_signal_status == 130)
 	{
@@ -80,11 +80,11 @@ static int check_signal_and_read(char **line)
 	return (0);
 }
 
-char *read_heredoc_content(char *delimiter, t_shell_state *shell)
+char	*read_heredoc_content(char *delimiter, t_shell_state *shell)
 {
-	char *content;
-	char *line;
-	int ret;
+	char	*content;
+	char	*line;
+	int		ret;
 
 	set_signals_heredoc();
 	if (!delimiter || !isatty(STDIN_FILENO))
@@ -97,7 +97,7 @@ char *read_heredoc_content(char *delimiter, t_shell_state *shell)
 			return (set_signals_parent(), NULL);
 		ret = handle_heredoc_line(&content, line, delimiter, shell);
 		if (ret == 1 || ret == 2)
-			break;
+			break ;
 		if (!line)
 		{
 			rl_event_hook = NULL;

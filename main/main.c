@@ -12,11 +12,11 @@
 
 #include "main.h"
 
-static void increment_shlvl(void)
+static void	increment_shlvl(void)
 {
-	char *shlvl_str;
-	int shlvl;
-	char new_shlvl[32];
+	char	*shlvl_str;
+	int		shlvl;
+	char	new_shlvl[32];
 
 	shlvl_str = getenv("SHLVL");
 	if (!shlvl_str)
@@ -28,10 +28,10 @@ static void increment_shlvl(void)
 	setenv("SHLVL", new_shlvl, 1);
 }
 
-static t_env_list *init_environment(char **envp)
+static t_env_list	*init_environment(char **envp)
 {
-	t_env_list *env;
-	extern char **environ;
+	t_env_list	*env;
+	extern char	**environ;
 
 	(void)envp;
 	increment_shlvl();
@@ -47,11 +47,11 @@ static t_env_list *init_environment(char **envp)
 	return (env);
 }
 
-int main(int argc, char **argv, char **envp)
+int	main(int argc, char **argv, char **envp)
 {
-	t_shell_state shell;
-	t_env_list *env;
-	int exit_status;
+	t_shell_state	shell;
+	t_env_list		*env;
+	int				exit_status;
 
 	(void)argc;
 	(void)argv;

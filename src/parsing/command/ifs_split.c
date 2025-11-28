@@ -14,12 +14,12 @@
 #include "minishell.h"
 #include "parser.h"
 
-int is_ifs_char(char c)
+int	is_ifs_char(char c)
 {
 	return (c == ' ' || c == '\t' || c == '\n');
 }
 
-void process_ifs_char(char *result, int *j, int *prev_was_space)
+void	process_ifs_char(char *result, int *j, int *prev_was_space)
 {
 	if (!(*prev_was_space))
 	{
@@ -28,12 +28,12 @@ void process_ifs_char(char *result, int *j, int *prev_was_space)
 	}
 }
 
-char *ifs_field_split(char *str, t_shell_state *shell)
+char	*ifs_field_split(char *str, t_shell_state *shell)
 {
-	char *result;
-	int i;
-	int j;
-	int prev_was_space;
+	char	*result;
+	int		i;
+	int		j;
+	int		prev_was_space;
 
 	if (!str)
 		return (NULL);

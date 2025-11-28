@@ -13,10 +13,10 @@
 #include "executor.h"
 #include "minishell.h"
 
-static char *build_path_candidate(char *dir, char *cmd, size_t len,
-								  t_shell_state *shell)
+static char	*build_path_candidate(char *dir, char *cmd, size_t len,
+		t_shell_state *shell)
 {
-	char *candidate;
+	char	*candidate;
 
 	candidate = gc_malloc(shell->gc, len);
 	if (!candidate)
@@ -28,11 +28,11 @@ static char *build_path_candidate(char *dir, char *cmd, size_t len,
 	return (candidate);
 }
 
-static char *search_in_paths(char **paths, char *cmd, t_shell_state *shell)
+static char	*search_in_paths(char **paths, char *cmd, t_shell_state *shell)
 {
-	char *candidate;
-	size_t len;
-	int i;
+	char	*candidate;
+	size_t	len;
+	int		i;
 
 	i = 0;
 	while (paths[i])
@@ -40,7 +40,7 @@ static char *search_in_paths(char **paths, char *cmd, t_shell_state *shell)
 		len = ft_strlen(paths[i]) + 1 + ft_strlen(cmd) + 1;
 		candidate = build_path_candidate(paths[i], cmd, len, shell);
 		if (!candidate)
-			break;
+			break ;
 		if (access(candidate, X_OK) == 0)
 			return (candidate);
 		i++;
@@ -48,10 +48,10 @@ static char *search_in_paths(char **paths, char *cmd, t_shell_state *shell)
 	return (NULL);
 }
 
-char *find_in_path(char *cmd, t_shell_state *shell)
+char	*find_in_path(char *cmd, t_shell_state *shell)
 {
-	char **paths;
-	char *path_env;
+	char	**paths;
+	char	*path_env;
 
 	if (!cmd)
 		return (NULL);

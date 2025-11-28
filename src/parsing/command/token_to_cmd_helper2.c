@@ -14,11 +14,11 @@
 #include "minishell.h"
 #include "parser.h"
 
-int handle_split_word(char **cmd_array, char *value, int *i,
-					  t_shell_state *shell)
+int	handle_split_word(char **cmd_array, char *value, int *i,
+		t_shell_state *shell)
 {
-	char **words;
-	int j;
+	char	**words;
+	int		j;
 
 	words = split_on_spaces(value, shell);
 	if (!words)
@@ -33,10 +33,10 @@ int handle_split_word(char **cmd_array, char *value, int *i,
 	return (0);
 }
 
-int handle_env_assignment(t_token *token, t_cmd_node *cmdnode,
-						  t_shell_state *shell)
+int	handle_env_assignment(t_token *token, t_cmd_node *cmdnode,
+		t_shell_state *shell)
 {
-	t_env_node *env_node;
+	t_env_node	*env_node;
 
 	env_node = gc_malloc(shell->gc, sizeof(t_env_node));
 	if (!env_node)
@@ -49,14 +49,16 @@ int handle_env_assignment(t_token *token, t_cmd_node *cmdnode,
 	return (0);
 }
 
-int handle_word_token(t_token_process_ctx *ctx)
+int	handle_word_token(t_token_process_ctx *ctx)
 {
 	if (*ctx->i == 0 && is_valid_env_assignment(ctx->token->value))
 		return (handle_env_assignment(ctx->token, ctx->cmdnode, ctx->shell));
-	if (*ctx->i == 0 && ctx->token->value && ctx->token->segment_list && should_split(ctx->token->segment_list) && ft_strchr(ctx->token->value, ' '))
+	if (*ctx->i == 0 && ctx->token->value && ctx->token->segment_list
+		&& should_split(ctx->token->segment_list)
+		&& ft_strchr(ctx->token->value, ' '))
 	{
 		if (handle_split_word(ctx->cmd_array, ctx->token->value, ctx->i,
-							  ctx->shell) < 0)
+				ctx->shell) < 0)
 			return (-1);
 	}
 	else
@@ -69,9 +71,9 @@ int handle_word_token(t_token_process_ctx *ctx)
 	return (0);
 }
 
-static int expand_word_token(t_token *token, t_shell_state *shell)
+static int	expand_word_token(t_token *token, t_shell_state *shell)
 {
-	t_segment_list *seglst;
+	t_segment_list	*seglst;
 
 	seglst = gc_malloc(shell->gc, sizeof(*seglst));
 	if (!seglst)
@@ -80,14 +82,13 @@ static int expand_word_token(t_token *token, t_shell_state *shell)
 	if (find_segment(seglst, token->value, shell))
 	{
 		token->segment_list = seglst;
-		token->value = segments_expand(seglst, shell->env,
-									   shell->last_status, shell);
+		token->value = segments_expand(seglst, shell->env, shell->last_status,
+				shell);
 	}
 	return (0);
 }
 
-int process_single_token(t_token *token, int *skip_next,
-						 t_shell_state *shell)
+int	process_single_token(t_token *token, int *skip_next, t_shell_state *shell)
 {
 	if (*skip_next)
 	{

@@ -13,7 +13,7 @@
 #include "minishell.h"
 #include "parser.h"
 
-bool is_built_in(char *str)
+bool	is_built_in(char *str)
 {
 	if (!str)
 		return (false);
@@ -34,7 +34,7 @@ bool is_built_in(char *str)
 	return (false);
 }
 
-int collect_redirs(t_token *token, t_cmd_node *cmdnode, t_shell_state *shell)
+int	collect_redirs(t_token *token, t_cmd_node *cmdnode, t_shell_state *shell)
 {
 	while (token && token->type != TK_PIPE)
 	{
@@ -43,26 +43,27 @@ int collect_redirs(t_token *token, t_cmd_node *cmdnode, t_shell_state *shell)
 			if (!token->next || token->next->type != TK_WORD)
 				return (-1);
 			create_filenode(token->next->value, token->type, cmdnode->files,
-							shell);
+				shell);
 			token = token->next;
 			if (token)
 				token = token->next;
-			continue;
+			continue ;
 		}
 		token = token->next;
 	}
 	return (0);
 }
 
-bool is_redirection(t_toktype t)
+bool	is_redirection(t_toktype t)
 {
-	return (t == TK_INFILE || t == TK_OUTFILE || t == TK_APPEND || t == TK_HEREDOC);
+	return (t == TK_INFILE || t == TK_OUTFILE || t == TK_APPEND
+		|| t == TK_HEREDOC);
 }
 
-int validate_pipe_syntax(t_token_list *toklst)
+int	validate_pipe_syntax(t_token_list *toklst)
 {
-	t_token *token;
-	t_token *prev;
+	t_token	*token;
+	t_token	*prev;
 
 	if (!toklst || !toklst->head)
 		return (0);
@@ -87,10 +88,10 @@ int validate_pipe_syntax(t_token_list *toklst)
 	return (0);
 }
 
-int is_valid_env_assignment(char *str)
+int	is_valid_env_assignment(char *str)
 {
-	int i;
-	char *eq;
+	int		i;
+	char	*eq;
 
 	if (!str || !*str)
 		return (0);

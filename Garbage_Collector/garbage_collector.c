@@ -12,9 +12,9 @@
 
 #include "garbage_collector.h"
 
-t_gc *gc_init(void)
+t_gc	*gc_init(void)
 {
-	t_gc *gc;
+	t_gc	*gc;
 
 	gc = malloc(sizeof(t_gc));
 	if (!gc)
@@ -24,9 +24,9 @@ t_gc *gc_init(void)
 	return (gc);
 }
 
-int gc_add_node(t_gc *gc, void *ptr, int fd, t_gc_type type)
+int	gc_add_node(t_gc *gc, void *ptr, int fd, t_gc_type type)
 {
-	t_gc_node *new_node;
+	t_gc_node	*new_node;
 
 	if (!gc)
 		return (0);
@@ -42,9 +42,9 @@ int gc_add_node(t_gc *gc, void *ptr, int fd, t_gc_type type)
 	return (1);
 }
 
-void *gc_malloc(t_gc *gc, size_t size)
+void	*gc_malloc(t_gc *gc, size_t size)
 {
-	void *ptr;
+	void	*ptr;
 
 	if (!gc)
 		return (NULL);
@@ -59,9 +59,9 @@ void *gc_malloc(t_gc *gc, size_t size)
 	return (ptr);
 }
 
-void *gc_malloc_persistent(t_gc *gc, size_t size)
+void	*gc_malloc_persistent(t_gc *gc, size_t size)
 {
-	void *ptr;
+	void	*ptr;
 
 	if (!gc)
 		return (NULL);
@@ -76,9 +76,9 @@ void *gc_malloc_persistent(t_gc *gc, size_t size)
 	return (ptr);
 }
 
-void *gc_calloc(t_gc *gc, size_t count, size_t size)
+void	*gc_calloc(t_gc *gc, size_t count, size_t size)
 {
-	void *ptr;
+	void	*ptr;
 
 	if (!gc)
 		return (NULL);

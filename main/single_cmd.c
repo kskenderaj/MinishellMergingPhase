@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   single_cmd.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: klejdi <klejdi@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/26 13:52:02 by klejdi           ###   ########.fr       */
+/*   Updated: 2025/11/28 14:12:16 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.h"
 
-static int execute_single_builtin(t_cmd_node *cmd, char **envp,
-								  t_shell_state *shell)
+static int	execute_single_builtin(t_cmd_node *cmd, char **envp,
+		t_shell_state *shell)
 {
-	int ret;
+	int	ret;
 
 	if (cmd->env && cmd->env->size > 0)
 		return (128);
@@ -23,11 +23,11 @@ static int execute_single_builtin(t_cmd_node *cmd, char **envp,
 	return (ret);
 }
 
-static int execute_external(t_cmd_node *cmd, char **envp, char **merged_envp,
-							t_shell_state *shell)
+static int	execute_external(t_cmd_node *cmd, char **envp, char **merged_envp,
+		t_shell_state *shell)
 {
-	t_cmd_list tmp_list;
-	int ret;
+	t_cmd_list	tmp_list;
+	int			ret;
 
 	(void)merged_envp;
 	ft_memset(&tmp_list, 0, sizeof(t_cmd_list));
@@ -37,11 +37,11 @@ static int execute_external(t_cmd_node *cmd, char **envp, char **merged_envp,
 	return (ret);
 }
 
-int handle_single_command(t_cmd_node *cmd, t_env_list *env,
-						  t_shell_state *shell)
+int	handle_single_command(t_cmd_node *cmd, t_env_list *env,
+		t_shell_state *shell)
 {
-	t_cmd_exec_data data;
-	int ret;
+	t_cmd_exec_data	data;
+	int				ret;
 
 	if (!cmd)
 		return (0);
@@ -51,8 +51,8 @@ int handle_single_command(t_cmd_node *cmd, t_env_list *env,
 	return (execute_command(cmd, shell, &data));
 }
 
-int setup_and_check_command(t_cmd_node *cmd, t_env_list *env,
-							t_shell_state *shell, t_cmd_exec_data *data)
+int	setup_and_check_command(t_cmd_node *cmd, t_env_list *env,
+		t_shell_state *shell, t_cmd_exec_data *data)
 {
 	data->envp = env_list_to_array(env, shell);
 	if (!data->envp)
@@ -63,8 +63,8 @@ int setup_and_check_command(t_cmd_node *cmd, t_env_list *env,
 		data->merged_envp = data->envp;
 	if (setup_cmd_redirections(cmd, &data->fds, shell) == -1)
 	{
-		cleanup_cmd_redir_failure(&data->fds, data->envp,
-								  data->merged_envp, shell);
+		cleanup_cmd_redir_failure(&data->fds, data->envp, data->merged_envp,
+			shell);
 		return (1);
 	}
 	apply_cmd_redirections(&data->fds, shell);
@@ -78,8 +78,8 @@ int setup_and_check_command(t_cmd_node *cmd, t_env_list *env,
 	return (-1);
 }
 
-int execute_command(t_cmd_node *cmd, t_shell_state *shell,
-					t_cmd_exec_data *data)
+int	execute_command(t_cmd_node *cmd, t_shell_state *shell,
+		t_cmd_exec_data *data)
 {
 	data->ret = execute_single_builtin(cmd, data->envp, shell);
 	if (data->ret != 128)

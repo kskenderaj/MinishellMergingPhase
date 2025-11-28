@@ -14,13 +14,13 @@
 #include "minishell.h"
 #include "parser.h"
 
-char *get_expand_status(t_shell_state *shell)
+char	*get_expand_status(t_shell_state *shell)
 {
 	return (gc_itoa(shell->gc, shell->last_status));
 }
 
-char *get_expand(char *seg_str, int i, t_env_list *envlst,
-				 t_shell_state *shell)
+char	*get_expand(char *seg_str, int i, t_env_list *envlst,
+		t_shell_state *shell)
 {
 	if (seg_str[i + 1] == '?')
 		return (get_expand_status(shell));
@@ -28,7 +28,7 @@ char *get_expand(char *seg_str, int i, t_env_list *envlst,
 		return (expand_env(seg_str + i, envlst, shell));
 }
 
-void free_env_node(t_env_node *node)
+void	free_env_node(t_env_node *node)
 {
 	if (node->key)
 		free(node->key);
@@ -37,13 +37,13 @@ void free_env_node(t_env_node *node)
 	free(node);
 }
 
-void remove_from_env_list(t_env_list *envlst, const char *key)
+void	remove_from_env_list(t_env_list *envlst, const char *key)
 {
-	t_env_node *prev;
-	t_env_node *curr;
+	t_env_node	*prev;
+	t_env_node	*curr;
 
 	if (!envlst || !key)
-		return;
+		return ;
 	prev = NULL;
 	curr = envlst->head;
 	while (curr)
@@ -58,20 +58,20 @@ void remove_from_env_list(t_env_list *envlst, const char *key)
 				envlst->tail = prev;
 			free_env_node(curr);
 			envlst->size--;
-			return;
+			return ;
 		}
 		prev = curr;
 		curr = curr->next;
 	}
 }
 
-void free_env_list(t_env_list *env)
+void	free_env_list(t_env_list *env)
 {
-	t_env_node *current;
-	t_env_node *next;
+	t_env_node	*current;
+	t_env_node	*next;
 
 	if (!env)
-		return;
+		return ;
 	current = env->head;
 	while (current)
 	{

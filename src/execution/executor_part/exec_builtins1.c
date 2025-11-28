@@ -13,7 +13,7 @@
 #include "executor.h"
 #include "minishell.h"
 
-static int cd_prepare_and_validate(char **args, int *argc, int *start_index)
+static int	cd_prepare_and_validate(char **args, int *argc, int *start_index)
 {
 	*start_index = 1;
 	if (*argc > 1 && strcmp(args[1], "--") == 0)
@@ -29,9 +29,9 @@ static int cd_prepare_and_validate(char **args, int *argc, int *start_index)
 	return (0);
 }
 
-static int resolve_cd_target(char **args, int argc, char **target)
+static int	resolve_cd_target(char **args, int argc, char **target)
 {
-	int start_index;
+	int	start_index;
 
 	if (cd_prepare_and_validate(args, &argc, &start_index))
 		return (1);
@@ -56,24 +56,25 @@ static int resolve_cd_target(char **args, int argc, char **target)
 	return (0);
 }
 
-static int cd_print_and_update(char **args, int argc, char *oldpwd,
-							   char *newpwd)
+static int	cd_print_and_update(char **args, int argc, char *oldpwd,
+		char *newpwd)
 {
 	if (args[1] && strcmp(args[1], "-") == 0)
 		printf("%s\n", newpwd);
-	else if (argc > 2 && strcmp(args[1], "--") == 0 && strcmp(args[2], "-") == 0)
+	else if (argc > 2 && strcmp(args[1], "--") == 0 && strcmp(args[2],
+			"-") == 0)
 		printf("%s\n", newpwd);
 	setenv("OLDPWD", oldpwd, 1);
 	setenv("PWD", newpwd, 1);
 	return (0);
 }
 
-int ft_cd(char **args, t_shell_state *shell)
+int	ft_cd(char **args, t_shell_state *shell)
 {
-	char *target;
-	char oldpwd[PATH_MAX];
-	char newpwd[PATH_MAX];
-	int argc;
+	char	*target;
+	char	oldpwd[PATH_MAX];
+	char	newpwd[PATH_MAX];
+	int		argc;
 
 	argc = 0;
 	while (args[argc])

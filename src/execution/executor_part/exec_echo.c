@@ -13,9 +13,9 @@
 #include "executor.h"
 #include "minishell.h"
 
-static int is_n_option(char *arg)
+static int	is_n_option(char *arg)
 {
-	int i;
+	int	i;
 
 	if (!arg || arg[0] != '-')
 		return (0);
@@ -29,15 +29,15 @@ static int is_n_option(char *arg)
 	return (i > 1);
 }
 
-static void echo_expand_and_print(char *arg)
+static void	echo_expand_and_print(char *arg)
 {
 	if (arg)
 		ft_putstr_fd(arg, STDOUT_FILENO);
 }
 
-static void echo_print_range(char **args, int start_index)
+static void	echo_print_range(char **args, int start_index)
 {
-	int i;
+	int	i;
 
 	i = start_index;
 	while (args[i])
@@ -49,10 +49,10 @@ static void echo_print_range(char **args, int start_index)
 	}
 }
 
-int ft_echo(char **args, t_shell_state *shell)
+int	ft_echo(char **args, t_shell_state *shell)
 {
-	int nl_option;
-	int start_index;
+	int	nl_option;
+	int	start_index;
 
 	(void)shell;
 	nl_option = 0;

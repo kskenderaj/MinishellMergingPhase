@@ -13,11 +13,11 @@
 #include "minishell.h"
 #include "parser.h"
 
-int find_key(char *str, t_env_node *env)
+int	find_key(char *str, t_env_node *env)
 {
-	char *eq;
-	size_t key_len;
-	char *temp;
+	char	*eq;
+	size_t	key_len;
+	char	*temp;
 
 	if (!str || !env)
 		return (0);
@@ -36,11 +36,11 @@ int find_key(char *str, t_env_node *env)
 	return (1);
 }
 
-int find_value(char *str, t_env_node *env)
+int	find_value(char *str, t_env_node *env)
 {
-	char *eq;
-	size_t val_len;
-	char *temp;
+	char	*eq;
+	size_t	val_len;
+	char	*temp;
 
 	if (!str || !env)
 		return (0);
@@ -63,7 +63,7 @@ int find_value(char *str, t_env_node *env)
 	return (1);
 }
 
-int push_env(t_env_list *lst, t_env_node *env)
+int	push_env(t_env_list *lst, t_env_node *env)
 {
 	if (!lst || !env)
 		return (0);
@@ -82,10 +82,10 @@ int push_env(t_env_list *lst, t_env_node *env)
 	return (1);
 }
 
-int get_envs(char **env, t_env_list *lst)
+int	get_envs(char **env, t_env_list *lst)
 {
-	int i;
-	t_env_node *node;
+	int			i;
+	t_env_node	*node;
 
 	if (!env || !lst)
 		return (0);

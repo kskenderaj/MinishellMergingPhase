@@ -14,9 +14,9 @@
 #include "minishell.h"
 #include <unistd.h>
 
-t_cmd_node *create_cmdnode(t_shell_state *shell)
+t_cmd_node	*create_cmdnode(t_shell_state *shell)
 {
-	t_cmd_node *cmdnode;
+	t_cmd_node	*cmdnode;
 
 	cmdnode = gc_malloc(shell->gc, sizeof(*cmdnode));
 	if (!cmdnode)
@@ -37,15 +37,15 @@ t_cmd_node *create_cmdnode(t_shell_state *shell)
 	return (cmdnode);
 }
 
-void create_filenode(char *filename, int red_type, t_file_list *filelst,
-					 t_shell_state *shell)
+void	create_filenode(char *filename, int red_type, t_file_list *filelst,
+		t_shell_state *shell)
 {
-	t_file_node *filenode;
-	t_heredoc_info *hdoc_info;
+	t_file_node		*filenode;
+	t_heredoc_info	*hdoc_info;
 
 	filenode = gc_malloc(shell->gc, sizeof(*filenode));
 	if (!filenode)
-		return;
+		return ;
 	filenode->redir_type = red_type;
 	filenode->heredoc_quoted = 0;
 	filenode->heredoc_content = NULL;
@@ -64,13 +64,13 @@ void create_filenode(char *filename, int red_type, t_file_list *filelst,
 	else
 		filenode->filename = filename;
 	push_file(filelst, filenode);
-	return;
+	return ;
 }
 
-void push_cmd(t_cmd_list *lst, t_cmd_node *node)
+void	push_cmd(t_cmd_list *lst, t_cmd_node *node)
 {
 	if (!lst || !node)
-		return;
+		return ;
 	if (!lst->head)
 	{
 		lst->head = node;
@@ -84,10 +84,10 @@ void push_cmd(t_cmd_list *lst, t_cmd_node *node)
 	lst->size++;
 }
 
-void push_file(t_file_list *lst, t_file_node *node)
+void	push_file(t_file_list *lst, t_file_node *node)
 {
 	if (!lst || !node)
-		return;
+		return ;
 	if (!lst->head)
 	{
 		lst->head = node;

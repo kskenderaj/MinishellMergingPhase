@@ -12,12 +12,12 @@
 
 #include "parser.h"
 
-int handle_quoted_redir_file(t_token_list *lst, char *input, int *i,
-							 t_shell_state *shell)
+int	handle_quoted_redir_file(t_token_list *lst, char *input, int *i,
+		t_shell_state *shell)
 {
-	int start;
-	int next;
-	t_tokenize_ctx ctx;
+	int				start;
+	int				next;
+	t_tokenize_ctx	ctx;
 
 	start = *i;
 	next = scan_quote(input, *i);
@@ -33,12 +33,12 @@ int handle_quoted_redir_file(t_token_list *lst, char *input, int *i,
 	return (0);
 }
 
-int add_redir_filename(t_token_list *lst, char *input, int *i,
-					   t_shell_state *shell)
+int	add_redir_filename(t_token_list *lst, char *input, int *i,
+		t_shell_state *shell)
 {
-	int start;
-	int end;
-	t_tokenize_ctx ctx;
+	int				start;
+	int				end;
+	t_tokenize_ctx	ctx;
 
 	start = *i;
 	end = word_end(input, *i);

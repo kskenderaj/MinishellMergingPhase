@@ -14,9 +14,9 @@
 #include "minishell.h"
 #include "parser.h"
 
-int has_quotes(char *str)
+int	has_quotes(char *str)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (str[i])
@@ -28,12 +28,12 @@ int has_quotes(char *str)
 	return (0);
 }
 
-char *remove_quotes_heredoc(char *str, t_shell_state *shell)
+char	*remove_quotes_heredoc(char *str, t_shell_state *shell)
 {
-	char *result;
-	int i;
-	int j;
-	char quote;
+	char	*result;
+	int		i;
+	int		j;
+	char	quote;
 
 	result = gc_malloc(shell->gc, ft_strlen(str) + 1);
 	if (!result)
@@ -57,10 +57,10 @@ char *remove_quotes_heredoc(char *str, t_shell_state *shell)
 	return (result);
 }
 
-t_heredoc_info *process_heredoc_delimiter(char *raw_delimiter,
-										  t_shell_state *shell)
+t_heredoc_info	*process_heredoc_delimiter(char *raw_delimiter,
+		t_shell_state *shell)
 {
-	t_heredoc_info *info;
+	t_heredoc_info	*info;
 
 	if (!raw_delimiter)
 		return (NULL);

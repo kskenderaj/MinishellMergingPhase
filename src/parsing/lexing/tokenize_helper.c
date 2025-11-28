@@ -6,17 +6,18 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/19 14:08:07 by kskender          #+#    #+#             */
-/*   Updated: 2025/11/26 18:17:49 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/28 13:24:18 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.h"
 
-int red_len(char *input, int i)
+int	red_len(char *input, int i)
 {
 	if (!input[i])
 		return (0);
-	if ((input[i] == '<' && input[i + 1] == '<') || (input[i] == '>' && input[i + 1] == '>'))
+	if ((input[i] == '<' && input[i + 1] == '<') || (input[i] == '>' && input[i
+				+ 1] == '>'))
 	{
 		return (2);
 	}
@@ -25,7 +26,7 @@ int red_len(char *input, int i)
 	return (0);
 }
 
-t_toktype red_type(const char *str, int i)
+t_toktype	red_type(const char *str, int i)
 {
 	if (str[i] == '<' && str[i + 1] == '<')
 		return (TK_HEREDOC);
@@ -36,9 +37,9 @@ t_toktype red_type(const char *str, int i)
 	return (TK_OUTFILE);
 }
 
-int handle_quote(char *input, int *i)
+int	handle_quote(char *input, int *i)
 {
-	int next;
+	int	next;
 
 	if (input[*i] != '\'' && input[*i] != '\"')
 		return (0);
@@ -49,11 +50,12 @@ int handle_quote(char *input, int *i)
 	return (0);
 }
 
-int word_end(char *input, int i)
+int	word_end(char *input, int i)
 {
-	int next;
+	int	next;
 
-	while (input[i] && input[i] != ' ' && input[i] != '\t' && input[i] != '|' && input[i] != '<' && input[i] != '>')
+	while (input[i] && input[i] != ' ' && input[i] != '\t' && input[i] != '|'
+		&& input[i] != '<' && input[i] != '>')
 	{
 		if (input[i] == '\'' || input[i] == '\"')
 		{
@@ -68,7 +70,7 @@ int word_end(char *input, int i)
 	return (i);
 }
 
-int handle_redir(t_tokenize_ctx *ctx, int redir_len)
+int	handle_redir(t_tokenize_ctx *ctx, int redir_len)
 {
 	if (!redir_len)
 		return (1);
@@ -76,7 +78,8 @@ int handle_redir(t_tokenize_ctx *ctx, int redir_len)
 		return (1);
 	*ctx->i += redir_len;
 	*ctx->i = skip_spaces(ctx->input, *ctx->i);
-	if (!ctx->input[*ctx->i] || ctx->input[*ctx->i] == '|' || ctx->input[*ctx->i] == '<' || ctx->input[*ctx->i] == '>')
+	if (!ctx->input[*ctx->i] || ctx->input[*ctx->i] == '|'
+		|| ctx->input[*ctx->i] == '<' || ctx->input[*ctx->i] == '>')
 		return (1);
 	return (add_redir_filename(ctx->lst, ctx->input, ctx->i, ctx->shell));
 }

@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   input_processing.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kskender <kskender@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/18 00:00:00 by klejdi            #+#    #+#             */
-/*   Updated: 2025/11/27 17:55:56 by kskender         ###   ########.fr       */
+/*   Updated: 2025/11/28 13:44:32 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "main.h"
 
-int process_command(t_cmd_list *cmdlst, t_env_list *envlst,
-					t_shell_state *shell)
+int	process_command(t_cmd_list *cmdlst, t_env_list *envlst,
+		t_shell_state *shell)
 {
-	int ret;
+	int	ret;
 
 	if (!cmdlst || !cmdlst->head)
 		return (0);
@@ -27,7 +27,7 @@ int process_command(t_cmd_list *cmdlst, t_env_list *envlst,
 	return (ret);
 }
 
-static int handle_syntax_error(t_cmd_list *cmdlst, t_shell_state *shell)
+static int	handle_syntax_error(t_cmd_list *cmdlst, t_shell_state *shell)
 {
 	if (cmdlst->syntax_error)
 		ft_putendl_fd("minishell: syntax error", 2);
@@ -35,24 +35,21 @@ static int handle_syntax_error(t_cmd_list *cmdlst, t_shell_state *shell)
 	return (2);
 }
 
-int process_input_line(char *line, t_env_list *env, int last_status,
-					   t_shell_state *shell)
+int	process_input_line(char *line, t_env_list *env, int last_status,
+		t_shell_state *shell)
 {
-	t_token_list toklst;
-	t_cmd_list cmdlst;
+	t_token_list	toklst;
+	t_cmd_list		cmdlst;
 
 	if (!line || !*line)
 		return (last_status);
 	init_token_lst(&toklst);
 	init_cmd_lst(&cmdlst);
-	if (tokenize(&toklst, line, shell) != 0)
-		return (handle_syntax_error(&cmdlst, shell));
-	if (token_to_cmd(&toklst, &cmdlst, shell) != 0)
-		return (handle_syntax_error(&cmdlst, shell));
-	if (cmdlst.syntax_error)
+	if (tokenize(&toklst, line, shell) != 0
+		|| token_to_cmd(&toklst, &cmdlst, shell) != 0 || cmdlst.syntax_error)
 		return (handle_syntax_error(&cmdlst, shell));
 	process_all_heredocs(&cmdlst, shell);
-	if(g_signal_status == 130)
+	if (g_signal_status == 130)
 	{
 		gc_clear(shell->gc);
 		shell->last_status = 130;
@@ -65,13 +62,12 @@ int process_input_line(char *line, t_env_list *env, int last_status,
 		gc_clear(shell->gc);
 		return (last_status);
 	}
-	gc_clear(shell->gc);
-	return (0);
+	return (gc_clear(shell->gc), 0);
 }
 
-static int append_char(char **line, char c, int *len, int *capacity)
+static int	append_char(char **line, char c, int *len, int *capacity)
 {
-	char *tmp;
+	char	*tmp;
 
 	if (*len >= *capacity)
 	{
@@ -89,13 +85,13 @@ static int append_char(char **line, char c, int *len, int *capacity)
 	return (1);
 }
 
-char *read_line_noninteractive(void)
+char	*read_line_noninteractive(void)
 {
-	char *line;
-	char c;
-	int len;
-	int capacity;
-	ssize_t ret;
+	char	*line;
+	char	c;
+	int		len;
+	int		capacity;
+	ssize_t	ret;
 
 	line = NULL;
 	len = 0;
@@ -104,9 +100,9 @@ char *read_line_noninteractive(void)
 	{
 		ret = read(STDIN_FILENO, &c, 1);
 		if (ret <= 0)
-			break;
+			break ;
 		if (c == '\n')
-			break;
+			break ;
 		if (!append_char(&line, c, &len, &capacity))
 			return (NULL);
 	}

@@ -13,10 +13,10 @@
 #include "executor.h"
 
 // Counts infile/heredoc redirections
-int count_infile(t_commandlist *cmd)
+int	count_infile(t_commandlist *cmd)
 {
-	int count;
-	t_filelist *cur;
+	int			count;
+	t_filelist	*cur;
 
 	count = 0;
 	cur = cmd->files;
@@ -30,10 +30,10 @@ int count_infile(t_commandlist *cmd)
 }
 
 // Finds the last infile/heredoc
-static t_filelist *find_last_infile(t_commandlist *cmd, int infile_count)
+static t_filelist	*find_last_infile(t_commandlist *cmd, int infile_count)
 {
-	int cur_count;
-	t_filelist *cur;
+	int			cur_count;
+	t_filelist	*cur;
 
 	cur_count = 0;
 	cur = cmd->files;
@@ -51,11 +51,11 @@ static t_filelist *find_last_infile(t_commandlist *cmd, int infile_count)
 }
 
 // Opens the last infile and returns fd
-int setup_infile_fd(t_commandlist *cmd, t_shell_state *shell)
+int	setup_infile_fd(t_commandlist *cmd, t_shell_state *shell)
 {
-	int infile_count;
-	t_filelist *last_infile;
-	int fd;
+	int			infile_count;
+	t_filelist	*last_infile;
+	int			fd;
 
 	(void)shell;
 	infile_count = count_infile(cmd);

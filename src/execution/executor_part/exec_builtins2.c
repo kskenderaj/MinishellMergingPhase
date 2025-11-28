@@ -13,25 +13,28 @@
 #include "executor.h"
 #include "minishell.h"
 
-int is_valid_identifier(const char *name)
+int	is_valid_identifier(const char *name)
 {
-	int i;
+	int	i;
 
-	if (!name || !(name[0] == '_' || (name[0] >= 'A' && name[0] <= 'Z') || (name[0] >= 'a' && name[0] <= 'z')))
+	if (!name || !(name[0] == '_' || (name[0] >= 'A' && name[0] <= 'Z')
+			|| (name[0] >= 'a' && name[0] <= 'z')))
 		return (0);
 	i = 1;
 	while (name[i])
 	{
-		if (!(name[i] == '_' || (name[i] >= 'A' && name[i] <= 'Z') || (name[i] >= 'a' && name[i] <= 'z') || (name[i] >= '0' && name[i] <= '9')))
+		if (!(name[i] == '_' || (name[i] >= 'A' && name[i] <= 'Z')
+				|| (name[i] >= 'a' && name[i] <= 'z') || (name[i] >= '0'
+					&& name[i] <= '9')))
 			return (0);
 		i++;
 	}
 	return (1);
 }
 
-static int export_no_value_check_existing(char *arg, t_shell_state *shell)
+static int	export_no_value_check_existing(char *arg, t_shell_state *shell)
 {
-	int i;
+	int	i;
 
 	if (!is_valid_identifier(arg))
 	{
@@ -50,10 +53,10 @@ static int export_no_value_check_existing(char *arg, t_shell_state *shell)
 	return (0);
 }
 
-int export_no_value(char *arg, t_shell_state *shell)
+int	export_no_value(char *arg, t_shell_state *shell)
 {
-	int status;
-	int i;
+	int	status;
+	int	i;
 
 	status = export_no_value_check_existing(arg, shell);
 	if (status == -1)
@@ -73,11 +76,11 @@ int export_no_value(char *arg, t_shell_state *shell)
 	return (0);
 }
 
-static int export_with_value(char *arg, t_shell_state *shell)
+static int	export_with_value(char *arg, t_shell_state *shell)
 {
-	char *eq;
-	char *name;
-	size_t namelen;
+	char	*eq;
+	char	*name;
+	size_t	namelen;
 
 	eq = ft_strchr(arg, '=');
 	if (!eq)
@@ -94,11 +97,11 @@ static int export_with_value(char *arg, t_shell_state *shell)
 	return (0);
 }
 
-int ft_export(char **args, t_shell_state *shell)
+int	ft_export(char **args, t_shell_state *shell)
 {
-	int i;
-	int status;
-	int has_error;
+	int	i;
+	int	status;
+	int	has_error;
 
 	i = 1;
 	has_error = 0;

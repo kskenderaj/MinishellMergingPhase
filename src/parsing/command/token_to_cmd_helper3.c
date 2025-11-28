@@ -6,14 +6,14 @@
 /*   By: jtoumani <jtoumani@student.42heilbronn.de> +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 00:00:00 by jtoumani          #+#    #+#             */
-/*   Updated: 2025/11/26 18:19:05 by jtoumani         ###   ########.fr       */
+/*   Updated: 2025/11/28 13:52:12 by jtoumani         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
 
-int skip_redirection(t_token **token)
+int	skip_redirection(t_token **token)
 {
 	if (!(*token)->next || (*token)->next->type != TK_WORD)
 		return (-1);
@@ -23,7 +23,7 @@ int skip_redirection(t_token **token)
 	return (0);
 }
 
-int process_word_result(t_token *token, int ret, int *i)
+int	process_word_result(t_token *token, int ret, int *i)
 {
 	if (ret < 0)
 		return (-1);
@@ -32,9 +32,9 @@ int process_word_result(t_token *token, int ret, int *i)
 	return (0);
 }
 
-int process_tokens_to_array(t_token_process_ctx *ctx)
+int	process_tok_to_array(t_token_process_ctx *ctx)
 {
-	int ret;
+	int	ret;
 
 	while (ctx->token && ctx->token->type != TK_PIPE)
 	{
@@ -42,7 +42,7 @@ int process_tokens_to_array(t_token_process_ctx *ctx)
 		{
 			if (skip_redirection(&ctx->token) < 0)
 				return (-1);
-			continue;
+			continue ;
 		}
 		if (ctx->token && ctx->token->type == TK_WORD)
 		{
@@ -50,7 +50,7 @@ int process_tokens_to_array(t_token_process_ctx *ctx)
 			if (process_word_result(ctx->token, ret, ctx->i) == 1)
 			{
 				ctx->token = ctx->token->next;
-				continue;
+				continue ;
 			}
 			if (ret < 0)
 				return (-1);
